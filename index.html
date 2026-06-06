@@ -1920,13 +1920,14 @@ window.loadRanking = async function() {
   const container = document.getElementById('rankingTable');
   container.innerHTML = '<div class="text-center" style="padding:40px"><span class="spinner"></span><p style="color:var(--text3);margin-top:12px">Loading...</p></div>';
   try {
-    const snap = await window._get(window._ref(window._db, 'users'));
-    if (!snap.exists()) {
+    const res = await fetch('https://typ-chapm-default-rtdb.firebaseio.com/users.json');
+    const data = await res.json();
+    if (!data) {
       container.innerHTML = '<div class="card text-center" style="padding:40px;color:var(--text3)">কোনো player নেই।</div>';
       return;
     }
     rankingData = [];
-    snap.forEach(c => rankingData.push({ uid: c.key, ...c.val() }));
+    Object.entries(data).forEach(([uid, val]) => rankingData.push({ uid, ...val }));
     // Points দিয়ে sort, তারপর wins, তারপর goals
     rankingData.sort((a, b) => {
       const sa = (a.goalsFor||0)*2 + (a.mvp||0)*3;
@@ -2165,13 +2166,14 @@ window.switchAdminTab = function(tab) {
 };
 
 async function loadAllPlayers() {
-  const snap = await window._get(window._ref(window._db, 'users'));
-  if (!snap.exists()) {
+  const res = await fetch('https://typ-chapm-default-rtdb.firebaseio.com/users.json');
+  const data = await res.json();
+  if (!data) {
     document.getElementById('adminPlayersList').innerHTML = '<div style="color:var(--text3);padding:20px;text-align:center">কোনো player নেই।</div>';
     return;
   }
   allPlayersCache = [];
-  snap.forEach(child => allPlayersCache.push({ uid: child.key, ...child.val() }));
+  Object.entries(data).forEach(([uid, val]) => allPlayersCache.push({ uid, ...val }));
   allPlayersCache.sort((a,b) => (a.name||'').localeCompare(b.name||''));
   document.getElementById('adminPlayerCount').textContent = allPlayersCache.length;
   renderAdminPlayers(allPlayersCache);
