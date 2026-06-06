@@ -1647,9 +1647,14 @@ let editAvatarBase64 = null;
 let regAvatarBase64 = null;
 let allUsersCache = [];
 
+// Expose Firebase utils to non-module scripts
+window._db = db;
+window._ref = ref;
+window._get = get;
+window._set = set;
+window._allUsersCache = allUsersCache;
+
 // ── AUTH STATE ──
-// Initial home page load
-loadHomePageData();
 
 onAuthStateChanged(auth, async (user) => {
   document.getElementById('loadingScreen').style.opacity = '0';
@@ -2884,10 +2889,14 @@ async function updateFriendlyStats(playerName, gf, ga, result) {
   await set(ref(db, `friendlyStats/${statsKey}`), updated);
 }
 
+// Initial home page load — called here so db/ref/get are in scope
+document.addEventListener('DOMContentLoaded', () => { if (typeof loadHomePageData === 'function') loadHomePageData(); });
+// fallback if DOMContentLoaded already fired
+if (document.readyState !== 'loading') { setTimeout(() => { if (typeof loadHomePageData === 'function') loadHomePageData(); }, 0); }
+
 </script>
 
 <script>
-
 
 // ════════════════════════════════════════
 // 🏠 HOME PAGE DATA
@@ -2900,7 +2909,7 @@ async function loadHomePageData() {
 
 async function loadHomeStats() {
   try {
-    const snap = await get(ref(db, 'users'));
+    const snap = await window._get(window._ref(window._db, 'users'));
     if (!snap.exists()) return;
     let players = [], clubs = new Set();
     snap.forEach(c => { const d = c.val(); players.push(d); if(d.club) clubs.add(d.club); });
@@ -2946,7 +2955,7 @@ async function loadHomeTopPlayers() {
 async function loadHomeRecentMatches() {
   const container = document.getElementById('homeRecentMatches');
   try {
-    const snap = await get(ref(db, 'matches'));
+    const snap = await window._get(window._ref(window._db, 'matches'));
     if (!snap.exists()) {
       container.innerHTML = '<div class="card" style="text-align:center;padding:30px;color:var(--text3)">এখনো কোনো match নেই।</div>';
       return;
@@ -2987,7 +2996,7 @@ async function loadHomeRecentMatches() {
 
 window.deleteMatchFromHome = async function(id) {
   if (!confirm('এই match delete করবে?')) return;
-  await set(ref(db, `matches/${id}`), null);
+  await window._set(window._ref(window._db, `matches/${id}`), null);
   loadHomeRecentMatches();
   // Admin panel list ও update করো
   if (typeof loadAdminMatches === 'function') loadAdminMatches();
@@ -2998,12 +3007,12 @@ window.deleteMatchFromHome = async function(id) {
 // ════════════════════════════════════════
 
 async function getAllUsers() {
-  if (allUsersCache.length) return allUsersCache;
-  const snap = await get(ref(db, 'users'));
+  if ((window._allUsersCache||[]).length) return window._allUsersCache;
+  const snap = await window._get(window._ref(window._db, 'users'));
   if (!snap.exists()) return [];
-  allUsersCache = [];
-  snap.forEach(c => allUsersCache.push({ uid: c.key, ...c.val() }));
-  return allUsersCache;
+  window._allUsersCache = [];
+  snap.forEach(c => window._allUsersCache.push({ uid: c.key, ...c.val() }));
+  return window._allUsersCache;
 }
 
 window.openPublicProfile = async function(uid) {
