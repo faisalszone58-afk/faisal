@@ -1647,12 +1647,24 @@ let editAvatarBase64 = null;
 let regAvatarBase64 = null;
 let allUsersCache = [];
 
-// Expose Firebase utils to non-module scripts
+// Expose Firebase utils + shared state to non-module scripts
 window._db = db;
 window._ref = ref;
 window._get = get;
 window._set = set;
 window._allUsersCache = allUsersCache;
+
+// Shared state: second script can access currentUser/currentUserData via window
+Object.defineProperty(window, 'currentUser', {
+  get: () => currentUser,
+  set: (v) => { currentUser = v; },
+  configurable: true
+});
+Object.defineProperty(window, 'currentUserData', {
+  get: () => currentUserData,
+  set: (v) => { currentUserData = v; },
+  configurable: true
+});
 
 // ── AUTH STATE ──
 
