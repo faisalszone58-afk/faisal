@@ -1648,6 +1648,7 @@ window._db = db;
 window._ref = ref;
 window._get = get;
 window._set = set;
+window._child = child;
 window._allUsersCache = allUsersCache;
 
 // Shared state: second script can access currentUser/currentUserData via window
@@ -1671,7 +1672,7 @@ onAuthStateChanged(auth, async (user) => {
 
   if (user) {
     currentUser = user;
-    const snap = await get(child(ref(db), `users/${user.uid}`));
+    const snap = await window._get(window._child(window._ref(window._db), `users/${user.uid}`));
     if (snap.exists()) {
       currentUserData = snap.val();
       updateNavUser();
@@ -1727,7 +1728,7 @@ window.register = async function() {
   }
 
   // Check username unique
-  const usernameSnap = await get(child(ref(db), `usernames/${username}`));
+  const usernameSnap = await window._get(window._child(window._ref(window._db), `usernames/${username}`));
   if (usernameSnap.exists()) {
     errEl.textContent = '❌ এই username already নেওয়া হয়েছে।'; errEl.classList.add('show'); return;
   }
@@ -1749,8 +1750,8 @@ window.register = async function() {
       rank: 0, points: 0
     };
 
-    await set(ref(db, `users/${uid}`), userData);
-    await set(ref(db, `usernames/${username}`), uid);
+    await window._set(window._ref(window._db, `users/${uid}`), userData);
+    await window._set(window._ref(window._db, `usernames/${username}`), uid);
 
     currentUserData = userData;
     sucEl.textContent = '✅ Account তৈরি হয়েছে! Welcome ' + name + '!';
@@ -1782,7 +1783,7 @@ window.login = async function() {
   try {
     await setPersistence(auth, browserLocalPersistence).catch(()=>{});
     await signInWithEmailAndPassword(auth, email, pass);
-    const snap = await get(child(ref(db), `users/${auth.currentUser.uid}`));
+    const snap = await window._get(window._child(window._ref(window._db), `users/${auth.currentUser.uid}`));
     if (snap.exists()) { currentUserData = snap.val(); updateNavUser(); }
     showPage('profile'); loadProfileData();
   } catch(e) {
@@ -1907,7 +1908,7 @@ window.saveProfile = async function() {
   const updates = { name, club, district };
   if (editAvatarBase64) updates.avatarUrl = editAvatarBase64;
 
-  await set(ref(db, `users/${currentUser.uid}`), { ...currentUserData, ...updates });
+  await window._set(window._ref(window._db, `users/${currentUser.uid}`), { ...currentUserData, ...updates });
   currentUserData = { ...currentUserData, ...updates };
   updateNavUser();
   sucEl.textContent = '✅ Profile update হয়েছে!'; sucEl.classList.add('show');
@@ -1919,7 +1920,7 @@ window.loadRanking = async function() {
   const container = document.getElementById('rankingTable');
   container.innerHTML = '<div class="text-center" style="padding:40px"><span class="spinner"></span><p style="color:var(--text3);margin-top:12px">Loading...</p></div>';
   try {
-    const snap = await get(ref(db, 'users'));
+    const snap = await window._get(window._ref(window._db, 'users'));
     if (!snap.exists()) {
       container.innerHTML = '<div class="card text-center" style="padding:40px;color:var(--text3)">কোনো player নেই।</div>';
       return;
@@ -2013,7 +2014,7 @@ window.loadMatches = async function() {
   const container = document.getElementById('matchesList');
   container.innerHTML = '<div class="text-center" style="padding:40px"><span class="spinner"></span></div>';
   try {
-    const snap = await get(ref(db, 'matches'));
+    const snap = await window._get(window._ref(window._db, 'matches'));
     if (!snap.exists()) {
       container.innerHTML = '<div class="card text-center" style="padding:40px;color:var(--text3)">কোনো match নেই।</div>';
       return;
@@ -2164,7 +2165,7 @@ window.switchAdminTab = function(tab) {
 };
 
 async function loadAllPlayers() {
-  const snap = await get(ref(db, 'users'));
+  const snap = await window._get(window._ref(window._db, 'users'));
   if (!snap.exists()) {
     document.getElementById('adminPlayersList').innerHTML = '<div style="color:var(--text3);padding:20px;text-align:center">কোনো player নেই।</div>';
     return;
@@ -2246,7 +2247,7 @@ window.savePlayerStats = async function() {
     rank: parseInt(document.getElementById('se_rank').value) || 0,
     points: parseInt(document.getElementById('se_points').value) || 0,
   };
-  await set(ref(db, `users/${uid}`), updates);
+  await window._set(window._ref(window._db, `users/${uid}`), updates);
   const idx = allPlayersCache.findIndex(x => x.uid === uid);
   if (idx !== -1) allPlayersCache[idx] = updates;
   closeStatsModal();
@@ -2257,8 +2258,8 @@ window.savePlayerStats = async function() {
 window.deletePlayer = async function(uid, name) {
   if (!confirm(`"${name}" কে delete করবে? এটা undo করা যাবে না।`)) return;
   const p = allPlayersCache.find(x => x.uid === uid);
-  if (p && p.username) await set(ref(db, `usernames/${p.username}`), null);
-  await set(ref(db, `users/${uid}`), null);
+  if (p && p.username) await window._set(window._ref(window._db, `usernames/${p.username}`), null);
+  await window._set(window._ref(window._db, `users/${uid}`), null);
   allPlayersCache = allPlayersCache.filter(x => x.uid !== uid);
   document.getElementById('adminPlayerCount').textContent = allPlayersCache.length;
   renderAdminPlayers(allPlayersCache);
@@ -2306,7 +2307,7 @@ window.addMatchResult = async function() {
 };
 
 async function loadAdminMatches() {
-  const snap = await get(ref(db, 'matches'));
+  const snap = await window._get(window._ref(window._db, 'matches'));
   const container = document.getElementById('adminMatchesList');
   if (!snap.exists()) { container.innerHTML = '<div style="color:var(--text3);font-size:13px">কোনো match নেই।</div>'; return; }
   const matches = [];
@@ -2325,7 +2326,7 @@ async function loadAdminMatches() {
 
 window.deleteMatch = async function(id) {
   if (!confirm('এই match delete করবে?')) return;
-  await set(ref(db, `matches/${id}`), null);
+  await window._set(window._ref(window._db, `matches/${id}`), null);
   loadAdminMatches();
 };
 
@@ -2360,7 +2361,7 @@ window.loadFriendlyLeaderboard = async function() {
   const container = document.getElementById('friendlyLeaderboardTable');
   container.innerHTML = '<div class="text-center" style="padding:40px"><span class="spinner"></span><p style="color:var(--text3);margin-top:12px">Loading...</p></div>';
   try {
-    const snap = await get(ref(db, 'friendlyStats'));
+    const snap = await window._get(window._ref(window._db, 'friendlyStats'));
     if (!snap.exists()) {
       container.innerHTML = '<div class="card text-center" style="padding:60px 20px"><div style="font-size:48px;margin-bottom:12px">🤝</div><p style="color:var(--text3)">এখনো কোনো friendly match হয়নি।</p></div>';
       return;
@@ -2447,7 +2448,7 @@ window.loadFriendlyResults = async function() {
   const container = document.getElementById('friendlyResultsList');
   container.innerHTML = '<div class="text-center" style="padding:40px"><span class="spinner"></span></div>';
   try {
-    const snap = await get(ref(db, 'friendlyMatches'));
+    const snap = await window._get(window._ref(window._db, 'friendlyMatches'));
     if (!snap.exists()) {
       container.innerHTML = '<div class="card text-center" style="padding:60px 20px"><div style="font-size:48px;margin-bottom:12px">📋</div><p style="color:var(--text3)">কোনো friendly match result নেই এখনো।</p></div>';
       return;
@@ -2490,7 +2491,7 @@ window.searchOpponentLive = async function() {
   // Load users if not cached
   if (!allUsersCache.length) {
     container.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:8px">🔄 Loading players...</div>';
-    const snap = await get(ref(db, 'users'));
+    const snap = await window._get(window._ref(window._db, 'users'));
     if (!snap.exists()) { container.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:8px">কোনো player নেই।</div>'; return; }
     snap.forEach(c => allUsersCache.push({ uid: c.key, ...c.val() }));
   }
@@ -2593,7 +2594,7 @@ window.submitFriendlyResult = async function() {
   };
 
   try {
-    await set(ref(db, 'friendlyResultRequests/' + Date.now()), resultData);
+    await window._set(window._ref(window._db, 'friendlyResultRequests/' + Date.now()), resultData);
     sucEl.textContent = '✅ Result submit হয়েছে! Admin approve করলে profile এ যোগ হবে।';
     sucEl.classList.add('show');
     setTimeout(() => {
@@ -2612,7 +2613,7 @@ window.loadMyRequests = async function() {
   const container = document.getElementById('myRequestsList');
   container.innerHTML = '<div class="text-center" style="padding:30px"><span class="spinner"></span></div>';
   try {
-    const snap = await get(ref(db, 'friendlyResultRequests'));
+    const snap = await window._get(window._ref(window._db, 'friendlyResultRequests'));
     if (!snap.exists()) { container.innerHTML = '<div class="card text-center" style="padding:40px;color:var(--text3)">কোনো submission নেই।</div>'; return; }
     const myReqs = [];
     snap.forEach(c => {
@@ -2648,7 +2649,7 @@ window.loadResultRequests = async function() {
   const container = document.getElementById('resultRequestsList');
   container.innerHTML = '<div class="text-center" style="padding:30px"><span class="spinner"></span></div>';
   try {
-    const snap = await get(ref(db, 'friendlyResultRequests'));
+    const snap = await window._get(window._ref(window._db, 'friendlyResultRequests'));
     if (!snap.exists()) { container.innerHTML = '<div style="color:var(--text3);padding:20px;text-align:center">কোনো result submission নেই।</div>'; document.getElementById('pendingResultCount').textContent = '0'; return; }
     const reqs = [];
     snap.forEach(c => reqs.push({ id: c.key, ...c.val() }));
@@ -2703,13 +2704,13 @@ window.loadResultRequests = async function() {
 // ── Admin: Approve Result → Apply to both player profiles ──
 window.approveResult = async function(id) {
   const note = document.getElementById('rNote_' + id)?.value.trim() || '';
-  const snap = await get(ref(db, 'friendlyResultRequests/' + id));
+  const snap = await window._get(window._ref(window._db, 'friendlyResultRequests/' + id));
   if (!snap.exists()) { alert('Result not found.'); return; }
   const r = snap.val();
 
   // Update both players' main profile stats (matches, wins, draws, losses, goalsFor, goalsAgainst, points)
   async function updatePlayerProfile(uid, gf, ga, result) {
-    const pSnap = await get(ref(db, 'users/' + uid));
+    const pSnap = await window._get(window._ref(window._db, 'users/' + uid));
     if (!pSnap.exists()) return;
     const p = pSnap.val();
     const updated = {
@@ -2722,7 +2723,7 @@ window.approveResult = async function(id) {
       goalsAgainst: (p.goalsAgainst||0) + ga,
       points: (p.points||0) + (result==='w'?3:result==='d'?1:0)
     };
-    await set(ref(db, 'users/' + uid), updated);
+    await window._set(window._ref(window._db, 'users/' + uid), updated);
   }
 
   // Apply to submitter
@@ -2736,13 +2737,13 @@ window.approveResult = async function(id) {
 
   // Save friendly match record
   const matchId = 'fr_' + id;
-  await set(ref(db, 'friendlyMatches/' + matchId), {
+  await window._set(window._ref(window._db, 'friendlyMatches/' + matchId), {
     home_team: r.submitterName, away_team: r.opponentName,
     home_score: r.submitterScore, away_score: r.opponentScore,
     date: r.date, note: r.note || '', match_type: 'friendly',
     status: 'completed', addedAt: new Date().toISOString()
   });
-  await set(ref(db, 'matches/' + matchId), {
+  await window._set(window._ref(window._db, 'matches/' + matchId), {
     home_team: r.submitterName, away_team: r.opponentName,
     home_score: r.submitterScore, away_score: r.opponentScore,
     date: r.date, note: r.note || '', match_type: 'friendly',
@@ -2751,9 +2752,9 @@ window.approveResult = async function(id) {
   });
 
   // Mark result as accepted
-  await set(ref(db, 'friendlyResultRequests/' + id + '/status'), 'accepted');
-  await set(ref(db, 'friendlyResultRequests/' + id + '/adminNote'), note || 'Approved');
-  await set(ref(db, 'friendlyResultRequests/' + id + '/approvedAt'), new Date().toISOString());
+  await window._set(window._ref(window._db, 'friendlyResultRequests/' + id + '/status'), 'accepted');
+  await window._set(window._ref(window._db, 'friendlyResultRequests/' + id + '/adminNote'), note || 'Approved');
+  await window._set(window._ref(window._db, 'friendlyResultRequests/' + id + '/approvedAt'), new Date().toISOString());
 
   // Reset allUsersCache so profile shows updated data
   allUsersCache = [];
@@ -2765,8 +2766,8 @@ window.approveResult = async function(id) {
 window.declineResult = async function(id) {
   const note = document.getElementById('rNote_' + id)?.value.trim() || '';
   if (!confirm('এই result decline করবে?')) return;
-  await set(ref(db, 'friendlyResultRequests/' + id + '/status'), 'declined');
-  if (note) await set(ref(db, 'friendlyResultRequests/' + id + '/adminNote'), note);
+  await window._set(window._ref(window._db, 'friendlyResultRequests/' + id + '/status'), 'declined');
+  if (note) await window._set(window._ref(window._db, 'friendlyResultRequests/' + id + '/adminNote'), note);
   loadResultRequests();
 };
 
@@ -2775,7 +2776,7 @@ window.loadFriendlyRequests = async function() {
   const container = document.getElementById('friendlyRequestsList');
   container.innerHTML = '<div class="text-center" style="padding:30px"><span class="spinner"></span></div>';
   try {
-    const snap = await get(ref(db, 'friendlyRequests'));
+    const snap = await window._get(window._ref(window._db, 'friendlyRequests'));
     if (!snap.exists()) { container.innerHTML = '<div style="color:var(--text3);padding:20px">কোনো request নেই।</div>'; document.getElementById('pendingRequestCount').textContent = '0'; return; }
     const reqs = [];
     snap.forEach(c => reqs.push({ id: c.key, ...c.val() }));
@@ -2811,8 +2812,8 @@ window.loadFriendlyRequests = async function() {
 
 window.updateRequestStatus = async function(id, status) {
   const note = document.getElementById('adminNote_' + id)?.value.trim() || '';
-  await set(ref(db, `friendlyRequests/${id}/status`), status);
-  if (note) await set(ref(db, `friendlyRequests/${id}/adminNote`), note);
+  await window._set(window._ref(window._db, `friendlyRequests/${id}/status`), status);
+  if (note) await window._set(window._ref(window._db, `friendlyRequests/${id}/adminNote`), note);
   loadFriendlyRequests();
 };
 
@@ -2842,10 +2843,10 @@ window.addFriendlyResult = async function() {
     status: 'completed', addedAt: new Date().toISOString()
   };
 
-  await set(ref(db, `friendlyMatches/${matchId}`), matchData);
+  await window._set(window._ref(window._db, `friendlyMatches/${matchId}`), matchData);
 
   // Also push to main matches for the Matches page Friendly filter
-  await set(ref(db, `matches/${matchId}`), {
+  await window._set(window._ref(window._db, `matches/${matchId}`), {
     ...matchData, tournament: 'Friendly Challenge', round: 'Friendly'
   });
 
@@ -2865,7 +2866,7 @@ window.addFriendlyResult = async function() {
 
 async function updateFriendlyStats(playerName, gf, ga, result) {
   // Find player by name in users
-  const snap = await get(ref(db, 'users'));
+  const snap = await window._get(window._ref(window._db, 'users'));
   if (!snap.exists()) return;
   let playerData = null;
   let playerUid = null;
@@ -2878,7 +2879,7 @@ async function updateFriendlyStats(playerName, gf, ga, result) {
   });
 
   const statsKey = playerUid || playerName.toLowerCase().replace(/\s+/g, '_');
-  const statsSnap = await get(ref(db, `friendlyStats/${statsKey}`));
+  const statsSnap = await window._get(window._ref(window._db, `friendlyStats/${statsKey}`));
   const existing = statsSnap.exists() ? statsSnap.val() : { m:0, w:0, d:0, l:0, gf:0, ga:0, pts:0 };
 
   const updated = {
@@ -2894,7 +2895,7 @@ async function updateFriendlyStats(playerName, gf, ga, result) {
     ga: (existing.ga||0) + ga,
     pts: (existing.pts||0) + (result==='w'?3:result==='d'?1:0)
   };
-  await set(ref(db, `friendlyStats/${statsKey}`), updated);
+  await window._set(window._ref(window._db, `friendlyStats/${statsKey}`), updated);
 }
 
 // Initial home page load — called here so db/ref/get are in scope
