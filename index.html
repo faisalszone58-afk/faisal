@@ -3016,7 +3016,7 @@ async function updateFriendlyStats(playerName, gf, ga, result) {
     }
   });
 
-  const statsKey = playerUid || playerName.toLowerCase().replace(/\s+/g, '_');
+  const statsKey = 'fs_' + (playerUid || playerName.toLowerCase().replace(/\s+/g, '_'));
   const _sr = await fetch(`https://typ-chapm-default-rtdb.firebaseio.com/friendlyStats/${statsKey}.json`);
   const _sd = await _sr.json();
   const statsSnap = { exists: () => !!_sd, val: () => _sd };
