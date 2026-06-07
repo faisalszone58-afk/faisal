@@ -937,6 +937,214 @@ select.form-input option { background: var(--card); }
 .text-center { text-align: center; }
 .mt-16 { margin-top: 16px; }
 .mt-8 { margin-top: 8px; }
+
+/* ══ TOURNAMENT STYLES ══ */
+.trn-header {
+  background: linear-gradient(135deg, var(--bg3), var(--card2));
+  border-bottom: 1px solid var(--border);
+  padding: 28px 20px 20px;
+  text-align: center;
+}
+.trn-title {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: clamp(22px, 5vw, 40px);
+  font-weight: 700;
+  letter-spacing: 4px;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.trn-subtitle { font-size: 13px; color: var(--text3); font-family: 'Share Tech Mono', monospace; letter-spacing: 1px; }
+
+.trn-tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--border);
+  background: var(--card);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.trn-tab {
+  flex: 1;
+  min-width: 80px;
+  padding: 12px 16px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text3);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+  white-space: nowrap;
+  background: transparent;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  font-family: 'Exo 2', sans-serif;
+}
+.trn-tab.active { color: var(--cyan); border-bottom-color: var(--cyan); background: rgba(0,212,255,0.04); }
+.trn-tab:hover:not(.active) { color: var(--text2); }
+.trn-content { display: none; padding: 20px; max-width: 1100px; margin: 0 auto; }
+.trn-content.active { display: block; }
+
+/* Standings table */
+.standings-table { width: 100%; border-collapse: collapse; background: var(--card); border-radius: 12px; overflow: hidden; border: 1px solid var(--border); min-width: 640px; }
+.standings-table th { padding: 11px 14px; text-align: center; font-size: 11px; color: var(--text3); font-family: 'Share Tech Mono', monospace; background: var(--card2); border-bottom: 1px solid var(--border); letter-spacing: 1px; }
+.standings-table th:nth-child(2) { text-align: left; }
+.standings-table td { padding: 12px 14px; text-align: center; font-family: 'Share Tech Mono', monospace; font-size: 13px; border-bottom: 1px solid rgba(45,31,110,0.4); }
+.standings-table td:nth-child(2) { text-align: left; }
+.standings-table tr:last-child td { border-bottom: none; }
+.standings-table tbody tr { transition: background 0.15s; }
+.standings-table tbody tr:hover { background: rgba(0,212,255,0.04); }
+.standings-table .pts-col { color: var(--cyan); font-weight: 700; font-size: 16px; font-family: 'Rajdhani', sans-serif; }
+.standings-table .qual-row td:first-child { border-left: 3px solid var(--green); }
+.standings-table .semi-row td:first-child { border-left: 3px solid var(--gold); }
+.standings-table .elim-row td:first-child { border-left: 3px solid transparent; }
+
+/* Team card */
+.team-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+.team-card:hover { border-color: rgba(0,212,255,0.3); }
+.team-card-header {
+  background: linear-gradient(135deg, var(--bg3), var(--card2));
+  padding: 16px 18px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  border-bottom: 1px solid var(--border);
+}
+.team-badge {
+  width: 46px; height: 46px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent1), var(--accent2));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+  border: 2px solid rgba(255,255,255,0.1);
+}
+.team-name { font-family: 'Rajdhani', sans-serif; font-size: 18px; font-weight: 700; color: var(--text); }
+.team-manager { font-size: 12px; color: var(--text3); margin-top: 2px; }
+.team-players-list { padding: 14px 18px; }
+.team-player-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 7px 0;
+  border-bottom: 1px solid rgba(45,31,110,0.3);
+  font-size: 13px; color: var(--text2);
+}
+.team-player-row:last-child { border-bottom: none; }
+.team-player-num {
+  width: 24px; height: 24px;
+  background: var(--bg3);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 700; color: var(--text3);
+  flex-shrink: 0;
+}
+.team-player-avatar {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: var(--bg3); border: 1px solid var(--border);
+  overflow: hidden; display: flex; align-items: center; justify-content: center;
+  font-size: 12px; flex-shrink: 0;
+}
+.team-player-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+/* Bracket / Knockout */
+.bracket-wrap { overflow-x: auto; padding: 10px 0 20px; }
+.bracket-round { display: flex; flex-direction: column; gap: 30px; min-width: 220px; }
+.bracket-match {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  width: 210px;
+  flex-shrink: 0;
+}
+.bracket-team {
+  display: flex; align-items: center; gap: 8px;
+  padding: 9px 12px;
+  font-size: 13px; font-weight: 600; color: var(--text2);
+  border-bottom: 1px solid var(--border);
+  transition: background 0.15s;
+}
+.bracket-team:last-child { border-bottom: none; }
+.bracket-team.winner { color: var(--cyan); background: rgba(0,212,255,0.06); }
+.bracket-team.loser { color: var(--text3); }
+.bracket-team-score {
+  margin-left: auto;
+  font-family: 'Rajdhani', sans-serif; font-size: 18px; font-weight: 700;
+  color: var(--gold);
+}
+
+/* Matchday cards */
+.matchday-group { margin-bottom: 24px; }
+.matchday-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px; letter-spacing: 2px; color: var(--cyan);
+  margin-bottom: 10px;
+  padding: 6px 14px;
+  background: rgba(0,212,255,0.06);
+  border-radius: 6px;
+  display: inline-block;
+}
+.match1v1-row {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 14px;
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 8px;
+  font-size: 13px;
+  flex-wrap: wrap;
+}
+.match1v1-player { flex: 1; min-width: 80px; font-weight: 600; color: var(--text); }
+.match1v1-player.right { text-align: right; }
+.match1v1-score {
+  text-align: center;
+  min-width: 64px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 5px 10px;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 18px; font-weight: 700;
+  color: var(--gold);
+}
+.match1v1-score.pending { font-size: 11px; color: var(--text3); font-family: 'Share Tech Mono', monospace; }
+.match1v1-pts {
+  font-size: 11px; color: var(--text3);
+  font-family: 'Share Tech Mono', monospace;
+  text-align: center; min-width: 60px;
+}
+.team-score-total {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 8px 14px;
+  background: var(--bg3);
+  border-radius: 0 0 10px 10px;
+  border-top: 1px dashed var(--border);
+  font-size: 12px; color: var(--text2);
+}
+.team-score-total strong { font-family: 'Rajdhani', sans-serif; font-size: 20px; color: var(--cyan); }
+
+/* Admin tournament */
+.trn-admin-section { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+.trn-admin-section-title { font-family: 'Rajdhani', sans-serif; font-size: 16px; font-weight: 700; color: var(--cyan); margin-bottom: 16px; letter-spacing: 1px; }
+.player-pick-list { max-height: 220px; overflow-y: auto; border: 1px solid var(--border); border-radius: 8px; }
+.player-pick-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 14px;
+  border-bottom: 1px solid rgba(45,31,110,0.3);
+  cursor: pointer; transition: background 0.15s; font-size: 13px;
+}
+.player-pick-item:last-child { border-bottom: none; }
+.player-pick-item:hover { background: var(--bg3); }
+.player-pick-item.selected { background: rgba(0,212,255,0.08); border-left: 3px solid var(--cyan); }
+.player-pick-item input[type=checkbox] { accent-color: var(--cyan); width: 16px; height: 16px; flex-shrink: 0; }
 </style>
 </head>
 <body>
@@ -975,6 +1183,7 @@ select.form-input option { background: var(--card); }
     <button class="nav-btn" onclick="showPage('ranking')">🏆 Ranking</button>
     <button class="nav-btn" onclick="showPage('matches')">⚽ Matches</button>
     <button class="nav-btn" onclick="showPage('friendly')" style="color:var(--green);border-color:rgba(0,230,118,0.3)">🤝 Friendly</button>
+    <button class="nav-btn" onclick="showPage('tournament')" style="color:var(--gold);border-color:rgba(124,92,252,0.4)">🏟️ Tournament</button>
     <!-- Guest buttons -->
     <span id="guestNav">
       <button class="nav-btn" onclick="showPage('login')">Login</button>
@@ -1351,6 +1560,8 @@ select.form-input option { background: var(--card); }
           <div style="font-size:10px;color:var(--text3);margin-top:2px;font-family:'Share Tech Mono',monospace">⭐ SCORE</div>
         </div>
       </div>
+      <!-- Badges -->
+      <div id="ppBadges" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px"></div>
       <!-- Win Rate bar -->
       <div style="margin-top:16px">
         <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text3);margin-bottom:6px">
@@ -1384,6 +1595,44 @@ select.form-input option { background: var(--card); }
         <div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text3);letter-spacing:1px;margin-bottom:8px">MATCH HISTORY</div>
         <div id="ppFriendlyList"><div style="text-align:center;color:var(--text3);font-size:13px;padding:10px">Loading...</div></div>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ COMPARE MODAL ═══════════════ -->
+<div class="modal-overlay" id="compareModal" onclick="if(event.target===this)this.classList.remove('show')">
+  <div class="modal-box" style="max-width:600px;padding:24px;overflow-y:auto;max-height:90vh">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+      <div style="font-family:'Share Tech Mono',monospace;font-size:13px;color:var(--cyan);letter-spacing:2px">⚡ PLAYER COMPARE</div>
+      <button onclick="document.getElementById('compareModal').classList.remove('show')" style="background:rgba(255,255,255,0.08);border:1px solid var(--border);color:var(--text2);width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:16px">✕</button>
+    </div>
+    <!-- Player 2 selector -->
+    <div style="margin-bottom:18px">
+      <input type="text" id="cmpSearch" placeholder="🔍 Search opponent player..." oninput="filterCmpPlayers()" class="form-input" style="width:100%;margin-bottom:10px">
+      <div id="cmpPlayerList" style="max-height:160px;overflow-y:auto;border-radius:10px;border:1px solid var(--border)"></div>
+    </div>
+    <!-- Compare result -->
+    <div id="cmpResult" style="display:none">
+      <!-- H2H -->
+      <div style="background:var(--bg3);border-radius:12px;padding:16px;margin-bottom:16px;text-align:center">
+        <div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text3);letter-spacing:2px;margin-bottom:10px">HEAD TO HEAD (FRIENDLY)</div>
+        <div style="display:flex;align-items:center;justify-content:center;gap:20px">
+          <div style="text-align:center">
+            <div id="h2hP1Name" style="font-weight:700;font-size:14px;color:var(--cyan)">—</div>
+            <div id="h2hP1Score" style="font-size:36px;font-weight:900;color:var(--green);font-family:'Rajdhani',sans-serif">0</div>
+            <div style="font-size:10px;color:var(--text3)">WINS</div>
+          </div>
+          <div style="font-size:20px;color:var(--text3);font-weight:700">VS</div>
+          <div style="text-align:center">
+            <div id="h2hP2Name" style="font-weight:700;font-size:14px;color:var(--gold)">—</div>
+            <div id="h2hP2Score" style="font-size:36px;font-weight:900;color:var(--green);font-family:'Rajdhani',sans-serif">0</div>
+            <div style="font-size:10px;color:var(--text3)">WINS</div>
+          </div>
+        </div>
+        <div id="h2hDraws" style="font-size:12px;color:var(--text3);margin-top:8px"></div>
+      </div>
+      <!-- Stats comparison bars -->
+      <div id="cmpBars" style="display:flex;flex-direction:column;gap:12px"></div>
     </div>
   </div>
 </div>
@@ -1434,6 +1683,74 @@ select.form-input option { background: var(--card); }
   </div>
 </div>
 
+<!-- ═══════════════ TOURNAMENT PAGE ═══════════════ -->
+<div class="page" id="page-tournament">
+  <div class="trn-header">
+    <div class="trn-title">🏟️ TYP LEAGUE</div>
+    <div class="trn-subtitle" id="trnSeasonLabel">// Season 2026 • Round Robin → Knockout</div>
+  </div>
+
+  <div class="trn-tabs">
+    <button class="trn-tab active" onclick="switchTrnTab('standings')">📊 Standings</button>
+    <button class="trn-tab" onclick="switchTrnTab('fixtures')">📅 Fixtures</button>
+    <button class="trn-tab" onclick="switchTrnTab('teams')">👥 Teams</button>
+    <button class="trn-tab" onclick="switchTrnTab('knockout')">⚡ Knockout</button>
+  </div>
+
+  <!-- STANDINGS TAB -->
+  <div class="trn-content active" id="trntab-standings">
+    <div style="margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+      <div style="font-size:12px;color:var(--text3);font-family:'Share Tech Mono',monospace">
+        <span style="border-left:3px solid var(--green);padding-left:6px;margin-right:12px">Top 4 → Semi-Final</span>
+      </div>
+      <button class="btn btn-outline" style="padding:7px 14px;font-size:12px" onclick="loadTournamentStandings()">🔄 Refresh</button>
+    </div>
+    <div style="overflow-x:auto;border-radius:12px;border:1px solid var(--border)">
+      <table class="standings-table" id="trnStandingsTable">
+        <thead>
+          <tr>
+            <th>#</th><th>TEAM</th><th>MP</th><th>W</th><th>D</th><th>L</th>
+            <th>GF</th><th>GA</th><th>GD</th><th class="pts-col">PTS</th>
+          </tr>
+        </thead>
+        <tbody id="trnStandingsBody">
+          <tr><td colspan="10" style="padding:50px;color:var(--text3);text-align:center"><span class="spinner"></span> Loading...</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div style="margin-top:16px;font-size:12px;color:var(--text3);font-family:'Share Tech Mono',monospace">
+      * প্রতিটা 1v1 match: Win=3pts, Draw=1pt। Team matchday জেতার জন্য total 1v1 points count হবে।
+    </div>
+  </div>
+
+  <!-- FIXTURES TAB -->
+  <div class="trn-content" id="trntab-fixtures">
+    <div style="display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap">
+      <button class="nav-btn active" id="fixFilterAll" onclick="filterFixtures('all',this)">All</button>
+      <button class="nav-btn" id="fixFilterPending" onclick="filterFixtures('pending',this)">Upcoming</button>
+      <button class="nav-btn" id="fixFilterDone" onclick="filterFixtures('done',this)">Completed</button>
+    </div>
+    <div id="trnFixturesList">
+      <div style="text-align:center;padding:60px;color:var(--text3)"><span class="spinner"></span> Loading...</div>
+    </div>
+  </div>
+
+  <!-- TEAMS TAB -->
+  <div class="trn-content" id="trntab-teams">
+    <div id="trnTeamsList" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px">
+      <div style="text-align:center;padding:60px;color:var(--text3)"><span class="spinner"></span> Loading...</div>
+    </div>
+  </div>
+
+  <!-- KNOCKOUT TAB -->
+  <div class="trn-content" id="trntab-knockout">
+    <div style="margin-bottom:16px;font-size:13px;color:var(--text3)">Top 4 teams from league stage qualify for Semi-Finals.</div>
+    <div id="trnKnockoutWrap">
+      <div style="text-align:center;padding:60px;color:var(--text3)"><span class="spinner"></span> Loading...</div>
+    </div>
+  </div>
+</div>
+
 <!-- ═══════════════ ADMIN PANEL PAGE ═══════════════ -->
 <div class="page" id="page-admin">
   <!-- Admin Login -->
@@ -1464,7 +1781,9 @@ select.form-input option { background: var(--card); }
         <div class="admin-tab active" onclick="switchAdminTab('players')">👥 Players</div>
         <div class="admin-tab" onclick="switchAdminTab('addmatch')">➕ Add Match Result</div>
         <div class="admin-tab" onclick="switchAdminTab('friendlymgmt')">🤝 Friendly Requests</div>
+        <div class="admin-tab" onclick="switchAdminTab('seasonreset')">🔄 Season Reset</div>
         <div class="admin-tab" onclick="switchAdminTab('resultmgmt')">📤 Result Requests <span id="pendingResultCount" style="background:var(--red);color:#fff;border-radius:10px;padding:1px 6px;font-size:11px;margin-left:4px">0</span></div>
+        <div class="admin-tab" onclick="switchAdminTab('tournament')">🏟️ Tournament</div>
       </div>
 
       <!-- PLAYERS TAB -->
@@ -1572,6 +1891,36 @@ select.form-input option { background: var(--card); }
       </div>
 
       <!-- RESULT REQUESTS ADMIN TAB -->
+      <div class="admin-section" id="adminTab-seasonreset">
+        <div style="font-size:15px;font-weight:700;color:var(--gold);margin-bottom:8px">🔄 Season Reset</div>
+        <p style="font-size:13px;color:var(--text3);margin-bottom:20px">সব player এর current stats archive হবে এবং নতুন season শুরু হবে। এই কাজ undoable নয়!</p>
+
+        <div style="background:rgba(255,71,87,0.08);border:1px solid rgba(255,71,87,0.3);border-radius:12px;padding:20px;margin-bottom:20px">
+          <div style="font-weight:700;color:var(--red);margin-bottom:10px">⚠️ Warning</div>
+          <ul style="color:var(--text2);font-size:13px;line-height:2;padding-left:18px">
+            <li>সব player এর W, D, L, GF, GA, MVP, Matches <strong>zero</strong> হবে</li>
+            <li>পুরনো data Firebase এ <code>seasons/season_X</code> এ archive হবে</li>
+            <li>Match history (matches node) clear হবে</li>
+            <li>Friendly matches archive হবে</li>
+          </ul>
+        </div>
+
+        <div style="margin-bottom:16px">
+          <label style="font-size:13px;color:var(--text2);display:block;margin-bottom:6px">নতুন Season এর নাম:</label>
+          <input type="text" id="newSeasonName" class="form-input" placeholder="যেমন: Season 2, Summer 2026..." style="max-width:300px">
+        </div>
+
+        <div style="margin-bottom:20px">
+          <label style="font-size:13px;color:var(--text2);display:block;margin-bottom:6px">নিশ্চিত করতে টাইপ করো: <strong style="color:var(--red)">RESET</strong></label>
+          <input type="text" id="resetConfirmInput" class="form-input" placeholder="RESET" style="max-width:200px">
+        </div>
+
+        <button onclick="doSeasonReset()" style="background:linear-gradient(135deg,#ff4757,#c0392b);border:none;color:#fff;padding:12px 28px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;letter-spacing:1px">
+          🔄 SEASON RESET করো
+        </button>
+        <div id="resetStatus" style="margin-top:16px;font-size:13px"></div>
+      </div>
+
       <div class="admin-section" id="adminTab-resultmgmt">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">
           <div style="font-size:15px;font-weight:700;color:var(--cyan)">📤 Player Submitted Friendly Results</div>
@@ -1705,6 +2054,91 @@ select.form-input option { background: var(--card); }
       </div>
       <div id="myRequestsList" style="display:none"></div>
     </div>
+  </div>
+</div>
+
+<!-- ADMIN TOURNAMENT SECTION -->
+<div class="admin-section" id="adminTab-tournament">
+  <div class="trn-admin-section">
+    <div class="trn-admin-section-title">⚙️ Tournament Settings</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+      <div class="form-group">
+        <label class="form-label">Season Name</label>
+        <input type="text" class="form-input" id="trnSeasonName" placeholder="e.g. TYP League 2026">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Status</label>
+        <select class="form-input" id="trnStatus">
+          <option value="upcoming">Upcoming</option>
+          <option value="active">Active</option>
+          <option value="knockout">Knockout Stage</option>
+          <option value="finished">Finished</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn btn-gold" onclick="saveTrnSettings()" style="padding:9px 22px;font-size:13px">💾 Save Settings</button>
+    <span id="trnSettingsSaved" style="margin-left:12px;font-size:13px;color:var(--green);display:none">✅ Saved!</span>
+  </div>
+
+  <div class="trn-admin-section">
+    <div class="trn-admin-section-title">👥 Manage Teams</div>
+    <div id="trnAdminTeamsList" style="margin-bottom:14px"></div>
+    <button class="btn btn-outline" onclick="openCreateTeamModal()" style="padding:9px 20px;font-size:13px">➕ Create New Team</button>
+  </div>
+
+  <div class="trn-admin-section">
+    <div class="trn-admin-section-title">⚽ Enter Match Results</div>
+    <p style="font-size:13px;color:var(--text3);margin-bottom:14px">Select a pending matchday to enter 1v1 results.</p>
+    <div style="margin-bottom:12px;display:flex;gap:10px;flex-wrap:wrap">
+      <select class="form-input" id="trnMatchdaySelect" style="flex:1;min-width:200px" onchange="loadMatchdayForEntry()">
+        <option value="">-- Select Matchday --</option>
+      </select>
+      <button class="btn btn-outline" onclick="loadTrnMatchdays()" style="padding:9px 16px;font-size:12px">🔄 Load</button>
+    </div>
+    <div id="trnMatchEntryArea"></div>
+    <div style="margin-top:12px;display:none" id="trnSaveMatchBtnWrap">
+      <button class="btn btn-gold" onclick="saveTrnMatchResults()" style="padding:10px 24px">💾 Save All Results</button>
+      <span id="trnMatchSaveStatus" style="margin-left:12px;font-size:13px;color:var(--green)"></span>
+    </div>
+  </div>
+
+  <div class="trn-admin-section">
+    <div class="trn-admin-section-title">⚡ Knockout Stage</div>
+    <p style="font-size:13px;color:var(--text3);margin-bottom:14px">Set Semi-Final & Final matches.</p>
+    <div id="trnKnockoutAdminArea"></div>
+    <button class="btn btn-outline" onclick="loadKnockoutAdmin()" style="padding:9px 20px;font-size:13px;margin-top:10px">🔄 Load Knockout</button>
+    <button class="btn" onclick="autoSetSemis()" style="padding:9px 20px;font-size:13px;margin-top:10px;margin-left:8px;background:rgba(124,92,252,0.15);border:1px solid var(--accent1);color:var(--gold)">🤖 Auto-Set from Top 4</button>
+  </div>
+</div>
+
+<!-- CREATE/EDIT TEAM MODAL -->
+<div class="modal-overlay" id="createTeamModal">
+  <div class="modal-box" style="max-width:600px;max-height:90vh;overflow-y:auto">
+    <div class="modal-title" id="createTeamModalTitle">➕ Create Team</div>
+    <input type="hidden" id="editTeamId">
+    <div class="form-group">
+      <label class="form-label">Team Name</label>
+      <input type="text" class="form-input" id="newTeamName" placeholder="e.g. FC Lions">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Manager / Captain Name</label>
+      <input type="text" class="form-input" id="newTeamManager" placeholder="e.g. Faisal">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Team Emoji / Icon</label>
+      <input type="text" class="form-input" id="newTeamEmoji" placeholder="🦁" maxlength="4">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Select Players (11 starters + up to 3 subs = 14 max)</label>
+      <input type="text" class="form-input" id="playerPickSearch" placeholder="🔍 Search player..." oninput="filterPlayerPick()" style="margin-bottom:8px">
+      <div class="player-pick-list" id="playerPickList"></div>
+      <div style="margin-top:8px;font-size:12px;color:var(--cyan)" id="playerPickCount">0 selected</div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:18px">
+      <button class="btn btn-gold" style="flex:1" onclick="saveTeam()">💾 Save Team</button>
+      <button class="btn btn-outline" style="flex:1" onclick="document.getElementById('createTeamModal').classList.remove('show')">Cancel</button>
+    </div>
+    <div id="createTeamError" style="margin-top:10px;font-size:13px;color:var(--red)"></div>
   </div>
 </div>
 
@@ -2332,6 +2766,76 @@ window.switchAdminTab = function(tab) {
   if (tab === 'addmatch') loadAdminMatches();
   if (tab === 'friendlymgmt') loadFriendlyRequests();
   if (tab === 'resultmgmt') loadResultRequests();
+};
+
+// ══════════════════════════════════════════
+// SEASON RESET
+// ══════════════════════════════════════════
+window.doSeasonReset = async function() {
+  const confirm = document.getElementById('resetConfirmInput').value.trim();
+  const seasonName = document.getElementById('newSeasonName').value.trim() || ('Season ' + new Date().getFullYear());
+  const statusEl = document.getElementById('resetStatus');
+
+  if (confirm !== 'RESET') {
+    statusEl.innerHTML = '<span style="color:var(--red)">❌ "RESET" লেখো confirmation box এ।</span>';
+    return;
+  }
+
+  statusEl.innerHTML = '<span style="color:var(--yellow)">⏳ Archiving data...</span>';
+
+  try {
+    const DB = 'https://typ-chapm-default-rtdb.firebaseio.com';
+
+    // 1. Fetch all users
+    const usersRes = await fetch(`${DB}/users.json`);
+    const usersData = await usersRes.json();
+
+    // 2. Fetch matches
+    const matchRes = await fetch(`${DB}/matches.json`);
+    const matchData = await matchRes.json();
+
+    // 3. Fetch friendly matches
+    const fRes = await fetch(`${DB}/friendlyMatches.json`);
+    const fData = await fRes.json();
+
+    // 4. Archive to seasons/seasonName
+    const archiveKey = seasonName.replace(/\s+/g, '_');
+    const archivePayload = {
+      archivedAt: new Date().toISOString(),
+      seasonName,
+      players: usersData,
+      matches: matchData || {},
+      friendlyMatches: fData || {}
+    };
+    await fetch(`${DB}/seasons/${archiveKey}.json`, {
+      method: 'PUT',
+      body: JSON.stringify(archivePayload)
+    });
+
+    statusEl.innerHTML = '<span style="color:var(--cyan)">✅ Archive done! Now resetting stats...</span>';
+
+    // 5. Reset each player stats
+    if (usersData) {
+      const resets = Object.entries(usersData).map(([uid, player]) => {
+        const resetData = { ...player, matches:0, wins:0, draws:0, losses:0, goalsFor:0, goalsAgainst:0, mvp:0, rank:null };
+        return fetch(`${DB}/users/${uid}.json`, { method: 'PATCH', body: JSON.stringify(resetData) });
+      });
+      await Promise.all(resets);
+    }
+
+    // 6. Clear matches
+    await fetch(`${DB}/matches.json`, { method: 'DELETE' });
+
+    // 7. Clear friendly matches
+    await fetch(`${DB}/friendlyMatches.json`, { method: 'DELETE' });
+
+    statusEl.innerHTML = `<span style="color:var(--green)">🎉 Season Reset সম্পন্ন! "${seasonName}" archive হয়েছে। নতুন season শুরু!</span>`;
+    document.getElementById('resetConfirmInput').value = '';
+    document.getElementById('newSeasonName').value = '';
+
+  } catch(e) {
+    statusEl.innerHTML = `<span style="color:var(--red)">❌ Error: ${e.message}</span>`;
+  }
 };
 
 async function loadAllPlayers() {
@@ -3197,6 +3701,27 @@ window.openPublicProfile = async function(uid) {
   document.getElementById('ppWP').textContent = wp + '%';
   setTimeout(() => { document.getElementById('ppWPBar').style.width = wp + '%'; }, 100);
 
+  // ── BADGES ──
+  const allUsers = users.filter(u => (u.matches||0) > 0);
+  const maxWins = Math.max(...allUsers.map(u => u.wins||0));
+  const maxMVP  = Math.max(...allUsers.map(u => u.mvp||0));
+  const badges = [];
+  if (w > 0 && w === maxWins)    badges.push({ icon: '🥇', label: 'Most Wins', color: '#f5c842' });
+  if (m > 0 && l === 0)          badges.push({ icon: '⚡', label: 'Unbeaten',  color: '#00e6f6' });
+  if (mvp > 0 && mvp === maxMVP) badges.push({ icon: '🏅', label: 'Most MVP',  color: '#ff9500' });
+  document.getElementById('ppBadges').innerHTML = badges.map(b =>
+    `<div style="display:flex;align-items:center;gap:5px;background:rgba(255,255,255,0.06);border:1px solid ${b.color}55;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700;color:${b.color};font-family:'Share Tech Mono',monospace">${b.icon} ${b.label}</div>`
+  ).join('');
+
+  // ── COMPARE BUTTON ──
+  document.getElementById('ppCompareBtn') && document.getElementById('ppCompareBtn').remove();
+  const cmpBtn = document.createElement('button');
+  cmpBtn.id = 'ppCompareBtn';
+  cmpBtn.textContent = '⚡ Compare';
+  cmpBtn.style.cssText = 'position:absolute;bottom:14px;right:14px;background:rgba(255,255,255,0.07);border:1px solid var(--border);color:var(--text2);padding:6px 14px;border-radius:20px;cursor:pointer;font-size:11px;font-weight:700;letter-spacing:1px;font-family:"Exo 2",sans-serif';
+  cmpBtn.onclick = () => openCompareModal(uid);
+  document.querySelector('#publicProfileModal .modal-box').appendChild(cmpBtn);
+
   // Load friendly matches
   const flContainer = document.getElementById('ppFriendlyList');
   flContainer.innerHTML = '<div style="text-align:center;color:var(--text3);font-size:13px;padding:10px">Loading...</div>';
@@ -3246,6 +3771,110 @@ window.openPublicProfile = async function(uid) {
   } catch(e) {
     flContainer.innerHTML = '<div style="color:var(--red);font-size:13px;padding:10px">Error loading.</div>';
   }
+};
+
+// ══════════════════════════════════════════
+// PLAYER COMPARE + HEAD TO HEAD
+// ══════════════════════════════════════════
+let _cmpPlayer1 = null;
+let _cmpAllUsers = [];
+
+window.openCompareModal = async function(uid) {
+  document.getElementById('compareModal').classList.add('show');
+  document.getElementById('cmpResult').style.display = 'none';
+  document.getElementById('cmpSearch').value = '';
+  const users = await getAllUsers();
+  _cmpAllUsers = users.filter(u => u.uid !== uid);
+  _cmpPlayer1 = users.find(u => u.uid === uid);
+  renderCmpList(_cmpAllUsers);
+};
+
+function filterCmpPlayers() {
+  const q = document.getElementById('cmpSearch').value.toLowerCase();
+  renderCmpList(_cmpAllUsers.filter(u => (u.name||'').toLowerCase().includes(q)));
+}
+window.filterCmpPlayers = filterCmpPlayers;
+
+function renderCmpList(list) {
+  const el = document.getElementById('cmpPlayerList');
+  if (!list.length) { el.innerHTML = '<div style="padding:12px;color:var(--text3);font-size:13px;text-align:center">No players found</div>'; return; }
+  el.innerHTML = list.slice(0, 30).map(u =>
+    `<div onclick="selectCmpPlayer('${u.uid}')" style="display:flex;align-items:center;gap:12px;padding:10px 14px;cursor:pointer;border-bottom:1px solid var(--border);transition:background 0.15s" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background=''">
+      <div style="width:36px;height:36px;border-radius:50%;background:var(--bg3);border:2px solid var(--border);overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">
+        ${u.avatarUrl ? `<img src="${u.avatarUrl}" style="width:100%;height:100%;object-fit:cover">` : '🎮'}
+      </div>
+      <div>
+        <div style="font-weight:700;font-size:14px">${u.name||'—'}</div>
+        <div style="font-size:11px;color:var(--text3)">${u.club||'—'} • ${u.district||'—'}</div>
+      </div>
+    </div>`
+  ).join('');
+}
+
+window.selectCmpPlayer = async function(uid2) {
+  const p1 = _cmpPlayer1;
+  const p2 = _cmpAllUsers.find(u => u.uid === uid2);
+  if (!p1 || !p2) return;
+
+  // ── Head to Head from friendlyMatches ──
+  let h2h_p1=0, h2h_p2=0, h2h_d=0;
+  try {
+    const res = await fetch('https://typ-chapm-default-rtdb.firebaseio.com/friendlyMatches.json');
+    const fdata = await res.json();
+    if (fdata) {
+      Object.values(fdata).forEach(fm => {
+        const names = [fm.home_team, fm.away_team];
+        if (!names.includes(p1.name) || !names.includes(p2.name)) return;
+        const p1Home = fm.home_team === p1.name;
+        const p1S = p1Home ? fm.home_score : fm.away_score;
+        const p2S = p1Home ? fm.away_score : fm.home_score;
+        if (p1S > p2S) h2h_p1++;
+        else if (p1S < p2S) h2h_p2++;
+        else h2h_d++;
+      });
+    }
+  } catch(e) {}
+
+  document.getElementById('h2hP1Name').textContent = p1.name;
+  document.getElementById('h2hP2Name').textContent = p2.name;
+  document.getElementById('h2hP1Score').textContent = h2h_p1;
+  document.getElementById('h2hP2Score').textContent = h2h_p2;
+  document.getElementById('h2hDraws').textContent = h2h_d > 0 ? `${h2h_d} Draw${h2h_d>1?'s':''}` : 'No draws';
+
+  // ── Stats comparison bars ──
+  const stats = [
+    { label: '⚽ Matches',  v1: p1.matches||0,   v2: p2.matches||0   },
+    { label: '🏆 Wins',     v1: p1.wins||0,       v2: p2.wins||0,     color1:'#00e676', color2:'#00e676' },
+    { label: '🤝 Draws',    v1: p1.draws||0,      v2: p2.draws||0     },
+    { label: '⚽ Goals',    v1: p1.goalsFor||0,   v2: p2.goalsFor||0, color1:'#f5c842', color2:'#f5c842' },
+    { label: '🏅 MVP',      v1: p1.mvp||0,        v2: p2.mvp||0,      color1:'#ff9500', color2:'#ff9500' },
+    { label: '📊 Win %',    v1: p1.matches ? +((p1.wins||0)/p1.matches*100).toFixed(1) : 0,
+                             v2: p2.matches ? +((p2.wins||0)/p2.matches*100).toFixed(1) : 0 },
+  ];
+
+  document.getElementById('cmpBars').innerHTML = stats.map(st => {
+    const total = st.v1 + st.v2;
+    const pct1 = total ? (st.v1/total*100) : 50;
+    const pct2 = total ? (st.v2/total*100) : 50;
+    const c1 = st.color1 || 'var(--cyan)';
+    const c2 = st.color2 || 'var(--gold)';
+    const winner = st.v1 > st.v2 ? 1 : st.v2 > st.v1 ? 2 : 0;
+    return `<div>
+      <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px">
+        <span style="font-weight:${winner===1?'900':'400'};color:${winner===1?'var(--cyan)':'var(--text2)'}">${st.v1}</span>
+        <span style="font-size:11px;color:var(--text3);font-family:'Share Tech Mono',monospace">${st.label}</span>
+        <span style="font-weight:${winner===2?'900':'400'};color:${winner===2?'var(--gold)':'var(--text2)'}">${st.v2}</span>
+      </div>
+      <div style="display:flex;height:8px;border-radius:4px;overflow:hidden;gap:2px">
+        <div style="width:${pct1}%;background:${c1};border-radius:4px 0 0 4px;transition:width 0.5s"></div>
+        <div style="width:${pct2}%;background:${c2};border-radius:0 4px 4px 0;transition:width 0.5s"></div>
+      </div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('cmpResult').style.display = 'block';
+  document.getElementById('cmpPlayerList').innerHTML = '';
+  document.getElementById('cmpSearch').value = p2.name;
 };
 
 // ── DOWNLOAD STATS CARD — Full-photo overlay style ──
@@ -3468,7 +4097,742 @@ function roundRect(ctx, x, y, w, h, r) {
   ctx.closePath();
 }
 
-window.closePublicProfile = function() {
+// ════════════════════════════════════════════════════════
+// 🏟️ TOURNAMENT SYSTEM — TYP League
+// Firebase path: tournament/
+// ════════════════════════════════════════════════════════
+
+const TRN_DB = 'https://typ-chapm-default-rtdb.firebaseio.com';
+let trnTeamsCache = [];
+let trnMatchesCache = [];
+let trnKnockoutCache = {};
+let trnSettingsCache = {};
+let trnAllFixtures = [];
+
+// ── Tab switcher ──
+window.switchTrnTab = function(tab) {
+  document.querySelectorAll('.trn-tab').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.trn-content').forEach(c => c.classList.remove('active'));
+  const btn = document.querySelector(`.trn-tab[onclick="switchTrnTab('${tab}')"]`);
+  if (btn) btn.classList.add('active');
+  const cnt = document.getElementById('trntab-' + tab);
+  if (cnt) cnt.classList.add('active');
+  if (tab === 'standings') loadTournamentStandings();
+  if (tab === 'fixtures') loadTrnFixtures();
+  if (tab === 'teams') loadTrnTeams();
+  if (tab === 'knockout') loadTrnKnockout();
+};
+
+// ── Load tournament data ──
+async function fetchTrnData() {
+  const [teamRes, matchRes, settRes, koRes] = await Promise.all([
+    fetch(`${TRN_DB}/tournament/teams.json`),
+    fetch(`${TRN_DB}/tournament/matches.json`),
+    fetch(`${TRN_DB}/tournament/settings.json`),
+    fetch(`${TRN_DB}/tournament/knockout.json`),
+  ]);
+  const teamsRaw = await teamRes.json();
+  const matchesRaw = await matchRes.json();
+  const settings = await settRes.json();
+  const knockout = await koRes.json();
+
+  trnTeamsCache = teamsRaw ? Object.entries(teamsRaw).map(([id, v]) => ({ id, ...v })) : [];
+  trnMatchesCache = matchesRaw ? Object.entries(matchesRaw).map(([id, v]) => ({ id, ...v })) : [];
+  trnSettingsCache = settings || {};
+  trnKnockoutCache = knockout || {};
+
+  if (trnSettingsCache.seasonName) {
+    const lbl = document.getElementById('trnSeasonLabel');
+    if (lbl) lbl.textContent = `// ${trnSettingsCache.seasonName} • Round Robin → Knockout`;
+  }
+  return { teams: trnTeamsCache, matches: trnMatchesCache, settings: trnSettingsCache, knockout: trnKnockoutCache };
+}
+
+// ── Calculate team standings ──
+function calcStandings(teams, matches) {
+  const table = {};
+  teams.forEach(t => {
+    table[t.id] = { id: t.id, name: t.name, emoji: t.emoji || '🏟️', mp: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, pts: 0 };
+  });
+
+  // Group matches by matchday (each matchday has multiple 1v1s between 2 teams)
+  const matchdayMap = {};
+  matches.forEach(m => {
+    if (m.status !== 'completed') return;
+    const key = `${m.matchday}_${m.homeTeam}_${m.awayTeam}`;
+    if (!matchdayMap[key]) matchdayMap[key] = { homeTeam: m.homeTeam, awayTeam: m.awayTeam, homePts: 0, awayPts: 0, matchday: m.matchday };
+    const hw = parseInt(m.homeScore) || 0;
+    const aw = parseInt(m.awayScore) || 0;
+    if (hw > aw) { matchdayMap[key].homePts += 3; }
+    else if (hw < aw) { matchdayMap[key].awayPts += 3; }
+    else { matchdayMap[key].homePts += 1; matchdayMap[key].awayPts += 1; }
+    matchdayMap[key].homePts = matchdayMap[key].homePts; // accumulate per 1v1
+  });
+
+  // But we also track GF/GA/W/D/L per individual 1v1 for goal stats
+  matches.forEach(m => {
+    if (m.status !== 'completed') return;
+    if (!table[m.homeTeam] || !table[m.awayTeam]) return;
+    const hs = parseInt(m.homeScore) || 0, as_ = parseInt(m.awayScore) || 0;
+    table[m.homeTeam].gf += hs; table[m.homeTeam].ga += as_;
+    table[m.awayTeam].gf += as_; table[m.awayTeam].ga += hs;
+  });
+
+  // Now credit W/D/L and pts per matchday result
+  Object.values(matchdayMap).forEach(md => {
+    if (!table[md.homeTeam] || !table[md.awayTeam]) return;
+    table[md.homeTeam].mp++;
+    table[md.awayTeam].mp++;
+    if (md.homePts > md.awayPts) {
+      table[md.homeTeam].w++; table[md.homeTeam].pts += 3;
+      table[md.awayTeam].l++;
+    } else if (md.homePts < md.awayPts) {
+      table[md.awayTeam].w++; table[md.awayTeam].pts += 3;
+      table[md.homeTeam].l++;
+    } else {
+      table[md.homeTeam].d++; table[md.homeTeam].pts += 1;
+      table[md.awayTeam].d++; table[md.awayTeam].pts += 1;
+    }
+  });
+
+  return Object.values(table).sort((a, b) => {
+    if (b.pts !== a.pts) return b.pts - a.pts;
+    const gdA = a.gf - a.ga, gdB = b.gf - b.ga;
+    if (gdB !== gdA) return gdB - gdA;
+    return b.gf - a.gf;
+  });
+}
+
+// ── STANDINGS PAGE ──
+window.loadTournamentStandings = async function() {
+  const tbody = document.getElementById('trnStandingsBody');
+  if (!tbody) return;
+  tbody.innerHTML = '<tr><td colspan="10" style="padding:40px;text-align:center;color:var(--text3)"><span class="spinner"></span></td></tr>';
+  try {
+    await fetchTrnData();
+    if (!trnTeamsCache.length) {
+      tbody.innerHTML = '<tr><td colspan="10" style="padding:50px;text-align:center;color:var(--text3)">কোনো team নেই। Admin থেকে team তৈরি করুন।</td></tr>';
+      return;
+    }
+    const standings = calcStandings(trnTeamsCache, trnMatchesCache);
+    const medals = ['🥇','🥈','🥉','🏅'];
+    tbody.innerHTML = standings.map((t, i) => {
+      const gd = t.gf - t.ga;
+      const rowClass = i < 4 ? (i < 2 ? 'qual-row' : 'semi-row') : 'elim-row';
+      return `<tr class="${rowClass}" style="cursor:default">
+        <td style="font-weight:700;color:${i<4?'var(--gold)':'var(--text3)'};font-family:'Rajdhani',sans-serif;font-size:16px">${medals[i] || (i+1)}</td>
+        <td>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--accent1),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">${t.emoji}</div>
+            <div>
+              <div style="font-weight:700;font-size:14px;color:var(--text)">${t.name}</div>
+              ${i < 4 ? `<div style="font-size:10px;color:${i<2?'var(--green)':'var(--gold)'};font-family:'Share Tech Mono',monospace">${i<2?'SEMI-FINAL':'SEMI-FINAL'}</div>` : ''}
+            </div>
+          </div>
+        </td>
+        <td>${t.mp}</td>
+        <td style="color:var(--green)">${t.w}</td>
+        <td style="color:var(--yellow)">${t.d}</td>
+        <td style="color:var(--red)">${t.l}</td>
+        <td>${t.gf}</td>
+        <td>${t.ga}</td>
+        <td style="color:${gd>=0?'var(--green)':'var(--red)'}">${gd>=0?'+':''}${gd}</td>
+        <td class="pts-col">${t.pts}</td>
+      </tr>`;
+    }).join('');
+  } catch(e) {
+    tbody.innerHTML = `<tr><td colspan="10" style="padding:40px;text-align:center;color:var(--red)">❌ Load হয়নি: ${e.message}</td></tr>`;
+  }
+};
+
+// ── TEAMS PAGE ──
+window.loadTrnTeams = async function() {
+  const container = document.getElementById('trnTeamsList');
+  if (!container) return;
+  container.innerHTML = '<div style="text-align:center;padding:60px;color:var(--text3)"><span class="spinner"></span></div>';
+  try {
+    await fetchTrnData();
+    if (!trnTeamsCache.length) {
+      container.innerHTML = '<div style="text-align:center;padding:60px;color:var(--text3)">কোনো team নেই।</div>';
+      return;
+    }
+    // Get user avatars
+    const usersRes = await fetch(`${TRN_DB}/users.json`);
+    const usersData = await usersRes.json() || {};
+    const userMap = {};
+    Object.entries(usersData).forEach(([uid, u]) => { userMap[uid] = u; });
+
+    container.innerHTML = trnTeamsCache.map(t => {
+      const players = t.players || [];
+      const playerRows = players.map((p, i) => {
+        const u = userMap[p.uid] || {};
+        const isSub = i >= 11;
+        return `<div class="team-player-row" style="${isSub?'opacity:0.6':''}" title="${isSub?'Substitute':'Starter'}">
+          <div class="team-player-num">${isSub ? 'S' : (i+1)}</div>
+          <div class="team-player-avatar">${u.avatarUrl ? `<img src="${u.avatarUrl}">` : '🎮'}</div>
+          <div style="flex:1">${p.name || u.name || '—'}</div>
+          ${isSub ? '<div style="font-size:10px;color:var(--text3);font-family:\'Share Tech Mono\',monospace">SUB</div>' : ''}
+        </div>`;
+      }).join('');
+      return `<div class="team-card">
+        <div class="team-card-header">
+          <div class="team-badge">${t.emoji || '🏟️'}</div>
+          <div>
+            <div class="team-name">${t.name}</div>
+            <div class="team-manager">👑 ${t.manager || '—'}</div>
+            <div style="font-size:11px;color:var(--text3);margin-top:3px;font-family:'Share Tech Mono',monospace">${players.length}/14 players</div>
+          </div>
+        </div>
+        <div class="team-players-list">${playerRows || '<div style="color:var(--text3);font-size:13px;padding:10px">No players assigned.</div>'}</div>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    container.innerHTML = `<div style="color:var(--red);padding:40px;text-align:center">❌ ${e.message}</div>`;
+  }
+};
+
+// ── FIXTURES PAGE ──
+window.loadTrnFixtures = async function() {
+  await fetchTrnData();
+  trnAllFixtures = [...trnMatchesCache];
+  filterFixtures('all', document.getElementById('fixFilterAll'));
+};
+
+window.filterFixtures = function(type, btn) {
+  document.querySelectorAll('#trntab-fixtures .nav-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  const container = document.getElementById('trnFixturesList');
+  if (!container) return;
+  let fixtures = trnAllFixtures;
+  if (type === 'pending') fixtures = trnAllFixtures.filter(m => m.status !== 'completed');
+  if (type === 'done') fixtures = trnAllFixtures.filter(m => m.status === 'completed');
+
+  if (!fixtures.length) {
+    container.innerHTML = '<div style="text-align:center;padding:60px;color:var(--text3)">কোনো fixture নেই।</div>';
+    return;
+  }
+
+  // Group by matchday
+  const grouped = {};
+  fixtures.forEach(m => {
+    const key = m.matchday || 'Matchday ?';
+    if (!grouped[key]) grouped[key] = [];
+    grouped[key].push(m);
+  });
+
+  const teamMap = {};
+  trnTeamsCache.forEach(t => { teamMap[t.id] = t; });
+
+  container.innerHTML = Object.entries(grouped).map(([day, ms]) => {
+    const rows = ms.map(m => {
+      const ht = teamMap[m.homeTeam] || {};
+      const at = teamMap[m.awayTeam] || {};
+      const done = m.status === 'completed';
+      const hs = parseInt(m.homeScore) || 0, as_ = parseInt(m.awayScore) || 0;
+      const winH = done && hs > as_, winA = done && as_ > hs;
+      return `<div class="match1v1-row">
+        <div class="match1v1-player" style="color:${winH?'var(--cyan)':'var(--text2)'}">
+          <span style="margin-right:6px">${ht.emoji||'🏟️'}</span>${ht.name||m.homeTeam||'—'}
+        </div>
+        <div class="match1v1-score ${done?'':'pending'}">${done ? `${hs}–${as_}` : 'vs'}</div>
+        <div class="match1v1-player right" style="color:${winA?'var(--cyan)':'var(--text2)'}">
+          ${at.name||m.awayTeam||'—'}<span style="margin-left:6px">${at.emoji||'🏟️'}</span>
+        </div>
+        ${m.player1 ? `<div style="font-size:11px;color:var(--text3);width:100%;text-align:center;font-family:'Share Tech Mono',monospace">${m.player1} vs ${m.player2}</div>` : ''}
+      </div>`;
+    }).join('');
+
+    return `<div class="matchday-group">
+      <div class="matchday-label">${day}</div>
+      ${rows}
+    </div>`;
+  }).join('');
+};
+
+// ── KNOCKOUT PAGE ──
+window.loadTrnKnockout = async function() {
+  const wrap = document.getElementById('trnKnockoutWrap');
+  if (!wrap) return;
+  try {
+    await fetchTrnData();
+    const ko = trnKnockoutCache;
+    const teamMap = {};
+    trnTeamsCache.forEach(t => { teamMap[t.id] = t; });
+
+    const renderMatch = (m, label) => {
+      if (!m) return `<div class="bracket-match" style="opacity:0.4"><div style="padding:10px;font-size:12px;color:var(--text3);text-align:center">${label}<br>TBD</div></div>`;
+      const t1 = teamMap[m.team1] || { name: m.team1Name || 'TBD', emoji: '🏟️' };
+      const t2 = teamMap[m.team2] || { name: m.team2Name || 'TBD', emoji: '🏟️' };
+      const done = m.status === 'completed';
+      const s1 = m.score1 ?? '—', s2 = m.score2 ?? '—';
+      const w1 = done && m.score1 > m.score2, w2 = done && m.score2 > m.score1;
+      return `<div>
+        <div style="font-size:10px;color:var(--text3);font-family:'Share Tech Mono',monospace;text-align:center;margin-bottom:6px;letter-spacing:1px">${label}</div>
+        <div class="bracket-match">
+          <div class="bracket-team ${w1?'winner':done?'loser':''}">
+            <span style="margin-right:6px">${t1.emoji}</span> ${t1.name}
+            <span class="bracket-team-score">${done?s1:''}</span>
+          </div>
+          <div class="bracket-team ${w2?'winner':done?'loser':''}">
+            <span style="margin-right:6px">${t2.emoji}</span> ${t2.name}
+            <span class="bracket-team-score">${done?s2:''}</span>
+          </div>
+        </div>
+      </div>`;
+    };
+
+    const sf1 = ko.semi1 || null;
+    const sf2 = ko.semi2 || null;
+    const final = ko.final || null;
+    const champion = ko.champion ? (teamMap[ko.champion] || { name: ko.champion, emoji: '🏆' }) : null;
+
+    wrap.innerHTML = `
+      <div style="display:flex;align-items:flex-start;gap:32px;overflow-x:auto;padding:10px 0 20px;min-width:max-content">
+        <!-- Semi Finals -->
+        <div style="display:flex;flex-direction:column;gap:60px;padding-top:0">
+          ${renderMatch(sf1, 'SEMI-FINAL 1')}
+          ${renderMatch(sf2, 'SEMI-FINAL 2')}
+        </div>
+        <!-- Connector lines (SVG) -->
+        <div style="display:flex;align-items:center;padding-top:60px">
+          <svg width="60" height="180" style="overflow:visible">
+            <line x1="0" y1="45" x2="30" y2="45" stroke="var(--border)" stroke-width="1.5"/>
+            <line x1="0" y1="135" x2="30" y2="135" stroke="var(--border)" stroke-width="1.5"/>
+            <line x1="30" y1="45" x2="30" y2="135" stroke="var(--border)" stroke-width="1.5"/>
+            <line x1="30" y1="90" x2="60" y2="90" stroke="var(--border)" stroke-width="1.5"/>
+          </svg>
+        </div>
+        <!-- Final -->
+        <div style="padding-top:60px">
+          ${renderMatch(final, '🏆 FINAL')}
+        </div>
+        <!-- Champion -->
+        ${champion ? `
+        <div style="display:flex;align-items:center;padding-top:60px">
+          <svg width="40" height="40"><line x1="0" y1="20" x2="40" y2="20" stroke="var(--gold)" stroke-width="2"/></svg>
+          <div style="background:linear-gradient(135deg,rgba(124,92,252,0.2),rgba(59,130,246,0.2));border:2px solid var(--gold);border-radius:14px;padding:14px 20px;text-align:center;min-width:140px">
+            <div style="font-size:28px">${champion.emoji}</div>
+            <div style="font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;color:var(--gold)">${champion.name}</div>
+            <div style="font-size:10px;color:var(--yellow);font-family:'Share Tech Mono',monospace;letter-spacing:1px;margin-top:4px">🏆 CHAMPION</div>
+          </div>
+        </div>` : ''}
+      </div>`;
+  } catch(e) {
+    wrap.innerHTML = `<div style="color:var(--red);padding:40px;text-align:center">❌ ${e.message}</div>`;
+  }
+};
+
+// ════════════════════════════════════════
+// 🛡️ ADMIN — Tournament Management
+// ════════════════════════════════════════
+
+window.saveTrnSettings = async function() {
+  const name = document.getElementById('trnSeasonName').value.trim();
+  const status = document.getElementById('trnStatus').value;
+  if (!name) { alert('Season name দিন।'); return; }
+  await fetch(`${TRN_DB}/tournament/settings.json`, {
+    method: 'PUT',
+    body: JSON.stringify({ seasonName: name, status, updatedAt: new Date().toISOString() })
+  });
+  const s = document.getElementById('trnSettingsSaved');
+  s.style.display = 'inline'; setTimeout(() => s.style.display = 'none', 2000);
+};
+
+// ── Admin: Load Teams ──
+window.loadTrnAdminTeams = async function() {
+  await fetchTrnData();
+  renderAdminTeamsList();
+  // Prefill settings form
+  if (trnSettingsCache.seasonName) document.getElementById('trnSeasonName').value = trnSettingsCache.seasonName;
+  if (trnSettingsCache.status) document.getElementById('trnStatus').value = trnSettingsCache.status;
+  // Load matchdays
+  loadTrnMatchdays();
+  loadKnockoutAdmin();
+};
+
+function renderAdminTeamsList() {
+  const container = document.getElementById('trnAdminTeamsList');
+  if (!container) return;
+  if (!trnTeamsCache.length) {
+    container.innerHTML = '<div style="color:var(--text3);font-size:13px;margin-bottom:8px">কোনো team নেই।</div>';
+    return;
+  }
+  container.innerHTML = trnTeamsCache.map(t => `
+    <div style="display:flex;align-items:center;gap:12px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin-bottom:10px">
+      <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--accent1),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">${t.emoji||'🏟️'}</div>
+      <div style="flex:1">
+        <div style="font-weight:700;font-size:14px;color:var(--text)">${t.name}</div>
+        <div style="font-size:12px;color:var(--text3)">👑 ${t.manager||'—'} • ${(t.players||[]).length} players</div>
+      </div>
+      <button class="btn-admin-edit" onclick="openEditTeamModal('${t.id}')">✏️ Edit</button>
+      <button class="btn-admin-del" onclick="deleteTeam('${t.id}','${t.name.replace(/'/g,'')}')">🗑️</button>
+    </div>
+  `).join('');
+}
+
+// ── Create / Edit Team Modal ──
+let _playerPickSelected = [];
+
+window.openCreateTeamModal = async function() {
+  document.getElementById('createTeamModalTitle').textContent = '➕ Create Team';
+  document.getElementById('editTeamId').value = '';
+  document.getElementById('newTeamName').value = '';
+  document.getElementById('newTeamManager').value = '';
+  document.getElementById('newTeamEmoji').value = '🏟️';
+  document.getElementById('createTeamError').textContent = '';
+  _playerPickSelected = [];
+  await loadPlayerPickList();
+  document.getElementById('createTeamModal').classList.add('show');
+};
+
+window.openEditTeamModal = async function(teamId) {
+  const t = trnTeamsCache.find(t => t.id === teamId);
+  if (!t) return;
+  document.getElementById('createTeamModalTitle').textContent = '✏️ Edit Team';
+  document.getElementById('editTeamId').value = teamId;
+  document.getElementById('newTeamName').value = t.name || '';
+  document.getElementById('newTeamManager').value = t.manager || '';
+  document.getElementById('newTeamEmoji').value = t.emoji || '🏟️';
+  document.getElementById('createTeamError').textContent = '';
+  _playerPickSelected = (t.players || []).map(p => p.uid);
+  await loadPlayerPickList();
+  document.getElementById('createTeamModal').classList.add('show');
+};
+
+async function loadPlayerPickList() {
+  const list = document.getElementById('playerPickList');
+  list.innerHTML = '<div style="padding:14px;text-align:center;color:var(--text3)"><span class="spinner"></span></div>';
+  const res = await fetch(`${TRN_DB}/users.json`);
+  const data = await res.json() || {};
+  const users = Object.entries(data).map(([uid, u]) => ({ uid, ...u })).sort((a,b)=>(a.name||'').localeCompare(b.name||''));
+  window._trnAllUsers = users;
+  renderPlayerPickList(users);
+}
+
+function renderPlayerPickList(users) {
+  const list = document.getElementById('playerPickList');
+  list.innerHTML = users.map(u => {
+    const sel = _playerPickSelected.includes(u.uid);
+    return `<label class="player-pick-item ${sel?'selected':''}" onclick="togglePlayerPick('${u.uid}',this)">
+      <input type="checkbox" ${sel?'checked':''} onclick="event.stopPropagation()">
+      <div style="width:28px;height:28px;border-radius:50%;background:var(--bg3);border:1px solid var(--border);overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0">
+        ${u.avatarUrl ? `<img src="${u.avatarUrl}" style="width:100%;height:100%;object-fit:cover">` : '🎮'}
+      </div>
+      <div>
+        <div style="font-weight:600">${u.name||'—'}</div>
+        <div style="font-size:11px;color:var(--text3)">${u.club||'—'}</div>
+      </div>
+    </label>`;
+  }).join('');
+  updatePlayerPickCount();
+}
+
+window.filterPlayerPick = function() {
+  const q = document.getElementById('playerPickSearch').value.toLowerCase();
+  const filtered = (window._trnAllUsers || []).filter(u =>
+    (u.name||'').toLowerCase().includes(q) || (u.club||'').toLowerCase().includes(q)
+  );
+  renderPlayerPickList(filtered);
+};
+
+window.togglePlayerPick = function(uid, el) {
+  const idx = _playerPickSelected.indexOf(uid);
+  const cb = el.querySelector('input[type=checkbox]');
+  if (idx === -1) {
+    if (_playerPickSelected.length >= 14) { alert('Maximum 14 players (11 starters + 3 subs)।'); return; }
+    _playerPickSelected.push(uid);
+    el.classList.add('selected'); if(cb) cb.checked = true;
+  } else {
+    _playerPickSelected.splice(idx, 1);
+    el.classList.remove('selected'); if(cb) cb.checked = false;
+  }
+  updatePlayerPickCount();
+};
+
+function updatePlayerPickCount() {
+  const el = document.getElementById('playerPickCount');
+  if (el) el.textContent = `${_playerPickSelected.length} selected (${Math.min(_playerPickSelected.length,11)} starters + ${Math.max(0,_playerPickSelected.length-11)} subs)`;
+}
+
+window.saveTeam = async function() {
+  const name = document.getElementById('newTeamName').value.trim();
+  const manager = document.getElementById('newTeamManager').value.trim();
+  const emoji = document.getElementById('newTeamEmoji').value.trim() || '🏟️';
+  const errEl = document.getElementById('createTeamError');
+  if (!name) { errEl.textContent = '❌ Team name দিন।'; return; }
+  if (_playerPickSelected.length < 1) { errEl.textContent = '❌ কমপক্ষে ১ জন player select করুন।'; return; }
+
+  const allUsers = window._trnAllUsers || [];
+  const players = _playerPickSelected.map((uid, i) => {
+    const u = allUsers.find(u => u.uid === uid) || {};
+    return { uid, name: u.name || '—', isStarter: i < 11 };
+  });
+
+  const teamId = document.getElementById('editTeamId').value;
+  const payload = { name, manager, emoji, players, updatedAt: new Date().toISOString() };
+
+  if (teamId) {
+    await fetch(`${TRN_DB}/tournament/teams/${teamId}.json`, { method: 'PATCH', body: JSON.stringify(payload) });
+  } else {
+    await fetch(`${TRN_DB}/tournament/teams.json`, { method: 'POST', body: JSON.stringify(payload) });
+  }
+
+  document.getElementById('createTeamModal').classList.remove('show');
+  await fetchTrnData();
+  renderAdminTeamsList();
+  // Auto-generate fixtures if 8 teams
+  if (trnTeamsCache.length === 8) {
+    const existing = trnMatchesCache.length;
+    if (existing === 0) {
+      if (confirm('8 টা team তৈরি হয়েছে! Auto-generate করবো সব fixtures (Home+Away round robin)?')) {
+        await generateFixtures();
+      }
+    }
+  }
+};
+
+window.deleteTeam = async function(id, name) {
+  if (!confirm(`"${name}" team delete করবে?`)) return;
+  await fetch(`${TRN_DB}/tournament/teams/${id}.json`, { method: 'DELETE' });
+  await fetchTrnData();
+  renderAdminTeamsList();
+};
+
+// ── Auto-generate Round Robin Fixtures ──
+async function generateFixtures() {
+  const teams = trnTeamsCache;
+  if (teams.length < 2) { alert('কমপক্ষে ২টা team লাগবে।'); return; }
+
+  const fixtures = [];
+  // Home + Away round robin
+  for (let i = 0; i < teams.length; i++) {
+    for (let j = i + 1; j < teams.length; j++) {
+      const t1 = teams[i], t2 = teams[j];
+      const t1Players = (t1.players || []).filter(p => p.isStarter).slice(0, 11);
+      const t2Players = (t2.players || []).filter(p => p.isStarter).slice(0, 11);
+      const matchCount = Math.min(t1Players.length, t2Players.length, 8);
+
+      for (let k = 0; k < matchCount; k++) {
+        // Home match
+        fixtures.push({
+          homeTeam: t1.id, awayTeam: t2.id,
+          player1: t1Players[k]?.name || `P${k+1}`, player2: t2Players[k]?.name || `P${k+1}`,
+          player1uid: t1Players[k]?.uid || '', player2uid: t2Players[k]?.uid || '',
+          matchday: `${t1.name} vs ${t2.name} (Home)`,
+          matchType: 'home', status: 'pending', createdAt: new Date().toISOString()
+        });
+        // Away match
+        fixtures.push({
+          homeTeam: t2.id, awayTeam: t1.id,
+          player1: t2Players[k]?.name || `P${k+1}`, player2: t1Players[k]?.name || `P${k+1}`,
+          player1uid: t2Players[k]?.uid || '', player2uid: t1Players[k]?.uid || '',
+          matchday: `${t2.name} vs ${t1.name} (Away)`,
+          matchType: 'away', status: 'pending', createdAt: new Date().toISOString()
+        });
+      }
+    }
+  }
+
+  // Save all fixtures
+  for (const f of fixtures) {
+    await fetch(`${TRN_DB}/tournament/matches.json`, { method: 'POST', body: JSON.stringify(f) });
+  }
+  alert(`✅ ${fixtures.length} টা match fixture তৈরি হয়েছে!`);
+  await fetchTrnData();
+}
+
+// ── Admin: Load Matchdays for Entry ──
+window.loadTrnMatchdays = async function() {
+  await fetchTrnData();
+  const sel = document.getElementById('trnMatchdaySelect');
+  if (!sel) return;
+  const days = [...new Set(trnMatchesCache.map(m => m.matchday))].sort();
+  sel.innerHTML = '<option value="">-- Select Matchday --</option>' +
+    days.map(d => {
+      const done = trnMatchesCache.filter(m => m.matchday === d && m.status === 'completed').length;
+      const total = trnMatchesCache.filter(m => m.matchday === d).length;
+      return `<option value="${d}">${d} (${done}/${total} done)</option>`;
+    }).join('');
+};
+
+window.loadMatchdayForEntry = function() {
+  const day = document.getElementById('trnMatchdaySelect').value;
+  const area = document.getElementById('trnMatchEntryArea');
+  const btnWrap = document.getElementById('trnSaveMatchBtnWrap');
+  if (!day) { area.innerHTML = ''; btnWrap.style.display = 'none'; return; }
+
+  const matches = trnMatchesCache.filter(m => m.matchday === day);
+  const teamMap = {};
+  trnTeamsCache.forEach(t => { teamMap[t.id] = t; });
+
+  area.innerHTML = matches.map(m => {
+    const ht = teamMap[m.homeTeam] || {};
+    const at = teamMap[m.awayTeam] || {};
+    const done = m.status === 'completed';
+    return `<div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:10px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+      <input type="hidden" class="trn-match-id" value="${m.id}">
+      <div style="flex:1;min-width:100px;font-size:13px;color:var(--text2);font-weight:600">
+        ${ht.emoji||'🏟️'} ${m.player1||'P1'} <span style="color:var(--text3)">(${ht.name||'?'})</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <input type="number" min="0" max="99" value="${done?m.homeScore:''}" placeholder="0"
+          class="form-input trn-score-home" data-id="${m.id}" style="width:60px;text-align:center;padding:8px 6px">
+        <span style="color:var(--text3);font-weight:700">—</span>
+        <input type="number" min="0" max="99" value="${done?m.awayScore:''}" placeholder="0"
+          class="form-input trn-score-away" data-id="${m.id}" style="width:60px;text-align:center;padding:8px 6px">
+      </div>
+      <div style="flex:1;min-width:100px;font-size:13px;color:var(--text2);font-weight:600;text-align:right">
+        <span style="color:var(--text3)">(${at.name||'?'})</span> ${m.player2||'P2'} ${at.emoji||'🏟️'}
+      </div>
+      ${done ? '<div style="font-size:11px;color:var(--green);font-family:\'Share Tech Mono\',monospace;width:100%;text-align:center">✅ DONE</div>' : ''}
+    </div>`;
+  }).join('');
+
+  btnWrap.style.display = 'block';
+};
+
+window.saveTrnMatchResults = async function() {
+  const statusEl = document.getElementById('trnMatchSaveStatus');
+  statusEl.textContent = '⏳ Saving...';
+  const homeInputs = document.querySelectorAll('.trn-score-home');
+  let saved = 0;
+  for (const inp of homeInputs) {
+    const id = inp.dataset.id;
+    const hs = inp.value.trim();
+    const awayInp = document.querySelector(`.trn-score-away[data-id="${id}"]`);
+    const as_ = awayInp ? awayInp.value.trim() : '';
+    if (hs === '' || as_ === '') continue;
+    await fetch(`${TRN_DB}/tournament/matches/${id}.json`, {
+      method: 'PATCH',
+      body: JSON.stringify({ homeScore: parseInt(hs), awayScore: parseInt(as_), status: 'completed', updatedAt: new Date().toISOString() })
+    });
+    saved++;
+  }
+  await fetchTrnData();
+  loadTrnMatchdays();
+  statusEl.textContent = `✅ ${saved} match saved!`;
+  setTimeout(() => statusEl.textContent = '', 3000);
+};
+
+// ── Knockout Admin ──
+window.loadKnockoutAdmin = async function() {
+  await fetchTrnData();
+  const area = document.getElementById('trnKnockoutAdminArea');
+  if (!area) return;
+  const ko = trnKnockoutCache;
+  const teamOptions = trnTeamsCache.map(t => `<option value="${t.id}">${t.emoji||''} ${t.name}</option>`).join('');
+  const tblank = '<option value="">-- Select Team --</option>';
+
+  const renderKOMatch = (key, label, m) => {
+    const t1 = m?.team1 || '', t2 = m?.team2 || '';
+    const s1 = m?.score1 ?? '', s2 = m?.score2 ?? '';
+    const done = m?.status === 'completed';
+    return `<div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:12px">
+      <div style="font-size:12px;color:var(--cyan);font-family:'Share Tech Mono',monospace;letter-spacing:1px;margin-bottom:10px">${label}</div>
+      <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center">
+        <select class="form-input" id="ko_t1_${key}" style="font-size:13px">
+          ${tblank}${teamOptions}
+        </select>
+        <div style="display:flex;gap:6px;align-items:center">
+          <input type="number" min="0" id="ko_s1_${key}" class="form-input" style="width:55px;text-align:center;padding:8px 6px" value="${s1}" placeholder="0">
+          <span style="color:var(--text3)">—</span>
+          <input type="number" min="0" id="ko_s2_${key}" class="form-input" style="width:55px;text-align:center;padding:8px 6px" value="${s2}" placeholder="0">
+        </div>
+        <select class="form-input" id="ko_t2_${key}" style="font-size:13px">
+          ${tblank}${teamOptions}
+        </select>
+      </div>
+      ${key === 'final' ? `<div style="margin-top:10px">
+        <label class="form-label">Champion (optional)</label>
+        <select class="form-input" id="ko_champion">${tblank}${teamOptions}</select>
+      </div>` : ''}
+      <div style="margin-top:8px;display:flex;gap:8px">
+        <select class="form-input" id="ko_st_${key}" style="flex:1;font-size:12px">
+          <option value="pending" ${m?.status==='pending'?'selected':''}>Upcoming</option>
+          <option value="completed" ${done?'selected':''}>Completed</option>
+        </select>
+      </div>
+    </div>`;
+  };
+
+  area.innerHTML = renderKOMatch('semi1', '⚡ SEMI-FINAL 1', ko.semi1) +
+    renderKOMatch('semi2', '⚡ SEMI-FINAL 2', ko.semi2) +
+    renderKOMatch('final', '🏆 FINAL', ko.final) +
+    `<button class="btn btn-gold" onclick="saveKnockout()" style="width:100%;padding:11px;margin-top:8px">💾 Save Knockout</button>
+     <span id="koSaveStatus" style="display:block;margin-top:8px;font-size:13px;color:var(--green)"></span>`;
+
+  // Set current values
+  ['semi1','semi2','final'].forEach(key => {
+    const m = ko[key];
+    if (!m) return;
+    const t1sel = document.getElementById(`ko_t1_${key}`);
+    const t2sel = document.getElementById(`ko_t2_${key}`);
+    if (t1sel && m.team1) t1sel.value = m.team1;
+    if (t2sel && m.team2) t2sel.value = m.team2;
+  });
+  if (ko.champion) {
+    const csel = document.getElementById('ko_champion');
+    if (csel) csel.value = ko.champion;
+  }
+};
+
+window.saveKnockout = async function() {
+  const parseMatch = (key) => {
+    const t1 = document.getElementById(`ko_t1_${key}`)?.value || '';
+    const t2 = document.getElementById(`ko_t2_${key}`)?.value || '';
+    const s1 = document.getElementById(`ko_s1_${key}`)?.value;
+    const s2 = document.getElementById(`ko_s2_${key}`)?.value;
+    const st = document.getElementById(`ko_st_${key}`)?.value || 'pending';
+    return { team1: t1, team2: t2, score1: s1!==''?parseInt(s1):null, score2: s2!==''?parseInt(s2):null, status: st };
+  };
+  const payload = {
+    semi1: parseMatch('semi1'),
+    semi2: parseMatch('semi2'),
+    final: parseMatch('final'),
+    champion: document.getElementById('ko_champion')?.value || '',
+    updatedAt: new Date().toISOString()
+  };
+  await fetch(`${TRN_DB}/tournament/knockout.json`, { method: 'PUT', body: JSON.stringify(payload) });
+  const st = document.getElementById('koSaveStatus');
+  if (st) { st.textContent = '✅ Saved!'; setTimeout(()=>st.textContent='',2500); }
+};
+
+window.autoSetSemis = async function() {
+  await fetchTrnData();
+  const standings = calcStandings(trnTeamsCache, trnMatchesCache);
+  if (standings.length < 4) { alert('কমপক্ষে ৪টা team-এর data লাগবে standings থেকে।'); return; }
+  const top4 = standings.slice(0, 4);
+  // 1st vs 4th, 2nd vs 3rd
+  const payload = {
+    semi1: { team1: top4[0].id, team2: top4[3].id, score1: null, score2: null, status: 'pending' },
+    semi2: { team1: top4[1].id, team2: top4[2].id, score1: null, score2: null, status: 'pending' },
+    final: trnKnockoutCache.final || { team1: '', team2: '', score1: null, score2: null, status: 'pending' },
+    champion: trnKnockoutCache.champion || '',
+    updatedAt: new Date().toISOString()
+  };
+  await fetch(`${TRN_DB}/tournament/knockout.json`, { method: 'PUT', body: JSON.stringify(payload) });
+  alert(`✅ Semi-finals set!\nSF1: ${top4[0].name} vs ${top4[3].name}\nSF2: ${top4[1].name} vs ${top4[2].name}`);
+  loadKnockoutAdmin();
+};
+
+// Hook into existing showPage and admin tab switcher
+const _origShowPage = window.showPage || function(){};
+window.showPage = function(name) {
+  _origShowPage(name);
+  if (name === 'tournament') {
+    switchTrnTab('standings');
+  }
+};
+
+const _origSwitchAdminTab = window.switchAdminTab;
+window.switchAdminTab = function(tab) {
+  _origSwitchAdminTab(tab);
+  if (tab === 'tournament') loadTrnAdminTeams();
+};
+
+window.window_switchTrnTab = window.switchTrnTab;
+
+window.filterFixtures = window.filterFixtures;
   document.getElementById('publicProfileModal').classList.remove('show');
   document.getElementById('ppWPBar').style.width = '0%';
 };
