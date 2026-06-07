@@ -2871,37 +2871,14 @@ window.loadResultRequests = async function() {
   }
 };
 
-// ── Admin: Approve Result → Apply to both player profiles ──
+// ── Admin: Approve Result → Apply to friendly stats only ──
 window.approveResult = async function(id) {
   const note = document.getElementById('rNote_' + id)?.value.trim() || '';
   const snap = await window._get(window._ref(window._db, 'friendlyResultRequests/' + id));
   if (!snap.exists()) { alert('Result not found.'); return; }
   const r = snap.val();
 
-  // Update both players' main profile stats (matches, wins, draws, losses, goalsFor, goalsAgainst, points)
-  async function updatePlayerProfile(uid, gf, ga, result) {
-    const pSnap = await window._get(window._ref(window._db, 'users/' + uid));
-    if (!pSnap.exists()) return;
-    const p = pSnap.val();
-    const updated = {
-      ...p,
-      matches: (p.matches||0) + 1,
-      wins: (p.wins||0) + (result==='w'?1:0),
-      draws: (p.draws||0) + (result==='d'?1:0),
-      losses: (p.losses||0) + (result==='l'?1:0),
-      goalsFor: (p.goalsFor||0) + gf,
-      goalsAgainst: (p.goalsAgainst||0) + ga,
-      points: (p.points||0) + (result==='w'?3:result==='d'?1:0)
-    };
-    await window._set(window._ref(window._db, 'users/' + uid), updated);
-  }
-
-  // Apply to submitter
-  await updatePlayerProfile(r.submittedBy, r.submitterScore, r.opponentScore, r.submitterResult);
-  // Apply to opponent
-  await updatePlayerProfile(r.opponentUid, r.opponentScore, r.submitterScore, r.opponentResult);
-
-  // Also update friendlyStats for leaderboard
+  // Only update friendlyStats (NOT main player profile/ranking)
   await updateFriendlyStats(r.submitterName, r.submitterScore, r.opponentScore, r.submitterResult);
   await updateFriendlyStats(r.opponentName, r.opponentScore, r.submitterScore, r.opponentResult);
 
@@ -2913,23 +2890,14 @@ window.approveResult = async function(id) {
     date: r.date, note: r.note || '', match_type: 'friendly',
     status: 'completed', addedAt: new Date().toISOString()
   });
-  await window._set(window._ref(window._db, 'matches/' + matchId), {
-    home_team: r.submitterName, away_team: r.opponentName,
-    home_score: r.submitterScore, away_score: r.opponentScore,
-    date: r.date, note: r.note || '', match_type: 'friendly',
-    tournament: 'Friendly Challenge', round: 'Friendly',
-    status: 'completed', addedAt: new Date().toISOString()
-  });
 
   // Mark result as accepted
   await window._set(window._ref(window._db, 'friendlyResultRequests/' + id + '/status'), 'accepted');
   await window._set(window._ref(window._db, 'friendlyResultRequests/' + id + '/adminNote'), note || 'Approved');
   await window._set(window._ref(window._db, 'friendlyResultRequests/' + id + '/approvedAt'), new Date().toISOString());
 
-  // Reset allUsersCache so profile shows updated data
   allUsersCache = [];
-
-  alert(`✅ Approved! ${r.submitterName} ও ${r.opponentName} এর profile এ result add হয়েছে।`);
+  alert(`✅ Approved! Friendly leaderboard এ result add হয়েছে।`);
   loadResultRequests();
 };
 
