@@ -2491,15 +2491,12 @@ window.searchOpponentLive = async function() {
 
   if (q.length < 1) { container.innerHTML = ''; return; }
 
-  // Load users if not cached
-  if (!(window._allUsersCache||[]).length) {
-    container.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:8px">🔄 Loading players...</div>';
-    const res = await fetch('https://typ-chapm-default-rtdb.firebaseio.com/users.json');
-    const data = await res.json();
-    window._allUsersCache = data ? Object.entries(data).map(([uid, val]) => ({ uid, ...val })) : [];
-  }
+  container.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:8px">🔄 Loading players...</div>';
+  const res = await fetch('https://typ-chapm-default-rtdb.firebaseio.com/users.json');
+  const data = await res.json();
+  const allUsers = data ? Object.entries(data).map(([uid, val]) => ({ uid, ...val })) : [];
 
-  const filtered = (window._allUsersCache||[]).filter(p => {
+  const filtered = allUsers.filter(p => {
     if (currentUser && p.uid === currentUser.uid) return false; // exclude self
     return (p.name||'').toLowerCase().includes(q) || (p.username||'').toLowerCase().includes(q) || (p.club||'').toLowerCase().includes(q);
   }).slice(0, 8);
