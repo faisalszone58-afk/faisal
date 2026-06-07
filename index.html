@@ -1122,6 +1122,7 @@ select.form-input option { background: var(--card); }
     <div class="tabs">
       <button class="tab-btn active" onclick="switchTab('overview')">Overview</button>
       <button class="tab-btn" onclick="switchTab('achievements')">Achievements</button>
+      <button class="tab-btn" onclick="switchTab('friendly')">🤝 Friendly</button>
     </div>
 
     <div class="tab-content active" id="tab-overview">
@@ -1143,6 +1144,10 @@ select.form-input option { background: var(--card); }
 
     <div class="tab-content" id="tab-achievements">
       <div id="achievementsGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px"></div>
+    </div>
+
+    <div class="tab-content" id="tab-friendly">
+      <div id="friendlyMatchesList"><div style="text-align:center;color:var(--text3);padding:40px 0">🤝 কোনো friendly match নেই।</div></div>
     </div>
   </div>
 </div>
@@ -2134,7 +2139,43 @@ window.switchTab = function(name) {
   document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
   document.querySelector(`[onclick="switchTab('${name}')"]`).classList.add('active');
   document.getElementById('tab-' + name).classList.add('active');
+  if (name === 'friendly') loadProfileFriendlyMatches();
 };
+
+async function loadProfileFriendlyMatches() {
+  const container = document.getElementById('friendlyMatchesList');
+  if (!currentUserData) return;
+  const myName = currentUserData.name;
+  try {
+    const res = await fetch('https://typ-chapm-default-rtdb.firebaseio.com/friendlyMatches.json');
+    const data = await res.json();
+    if (!data) { container.innerHTML = '<div style="text-align:center;color:var(--text3);padding:40px">🤝 কোনো friendly match নেই।</div>'; return; }
+    const matches = Object.entries(data)
+      .map(([id, m]) => ({ id, ...m }))
+      .filter(m => m.home_team === myName || m.away_team === myName)
+      .sort((a, b) => (b.addedAt||'').localeCompare(a.addedAt||''));
+    if (!matches.length) { container.innerHTML = '<div style="text-align:center;color:var(--text3);padding:40px">🤝 কোনো friendly match নেই।</div>'; return; }
+    container.innerHTML = matches.map(m => {
+      const isHome = m.home_team === myName;
+      const myScore = isHome ? m.home_score : m.away_score;
+      const oppScore = isHome ? m.away_score : m.home_score;
+      const oppName = isHome ? m.away_team : m.home_team;
+      const result = myScore > oppScore ? 'W' : myScore < oppScore ? 'L' : 'D';
+      const rc = result === 'W' ? 'var(--green)' : result === 'L' ? 'var(--red)' : 'var(--yellow)';
+      return `<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:12px">
+        <div style="font-size:13px;color:var(--text2)">${m.date||'—'}</div>
+        <div style="flex:1;text-align:center">
+          <div style="font-weight:700;font-size:15px">${myName} <span style="color:var(--text3)">vs</span> ${oppName}</div>
+          <div style="font-size:20px;font-weight:900;color:var(--cyan);margin-top:4px">${myScore} - ${oppScore}</div>
+          ${m.note ? `<div style="font-size:11px;color:var(--text3);margin-top:2px">${m.note}</div>` : ''}
+        </div>
+        <div style="font-size:18px;font-weight:900;color:${rc};background:rgba(0,0,0,0.2);padding:6px 12px;border-radius:8px">${result}</div>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    container.innerHTML = '<div style="text-align:center;color:var(--red);padding:20px">Error loading.</div>';
+  }
+}
 
 // ════════════════════════════════════════
 // 🛡️ ADMIN PANEL
