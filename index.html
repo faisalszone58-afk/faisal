@@ -2495,6 +2495,7 @@ window.searchOpponentLive = async function() {
   const res = await fetch('https://typ-chapm-default-rtdb.firebaseio.com/users.json');
   const data = await res.json();
   const allUsers = data ? Object.entries(data).map(([uid, val]) => ({ uid, ...val })) : [];
+  window._allUsersCache = allUsers; // keep for selectOpponent
 
   const filtered = allUsers.filter(p => {
     if (currentUser && p.uid === currentUser.uid) return false; // exclude self
@@ -2522,7 +2523,7 @@ window.searchOpponentLive = async function() {
 };
 
 window.selectOpponent = function(uid) {
-  const p = allUsersCache.find(x => x.uid === uid);
+  const p = (window._allUsersCache||[]).find(x => x.uid === uid);
   if (!p) return;
   selectedOpponent = p;
 
