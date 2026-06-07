@@ -1304,6 +1304,7 @@ select.form-input option { background: var(--card); }
     <!-- Header -->
     <div style="background:linear-gradient(135deg,var(--bg3),var(--card2));padding:28px 24px 20px;border-bottom:1px solid var(--border);position:relative">
       <button onclick="closePublicProfile()" style="position:absolute;top:14px;right:14px;background:rgba(255,255,255,0.08);border:1px solid var(--border);color:var(--text2);width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center">✕</button>
+      <button onclick="downloadStatsCard()" id="ppDownloadBtn" style="position:absolute;top:14px;right:52px;background:linear-gradient(135deg,var(--accent1),var(--accent2));border:none;color:#fff;padding:5px 12px;border-radius:20px;cursor:pointer;font-size:11px;font-weight:700;letter-spacing:1px;display:flex;align-items:center;gap:5px;font-family:'Exo 2',sans-serif">⬇ CARD</button>
       <div style="display:flex;align-items:center;gap:18px">
         <div id="ppAvatar" style="width:80px;height:80px;border-radius:50%;border:3px solid var(--gold);background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:32px;overflow:hidden;flex-shrink:0;box-shadow:0 0 20px rgba(245,166,35,0.2)">🎮</div>
         <div>
@@ -3178,6 +3179,10 @@ window.openPublicProfile = async function(uid) {
   const score = goals*2 + mvp*3;
   const wp = m > 0 ? ((w/m)*100).toFixed(1) : '0.0';
 
+  // Store for download
+  window._ppCurrentPlayer = p;
+  window._ppCurrentStats = { m, w, d, l, goals, mvp, score, wp, ga: p.goalsAgainst||0 };
+
   document.getElementById('ppRank').textContent = p.rank ? `RANK #${p.rank} • TYP PLAYER` : 'TYP PLAYER';
   document.getElementById('ppName').textContent = p.name || '—';
   document.getElementById('ppClub').textContent = p.club || '—';
@@ -3242,6 +3247,226 @@ window.openPublicProfile = async function(uid) {
     flContainer.innerHTML = '<div style="color:var(--red);font-size:13px;padding:10px">Error loading.</div>';
   }
 };
+
+// ── DOWNLOAD STATS CARD — Full-photo overlay style ──
+window.downloadStatsCard = async function() {
+  const p = window._ppCurrentPlayer;
+  const s = window._ppCurrentStats;
+  if (!p || !s) return;
+
+  const btn = document.getElementById('ppDownloadBtn');
+  btn.innerHTML = '⏳ Generating...';
+  btn.disabled = true;
+
+  const W = 900, H = 1200;
+  const canvas = document.createElement('canvas');
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext('2d');
+
+  // ── Load avatar ──
+  const avatarImg = await new Promise(resolve => {
+    if (!p.avatarUrl) { resolve(null); return; }
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => resolve(img);
+    img.onerror = () => resolve(null);
+    img.src = p.avatarUrl;
+  });
+
+  // ════════════════════════════════════════════
+  // LAYER 1: BLACK BASE
+  // ════════════════════════════════════════════
+  ctx.fillStyle = '#000000';
+  ctx.fillRect(0, 0, W, H);
+
+  // ════════════════════════════════════════════
+  // LAYER 2: PLAYER PHOTO — COVER FULL CARD
+  // object-fit: cover — fill entire W×H, crop center
+  // ════════════════════════════════════════════
+  if (avatarImg) {
+    const iW = avatarImg.width, iH = avatarImg.height;
+    const scale = Math.max(W / iW, H / iH); // cover (not contain)
+    const dw = iW * scale;
+    const dh = iH * scale;
+    const dx = (W - dw) / 2; // center horizontally
+    const dy = 0;             // anchor top so face shows
+    ctx.drawImage(avatarImg, dx, dy, dw, dh);
+  } else {
+    const pg = ctx.createRadialGradient(W/2, H*0.4, 0, W/2, H*0.4, 500);
+    pg.addColorStop(0, '#1a1a2e'); pg.addColorStop(1, '#000000');
+    ctx.fillStyle = pg;
+    ctx.fillRect(0, 0, W, H);
+    ctx.font = '200px serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText('🎮', W/2, H * 0.38);
+  }
+
+  // ════════════════════════════════════════════
+  // LAYER 3: DARK OVERLAYS (so text is readable)
+  // ════════════════════════════════════════════
+
+  // Top vignette (for logo + rank area)
+  const topFade = ctx.createLinearGradient(0, 0, 0, 200);
+  topFade.addColorStop(0, 'rgba(0,0,0,0.72)');
+  topFade.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = topFade;
+  ctx.fillRect(0, 0, W, 200);
+
+  // Bottom overlay — strong dark gradient for info panel
+  const botFade = ctx.createLinearGradient(0, H * 0.48, 0, H);
+  botFade.addColorStop(0,   'rgba(0,0,0,0)');
+  botFade.addColorStop(0.18,'rgba(0,0,0,0.55)');
+  botFade.addColorStop(0.42,'rgba(0,0,0,0.85)');
+  botFade.addColorStop(0.65,'rgba(0,0,0,0.96)');
+  botFade.addColorStop(1,   'rgba(0,0,0,1)');
+  ctx.fillStyle = botFade;
+  ctx.fillRect(0, H * 0.48, W, H * 0.52);
+
+  // Side vignettes
+  const vigL = ctx.createLinearGradient(0, 0, 160, 0);
+  vigL.addColorStop(0, 'rgba(0,0,0,0.6)'); vigL.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = vigL; ctx.fillRect(0, 0, 160, H);
+  const vigR = ctx.createLinearGradient(W - 160, 0, W, 0);
+  vigR.addColorStop(0, 'rgba(0,0,0,0)'); vigR.addColorStop(1, 'rgba(0,0,0,0.6)');
+  ctx.fillStyle = vigR; ctx.fillRect(W - 160, 0, 160, H);
+
+  // ════════════════════════════════════════════
+  // LAYER 4: TOP-LEFT — TYP LOGO (placeholder)
+  // ════════════════════════════════════════════
+  ctx.fillStyle = '#ffffff';
+  ctx.font = 'bold 44px Arial Black, Arial, sans-serif';
+  ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+  ctx.fillText('⚡ TYP', 32, 32);
+
+  // ════════════════════════════════════════════
+  // LAYER 4b: TOP-RIGHT — RANK
+  // ════════════════════════════════════════════
+  if (p.rank) {
+    ctx.fillStyle = '#f5c842';
+    ctx.font = 'bold 56px Arial Black, Arial, sans-serif';
+    ctx.textAlign = 'right'; ctx.textBaseline = 'top';
+    ctx.fillText(`#${p.rank}`, W - 32, 28);
+  }
+
+  // ════════════════════════════════════════════
+  // LAYER 5: CLUB BADGE — centered, lower-mid
+  // ════════════════════════════════════════════
+  const badgeX = W / 2, badgeY = H * 0.62, badgeR = 68;
+
+  // Shadow behind badge
+  ctx.shadowColor = 'rgba(0,0,0,0.7)';
+  ctx.shadowBlur = 18;
+  ctx.beginPath(); ctx.arc(badgeX, badgeY, badgeR, 0, Math.PI * 2);
+  ctx.fillStyle = '#ffffff'; ctx.fill();
+  ctx.shadowBlur = 0;
+
+  ctx.strokeStyle = '#dddddd'; ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.arc(badgeX, badgeY, badgeR, 0, Math.PI * 2); ctx.stroke();
+
+  // Club initials
+  const clubWords = (p.club || 'TYP').trim().split(/\s+/);
+  const initials  = clubWords.map(w => w[0] || '').join('').slice(0, 4).toUpperCase();
+  const iFSize    = initials.length <= 2 ? 40 : initials.length === 3 ? 30 : 24;
+  ctx.fillStyle = '#111111';
+  ctx.font = `bold ${iFSize}px Arial Black, Arial, sans-serif`;
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(initials, badgeX, badgeY);
+
+  // ════════════════════════════════════════════
+  // LAYER 6: PLAYER NAME — big bold white
+  // ════════════════════════════════════════════
+  const nameY = badgeY + badgeR + 28;
+  const name = p.name || '—';
+  let fSize = 78;
+  ctx.font = `bold ${fSize}px Arial Black, Arial, sans-serif`;
+  ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+  while (ctx.measureText(name).width > W - 60 && fSize > 34) {
+    fSize -= 2;
+    ctx.font = `bold ${fSize}px Arial Black, Arial, sans-serif`;
+  }
+  // Text shadow for readability
+  ctx.shadowColor = 'rgba(0,0,0,0.9)';
+  ctx.shadowBlur = 12;
+  ctx.fillStyle = '#ffffff';
+  ctx.fillText(name, W / 2, nameY);
+  ctx.shadowBlur = 0;
+
+  // ── Club | District ──
+  const subY = nameY + fSize + 10;
+  ctx.fillStyle = '#cccccc';
+  ctx.font = '28px Arial, sans-serif';
+  ctx.shadowColor = 'rgba(0,0,0,0.8)'; ctx.shadowBlur = 8;
+  ctx.fillText(`${p.club || '—'}  |  ${p.district || '—'}`, W / 2, subY);
+  ctx.shadowBlur = 0;
+
+  // ── Separator ──
+  const sepY = subY + 42;
+  ctx.strokeStyle = 'rgba(255,255,255,0.18)'; ctx.lineWidth = 1.2;
+  ctx.beginPath(); ctx.moveTo(50, sepY); ctx.lineTo(W - 50, sepY); ctx.stroke();
+
+  // ════════════════════════════════════════════
+  // LAYER 7: STATS ROW — PL W D GF GA
+  // ════════════════════════════════════════════
+  const stats = [
+    { label: 'PL',  value: s.m     },
+    { label: 'W',   value: s.w     },
+    { label: 'D',   value: s.d     },
+    { label: 'GF',  value: s.goals },
+    { label: '🏅MVP', value: s.mvp  },
+  ];
+  const statsY = sepY + 18;
+  const colW   = W / stats.length;
+
+  stats.forEach((st, i) => {
+    const cx = colW * i + colW / 2;
+    // Label
+    ctx.fillStyle = 'rgba(255,255,255,0.65)';
+    ctx.font = 'bold 26px Arial, sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+    ctx.shadowColor = 'rgba(0,0,0,0.9)'; ctx.shadowBlur = 6;
+    ctx.fillText(st.label, cx, statsY);
+    // Value — yellow
+    ctx.fillStyle = '#f5c842';
+    ctx.font = 'bold 82px Arial Black, Arial, sans-serif';
+    ctx.textBaseline = 'top';
+    ctx.shadowColor = 'rgba(0,0,0,0.95)'; ctx.shadowBlur = 10;
+    ctx.fillText(st.value, cx, statsY + 32);
+  });
+  ctx.shadowBlur = 0;
+
+  // ════════════════════════════════════════════
+  // LAYER 8: FOOTER
+  // ════════════════════════════════════════════
+  const dateStr = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: '2-digit' });
+  ctx.fillStyle = 'rgba(180,180,180,0.7)';
+  ctx.font = '20px monospace';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+  ctx.fillText(`All-Time Official  |  TYP Championship  |  ${dateStr}`, W / 2, H - 22);
+
+  // ── Export ──
+  const link = document.createElement('a');
+  link.download = `${(p.name || 'player').replace(/\s+/g, '-')}_TYP-Stats.png`;
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+
+  btn.innerHTML = '⬇ CARD';
+  btn.disabled = false;
+};
+
+// Helper: rounded rect path
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x+r, y);
+  ctx.lineTo(x+w-r, y);
+  ctx.quadraticCurveTo(x+w, y, x+w, y+r);
+  ctx.lineTo(x+w, y+h-r);
+  ctx.quadraticCurveTo(x+w, y+h, x+w-r, y+h);
+  ctx.lineTo(x+r, y+h);
+  ctx.quadraticCurveTo(x, y+h, x, y+h-r);
+  ctx.lineTo(x, y+r);
+  ctx.quadraticCurveTo(x, y, x+r, y);
+  ctx.closePath();
+}
 
 window.closePublicProfile = function() {
   document.getElementById('publicProfileModal').classList.remove('show');
