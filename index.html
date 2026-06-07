@@ -1260,6 +1260,11 @@ select.form-input option { background: var(--card); }
           <div id="ppWPBar" style="height:100%;background:linear-gradient(90deg,var(--cyan),var(--green));border-radius:3px;transition:width 0.6s ease;width:0%"></div>
         </div>
       </div>
+      <!-- Friendly Matches -->
+      <div style="margin-top:20px;border-top:1px solid var(--border);padding-top:16px">
+        <div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--cyan);letter-spacing:2px;margin-bottom:12px">🤝 FRIENDLY MATCHES</div>
+        <div id="ppFriendlyList"><div style="text-align:center;color:var(--text3);font-size:13px;padding:10px">Loading...</div></div>
+      </div>
     </div>
   </div>
 </div>
@@ -3093,7 +3098,37 @@ window.openPublicProfile = async function(uid) {
   document.getElementById('ppWP').textContent = wp + '%';
   setTimeout(() => { document.getElementById('ppWPBar').style.width = wp + '%'; }, 100);
 
+  // Load friendly matches
+  const flContainer = document.getElementById('ppFriendlyList');
+  flContainer.innerHTML = '<div style="text-align:center;color:var(--text3);font-size:13px;padding:10px">Loading...</div>';
   modal.classList.add('show');
+
+  try {
+    const res = await fetch('https://typ-chapm-default-rtdb.firebaseio.com/friendlyMatches.json');
+    const fdata = await res.json();
+    if (!fdata) { flContainer.innerHTML = '<div style="text-align:center;color:var(--text3);font-size:13px;padding:10px">কোনো friendly match নেই।</div>'; return; }
+    const pName = p.name;
+    const fmatches = Object.entries(fdata)
+      .map(([id, fm]) => ({ id, ...fm }))
+      .filter(fm => fm.home_team === pName || fm.away_team === pName)
+      .sort((a, b) => (b.addedAt||'').localeCompare(a.addedAt||''));
+    if (!fmatches.length) { flContainer.innerHTML = '<div style="text-align:center;color:var(--text3);font-size:13px;padding:10px">কোনো friendly match নেই।</div>'; return; }
+    flContainer.innerHTML = fmatches.map(fm => {
+      const isHome = fm.home_team === pName;
+      const myS = isHome ? fm.home_score : fm.away_score;
+      const oppS = isHome ? fm.away_score : fm.home_score;
+      const oppN = isHome ? fm.away_team : fm.home_team;
+      const res2 = myS > oppS ? 'W' : myS < oppS ? 'L' : 'D';
+      const rc = res2 === 'W' ? 'var(--green)' : res2 === 'L' ? 'var(--red)' : 'var(--yellow)';
+      return `<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:var(--bg3);border-radius:8px;margin-bottom:6px;font-size:13px">
+        <div style="color:var(--text3)">${fm.date||'—'}</div>
+        <div style="text-align:center;flex:1;padding:0 8px"><span style="color:var(--text2)">${pName}</span> <span style="color:var(--text3)">vs</span> <span style="color:var(--text2)">${oppN}</span><br><span style="font-weight:700;color:var(--cyan)">${myS} - ${oppS}</span></div>
+        <div style="font-weight:900;color:${rc};padding:4px 10px;border-radius:6px;background:rgba(0,0,0,0.2)">${res2}</div>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    flContainer.innerHTML = '<div style="color:var(--red);font-size:13px;padding:10px">Error loading.</div>';
+  }
 };
 
 window.closePublicProfile = function() {
