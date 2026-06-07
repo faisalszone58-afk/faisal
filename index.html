@@ -2819,10 +2819,11 @@ window.loadResultRequests = async function() {
   const container = document.getElementById('resultRequestsList');
   container.innerHTML = '<div class="text-center" style="padding:30px"><span class="spinner"></span></div>';
   try {
-    const snap = await window._get(window._ref(window._db, 'friendlyResultRequests'));
-    if (!snap.exists()) { container.innerHTML = '<div style="color:var(--text3);padding:20px;text-align:center">কোনো result submission নেই।</div>'; document.getElementById('pendingResultCount').textContent = '0'; return; }
+    const _res = await fetch("https://typ-chapm-default-rtdb.firebaseio.com/friendlyResultRequests.json");
+    const _data = await _res.json();
+    if (!_data) { container.innerHTML = "<div style=\"color:var(--text3);padding:20px;text-align:center\">কোনো result submission নেই।</div>"; document.getElementById("pendingResultCount").textContent = "0"; return; }
     const reqs = [];
-    snap.forEach(c => reqs.push({ id: c.key, ...c.val() }));
+    Object.entries(_data).forEach(([k, v]) => reqs.push({ id: k, ...v }));
     reqs.sort((a,b) => (b.submittedAt||'').localeCompare(a.submittedAt||''));
     const pending = reqs.filter(r => r.status === 'pending').length;
     document.getElementById('pendingResultCount').textContent = pending;
