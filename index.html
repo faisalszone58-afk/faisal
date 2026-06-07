@@ -1262,7 +1262,26 @@ select.form-input option { background: var(--card); }
       </div>
       <!-- Friendly Matches -->
       <div style="margin-top:20px;border-top:1px solid var(--border);padding-top:16px">
-        <div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--cyan);letter-spacing:2px;margin-bottom:12px">🤝 FRIENDLY MATCHES</div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--cyan);letter-spacing:2px;margin-bottom:12px">🤝 FRIENDLY STATS</div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px">
+          <div style="background:var(--bg3);border-radius:10px;padding:10px 6px;text-align:center">
+            <div id="ppFM" style="font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;color:var(--text)">—</div>
+            <div style="font-size:10px;color:var(--text3);font-family:'Share Tech Mono',monospace">M</div>
+          </div>
+          <div style="background:rgba(0,230,118,0.08);border:1px solid rgba(0,230,118,0.2);border-radius:10px;padding:10px 6px;text-align:center">
+            <div id="ppFW" style="font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;color:var(--green)">—</div>
+            <div style="font-size:10px;color:var(--text3);font-family:'Share Tech Mono',monospace">W</div>
+          </div>
+          <div style="background:rgba(255,209,102,0.08);border:1px solid rgba(255,209,102,0.2);border-radius:10px;padding:10px 6px;text-align:center">
+            <div id="ppFD" style="font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;color:var(--yellow)">—</div>
+            <div style="font-size:10px;color:var(--text3);font-family:'Share Tech Mono',monospace">D</div>
+          </div>
+          <div style="background:rgba(255,71,87,0.08);border:1px solid rgba(255,71,87,0.2);border-radius:10px;padding:10px 6px;text-align:center">
+            <div id="ppFL" style="font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;color:var(--red)">—</div>
+            <div style="font-size:10px;color:var(--text3);font-family:'Share Tech Mono',monospace">L</div>
+          </div>
+        </div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text3);letter-spacing:1px;margin-bottom:8px">MATCH HISTORY</div>
         <div id="ppFriendlyList"><div style="text-align:center;color:var(--text3);font-size:13px;padding:10px">Loading...</div></div>
       </div>
     </div>
@@ -3112,7 +3131,25 @@ window.openPublicProfile = async function(uid) {
       .map(([id, fm]) => ({ id, ...fm }))
       .filter(fm => fm.home_team === pName || fm.away_team === pName)
       .sort((a, b) => (b.addedAt||'').localeCompare(a.addedAt||''));
-    if (!fmatches.length) { flContainer.innerHTML = '<div style="text-align:center;color:var(--text3);font-size:13px;padding:10px">কোনো friendly match নেই।</div>'; return; }
+    if (!fmatches.length) {
+      document.getElementById('ppFM').textContent = 0;
+      document.getElementById('ppFW').textContent = 0;
+      document.getElementById('ppFD').textContent = 0;
+      document.getElementById('ppFL').textContent = 0;
+      flContainer.innerHTML = '<div style="text-align:center;color:var(--text3);font-size:13px;padding:10px">কোনো friendly match নেই।</div>'; return;
+    }
+    // Calculate friendly stats
+    let fm_w=0, fm_d=0, fm_l=0;
+    fmatches.forEach(fm => {
+      const isHome = fm.home_team === pName;
+      const myS = isHome ? fm.home_score : fm.away_score;
+      const oppS = isHome ? fm.away_score : fm.home_score;
+      if (myS > oppS) fm_w++; else if (myS < oppS) fm_l++; else fm_d++;
+    });
+    document.getElementById('ppFM').textContent = fmatches.length;
+    document.getElementById('ppFW').textContent = fm_w;
+    document.getElementById('ppFD').textContent = fm_d;
+    document.getElementById('ppFL').textContent = fm_l;
     flContainer.innerHTML = fmatches.map(fm => {
       const isHome = fm.home_team === pName;
       const myS = isHome ? fm.home_score : fm.away_score;
