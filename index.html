@@ -4815,24 +4815,15 @@ window.autoSetSemis = async function() {
   loadKnockoutAdmin();
 };
 
-// Hook into existing showPage and admin tab switcher
-const _origShowPage = window.showPage || function(){};
-window.showPage = function(name) {
-  _origShowPage(name);
-  if (name === 'tournament') {
-    switchTrnTab('standings');
-  }
-};
-
+// Hook tournament into admin tab switcher only
+// (showPage is defined in the non-module script below — don't override it here)
 const _origSwitchAdminTab = window.switchAdminTab;
 window.switchAdminTab = function(tab) {
   _origSwitchAdminTab(tab);
   if (tab === 'tournament') loadTrnAdminTeams();
 };
 
-window.window_switchTrnTab = window.switchTrnTab;
-
-window.filterFixtures = window.filterFixtures;
+window.closePublicProfile = function() {
   document.getElementById('publicProfileModal').classList.remove('show');
   document.getElementById('ppWPBar').style.width = '0%';
 };
@@ -4950,6 +4941,9 @@ function showPage(name) {
     document.getElementById('adminDashSection').style.display = 'none';
     document.getElementById('adminPassInput').value = '';
     document.getElementById('adminLoginError').classList.remove('show');
+  }
+  if (name === 'tournament') {
+    if (typeof switchTrnTab === 'function') switchTrnTab('standings');
   }
 }
 </script>
