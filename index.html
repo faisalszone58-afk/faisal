@@ -2429,7 +2429,9 @@ window.loadFriendlyLeaderboard = async function() {
   const container = document.getElementById('friendlyLeaderboardTable');
   container.innerHTML = '<div class="text-center" style="padding:40px"><span class="spinner"></span><p style="color:var(--text3);margin-top:12px">Loading...</p></div>';
   try {
-    const snap = await window._get(window._ref(window._db, 'friendlyStats'));
+    const _res = await fetch('https://typ-chapm-default-rtdb.firebaseio.com/friendlyStats.json');
+    const _fdata = await _res.json();
+    const snap = { exists: () => !!_fdata, forEach: (cb) => _fdata && Object.entries(_fdata).forEach(([k,v]) => cb({ key: k, val: () => v })) };
     if (!snap.exists()) {
       container.innerHTML = '<div class="card text-center" style="padding:60px 20px"><div style="font-size:48px;margin-bottom:12px">🤝</div><p style="color:var(--text3)">এখনো কোনো friendly match হয়নি।</p></div>';
       return;
@@ -2945,7 +2947,9 @@ async function updateFriendlyStats(playerName, gf, ga, result) {
   });
 
   const statsKey = playerUid || playerName.toLowerCase().replace(/\s+/g, '_');
-  const statsSnap = await window._get(window._ref(window._db, `friendlyStats/${statsKey}`));
+  const _sr = await fetch(`https://typ-chapm-default-rtdb.firebaseio.com/friendlyStats/${statsKey}.json`);
+  const _sd = await _sr.json();
+  const statsSnap = { exists: () => !!_sd, val: () => _sd };
   const existing = statsSnap.exists() ? statsSnap.val() : { m:0, w:0, d:0, l:0, gf:0, ga:0, pts:0 };
 
   const updated = {
@@ -2961,7 +2965,7 @@ async function updateFriendlyStats(playerName, gf, ga, result) {
     ga: (existing.ga||0) + ga,
     pts: (existing.pts||0) + (result==='w'?3:result==='d'?1:0)
   };
-  await window._set(window._ref(window._db, `friendlyStats/${statsKey}`), updated);
+  await fetch(`https://typ-chapm-default-rtdb.firebaseio.com/friendlyStats/${statsKey}.json`, { method: 'PUT', body: JSON.stringify(updated) });
 }
 
 // Initial home page load — called here so db/ref/get are in scope
