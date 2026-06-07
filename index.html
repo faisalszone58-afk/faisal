@@ -3019,10 +3019,9 @@ window.deleteMatchFromHome = async function(id) {
 
 async function getAllUsers() {
   if ((window._allUsersCache||[]).length) return window._allUsersCache;
-  const snap = await window._get(window._ref(window._db, 'users'));
-  if (!snap.exists()) return [];
-  window._allUsersCache = [];
-  snap.forEach(c => window._allUsersCache.push({ uid: c.key, ...c.val() }));
+  const res = await fetch('https://typ-chapm-default-rtdb.firebaseio.com/users.json');
+  const data = await res.json();
+  window._allUsersCache = data ? Object.entries(data).map(([uid, val]) => ({ uid, ...val })) : [];
   return window._allUsersCache;
 }
 
