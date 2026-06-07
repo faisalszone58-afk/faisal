@@ -1928,13 +1928,14 @@ window.loadRanking = async function() {
     }
     rankingData = [];
     Object.entries(data).forEach(([uid, val]) => rankingData.push({ uid, ...val }));
-    // Points দিয়ে sort, তারপর wins, তারপর goals
+    // Points (W=3,D=1) first, then score (goals*2 + mvp*3)
     rankingData.sort((a, b) => {
+      const pa = (a.wins||0)*3 + (a.draws||0)*1;
+      const pb = (b.wins||0)*3 + (b.draws||0)*1;
+      if (pb !== pa) return pb - pa;
       const sa = (a.goalsFor||0)*2 + (a.mvp||0)*3;
       const sb = (b.goalsFor||0)*2 + (b.mvp||0)*3;
-      if (sb !== sa) return sb - sa;
-      if ((b.mvp||0) !== (a.mvp||0)) return (b.mvp||0) - (a.mvp||0);
-      return (b.goalsFor||0) - (a.goalsFor||0);
+      return sb - sa;
     });
     renderRanking(rankingData);
     document.getElementById('statPlayers').textContent = rankingData.length;
@@ -2491,14 +2492,14 @@ window.searchOpponentLive = async function() {
   if (q.length < 1) { container.innerHTML = ''; return; }
 
   // Load users if not cached
-  if (!allUsersCache.length) {
+  if (!(window._allUsersCache||[]).length) {
     container.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:8px">🔄 Loading players...</div>';
-    const snap = await window._get(window._ref(window._db, 'users'));
-    if (!snap.exists()) { container.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:8px">কোনো player নেই।</div>'; return; }
-    snap.forEach(c => allUsersCache.push({ uid: c.key, ...c.val() }));
+    const res = await fetch('https://typ-chapm-default-rtdb.firebaseio.com/users.json');
+    const data = await res.json();
+    window._allUsersCache = data ? Object.entries(data).map(([uid, val]) => ({ uid, ...val })) : [];
   }
 
-  const filtered = allUsersCache.filter(p => {
+  const filtered = (window._allUsersCache||[]).filter(p => {
     if (currentUser && p.uid === currentUser.uid) return false; // exclude self
     return (p.name||'').toLowerCase().includes(q) || (p.username||'').toLowerCase().includes(q) || (p.club||'').toLowerCase().includes(q);
   }).slice(0, 8);
