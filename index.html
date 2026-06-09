@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>TYP Championship</title>
+<title>TEXT YOUR PES</title>
 <link href="https://fonts.googleapis.com/css2?family=Rubik+Glitch&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -1629,7 +1629,7 @@ select.form-input option { background: var(--card); }
 <div class="page active" id="page-home">
   <div class="hero">
     <div class="hero-badge">🏆 Season 2026 • Active</div>
-    <h1><span class="gold">TYP</span> <span class="cyan">CHAMPIONSHIP</span></h1>
+    <h1><span class="gold">TEXT</span> <span class="cyan">YOUR PES</span></h1>
     <p>Bangladesh-এর সেরা eFootball community। খেলো, জেতো, legend হও।</p>
     <div class="hero-btns" id="heroBtns">
       <button class="btn btn-gold" onclick="showPage('register')">🚀 Join Now</button>
@@ -1681,7 +1681,7 @@ select.form-input option { background: var(--card); }
   <div class="auth-wrap">
     <div class="auth-box">
       <div class="auth-logo">
-        <h2>⚡ TYP</h2>
+        <h2>⚡ TEXT YOUR PES</h2>
         <p>নতুন account তৈরি করুন</p>
       </div>
 
@@ -1778,7 +1778,7 @@ select.form-input option { background: var(--card); }
   <div class="auth-wrap">
     <div class="auth-box">
       <div class="auth-logo">
-        <h2>⚡ TYP</h2>
+        <h2>⚡ TEXT YOUR PES</h2>
         <p>আপনার account-এ login করুন</p>
       </div>
 
@@ -2485,7 +2485,7 @@ select.form-input option { background: var(--card); }
       <div class="admin-header">
         <div>
           <div class="admin-title">🛡️ ADMIN PANEL</div>
-          <div style="font-size:13px;color:var(--text3);margin-top:4px">TYP Championship Management</div>
+          <div style="font-size:13px;color:var(--text3);margin-top:4px">TEXT YOUR PES Management</div>
         </div>
         <span class="admin-badge">ADMIN</span>
       </div>
@@ -2544,7 +2544,7 @@ select.form-input option { background: var(--card); }
           </div>
           <div class="form-group">
             <label class="form-label">Tournament</label>
-            <input type="text" class="form-input" id="mTournament" placeholder="TYP Championship Season 1" value="TYP Championship">
+            <input type="text" class="form-input" id="mTournament" placeholder="TEXT YOUR PES Season 1" value="TEXT YOUR PES">
           </div>
           <button class="btn btn-gold" style="width:100%;margin-top:8px" onclick="addMatchResult()">✅ Save Match Result</button>
         </div>
@@ -3439,6 +3439,9 @@ function updateNavUser() {
   document.getElementById('dropdownName').textContent = currentUserData.name || 'Player';
   document.getElementById('dropdownClub').textContent = currentUserData.club || '—';
   updateBnavAvatar();
+  // Hide Join Now button when logged in
+  const heroBtns = document.getElementById('heroBtns');
+  if (heroBtns) heroBtns.style.display = 'none';
 }
 
 // ── TOGGLE DROPDOWN ──
@@ -4922,7 +4925,7 @@ window.downloadStatsCard = async function() {
   ctx.fillStyle = 'rgba(180,180,180,0.7)';
   ctx.font = '20px monospace';
   ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
-  ctx.fillText(`All-Time Official  |  TYP Championship  |  ${dateStr}`, W / 2, H - 22);
+  ctx.fillText(`All-Time Official  |  TEXT YOUR PES  |  ${dateStr}`, W / 2, H - 22);
 
   // ── Export ──
   const link = document.createElement('a');
