@@ -5849,13 +5849,27 @@ window.bnavProfile = function() {
     menu.style.cssText = 'position:fixed;bottom:70px;right:10px;background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:8px;z-index:9999;min-width:160px;box-shadow:0 -4px 20px rgba(0,0,0,0.5)';
     menu.innerHTML = `
       <div onclick="showPage('profile');setBottomNav('profile');document.getElementById('bnavProfileMenu').remove()" style="padding:10px 14px;cursor:pointer;border-radius:8px;color:var(--text);font-size:14px;display:flex;align-items:center;gap:8px" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background=''">👤 My Profile</div>
+      <div onclick="showPage('tournament');setBottomNav('');document.getElementById('bnavProfileMenu').remove()" style="padding:10px 14px;cursor:pointer;border-radius:8px;color:var(--text);font-size:14px;display:flex;align-items:center;gap:8px" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background=''" >🏟️ Tournament</div>
+      <div onclick="showPage('rules');setBottomNav('');document.getElementById('bnavProfileMenu').remove()" style="padding:10px 14px;cursor:pointer;border-radius:8px;color:var(--text);font-size:14px;display:flex;align-items:center;gap:8px" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background=''">📋 Rules</div>
+      <div style="height:1px;background:var(--border);margin:4px 0"></div>
       <div onclick="logout();document.getElementById('bnavProfileMenu')?.remove()" style="padding:10px 14px;cursor:pointer;border-radius:8px;color:var(--red);font-size:14px;display:flex;align-items:center;gap:8px" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background=''">🚪 Logout</div>
     `;
     document.body.appendChild(menu);
     setTimeout(() => { document.addEventListener('click', function handler(e) { if (!menu.contains(e.target) && e.target.id !== 'bnav-profile') { menu.remove(); document.removeEventListener('click', handler); } }); }, 100);
   } else {
-    showPage('login');
-    setBottomNav('');
+    const existing = document.getElementById('bnavProfileMenu');
+    if (existing) { existing.remove(); return; }
+    const menu = document.createElement('div');
+    menu.id = 'bnavProfileMenu';
+    menu.style.cssText = 'position:fixed;bottom:70px;right:10px;background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:8px;z-index:9999;min-width:160px;box-shadow:0 -4px 20px rgba(0,0,0,0.5)';
+    menu.innerHTML = `
+      <div onclick="showPage('tournament');setBottomNav('');document.getElementById('bnavProfileMenu').remove()" style="padding:10px 14px;cursor:pointer;border-radius:8px;color:var(--text);font-size:14px;display:flex;align-items:center;gap:8px" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background=''">🏟️ Tournament</div>
+      <div onclick="showPage('rules');setBottomNav('');document.getElementById('bnavProfileMenu').remove()" style="padding:10px 14px;cursor:pointer;border-radius:8px;color:var(--text);font-size:14px;display:flex;align-items:center;gap:8px" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background=''">📋 Rules</div>
+      <div style="height:1px;background:var(--border);margin:4px 0"></div>
+      <div onclick="showPage('login');document.getElementById('bnavProfileMenu')?.remove()" style="padding:10px 14px;cursor:pointer;border-radius:8px;color:var(--primary);font-size:14px;display:flex;align-items:center;gap:8px" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background=''">🔐 Login</div>
+    `;
+    document.body.appendChild(menu);
+    setTimeout(() => { document.addEventListener('click', function handler(e) { if (!menu.contains(e.target) && e.target.id !== 'bnav-profile') { menu.remove(); document.removeEventListener('click', handler); } }); }, 100);
   }
 };
 
