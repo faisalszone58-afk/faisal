@@ -1101,6 +1101,83 @@ select.form-input option { background: var(--card); }
 }
 .team-player-avatar img { width: 100%; height: 100%; object-fit: cover; }
 
+/* RULES PAGE */
+.rules-section {
+  margin-bottom: 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  animation: fadeUp .4s ease both;
+}
+.rules-header {
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  user-select: none;
+  transition: background .2s;
+}
+.rules-header:hover { background: var(--bg3); }
+.rules-title {
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--primary);
+  flex: 1;
+  letter-spacing: 0.02em;
+}
+.rules-toggle {
+  color: var(--text3);
+  font-size: 11px;
+  transition: transform .3s;
+}
+.rules-section.collapsed .rules-toggle { transform: rotate(-90deg); }
+.rules-body {
+  background: var(--card2);
+  padding: 16px 18px;
+}
+.rules-section.collapsed .rules-body { display: none; }
+.rule-row {
+  padding: 9px 0;
+  border-bottom: 1px solid rgba(113,50,202,0.1);
+  line-height: 1.75;
+  font-size: 13.5px;
+  color: var(--text2);
+}
+.rule-row:last-child { border-bottom: none; padding-bottom: 0; }
+.rl {
+  display: inline-block;
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  padding: 2px 7px;
+  border-radius: 4px;
+  margin-right: 7px;
+  vertical-align: middle;
+}
+.rl-green  { background: rgba(22,163,74,.12);  color: var(--green);  border: 1px solid rgba(22,163,74,.3); }
+.rl-gold   { background: rgba(202,138,4,.12);   color: var(--yellow); border: 1px solid rgba(202,138,4,.3); }
+.rl-red    { background: rgba(220,38,38,.12);   color: var(--red);    border: 1px solid rgba(220,38,38,.3); }
+.rl-yellow { background: rgba(202,138,4,.1);    color: var(--yellow); border: 1px solid rgba(202,138,4,.25); }
+.rh { color: var(--primary); font-weight: 600; }
+.setting-pill-r {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-family: 'Inter', sans-serif;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text2);
+}
+.setting-pill-r .spv { color: var(--primary); font-weight: 700; margin-left: auto; letter-spacing: 0.04em; }
+
 /* Bracket / Knockout */
 .bracket-wrap { overflow-x: auto; padding: 10px 0 20px; }
 .bracket-round { display: flex; flex-direction: column; gap: 30px; min-width: 220px; }
@@ -1523,6 +1600,7 @@ select.form-input option { background: var(--card); }
     <button class="nav-btn" onclick="showPage('matches')">⚽ Matches</button>
     <button class="nav-btn" onclick="showPage('friendly')" style="color:var(--green);border-color:rgba(0,230,118,0.3)">🤝 Friendly</button>
     <button class="nav-btn" onclick="showPage('tournament')" style="color:var(--gold);border-color:rgba(124,92,252,0.4)">🏟️ Tournament</button>
+    <button class="nav-btn" onclick="showPage('rules')" style="color:var(--red);border-color:rgba(220,38,38,0.3)">📋 Rules</button>
     <!-- Guest buttons -->
     <span id="guestNav">
       <button class="nav-btn" onclick="showPage('login')">Login</button>
@@ -2111,6 +2189,278 @@ select.form-input option { background: var(--card); }
     <div id="trnKnockoutWrap">
       <div style="text-align:center;padding:60px;color:var(--text3)"><span class="spinner"></span> Loading...</div>
     </div>
+  </div>
+</div>
+
+<!-- ═══════════════ RULES PAGE ═══════════════ -->
+<div class="page" id="page-rules">
+  <div style="max-width:860px;margin:0 auto;padding:30px 16px 80px">
+
+    <!-- Header -->
+    <div style="text-align:center;padding:40px 20px 32px;border-bottom:1px solid var(--border);margin-bottom:28px">
+      <div style="display:inline-block;background:var(--bg2);border:1px solid var(--border);color:var(--text2);font-family:'Inter',sans-serif;font-size:11px;letter-spacing:0.2em;padding:4px 14px;border-radius:20px;margin-bottom:16px;font-weight:600">OFFICIAL DOCUMENT</div>
+      <h1 style="font-family:'Rubik Glitch',cursive;font-size:clamp(1.6rem,5vw,2.8rem);color:var(--primary);line-height:1.6;margin-bottom:10px">TYP AUCTION<br>TOURNAMENT</h1>
+      <p style="font-family:'Inter',sans-serif;font-size:13px;letter-spacing:0.3em;color:var(--text3);font-weight:600">RULES &amp; REGULATIONS</p>
+    </div>
+
+    <!-- Rules sections -->
+
+    <!-- 1 -->
+    <div class="rules-section" id="rs1">
+      <div class="rules-header" onclick="toggleRule(this)">
+        <span style="font-size:1.2rem">📋</span>
+        <span class="rules-title">স্কোয়াড সাবমিশন সংক্রান্ত</span>
+        <span class="rules-toggle">▼</span>
+      </div>
+      <div class="rules-body">
+        <div class="rule-row"><span class="rl rl-gold">A</span> <strong>সাবমিশন ডেডলাইন:</strong> স্কোয়াড সাবমিটের ডেডলাইন হলো ম্যাচ ডে-এর দিন দুপুর <span class="rh">১২:৫৯ মিনিট</span>।</div>
+        <div class="rule-row"><span class="rl rl-yellow">B</span> <strong>ডেডলাইন মিস:</strong> ডেডলাইনের আগে স্কোয়াড সাবমিট করতে ব্যর্থ হলে, সর্বশেষ ম্যাচডে স্কোয়াড ব্যবহার করে ফিক্সার তৈরি করা হবে।</div>
+        <div class="rule-row"><span class="rl rl-red">C</span> <strong style="color:var(--red)">কমিটির সিদ্ধান্ত চূড়ান্ত সিদ্ধান্ত:</strong> সকল টিম ম্যানেজার মেনে নিতে বাধ্য থাকবে।</div>
+      </div>
+    </div>
+
+    <!-- 2 -->
+    <div class="rules-section" id="rs2">
+      <div class="rules-header" onclick="toggleRule(this)">
+        <span style="font-size:1.2rem">👥</span>
+        <span class="rules-title">Matchday Group Create</span>
+        <span class="rules-toggle">▼</span>
+      </div>
+      <div class="rules-body">
+        <div class="rule-row">নির্ধারিত দিনে যে Team এর <span class="rh">Home ম্যাচ</span> থাকবে সেই Team এর ম্যানেজার ম্যাচ ডে গ্রুপ খুলতে বাধ্য থাকবে। গ্রুপ create করে অপনেন্ট ম্যানেজার কে Add করা বাধ্যতামূলক।</div>
+      </div>
+    </div>
+
+    <!-- 3 -->
+    <div class="rules-section" id="rs3">
+      <div class="rules-header" onclick="toggleRule(this)">
+        <span style="font-size:1.2rem">🎮</span>
+        <span class="rules-title">ম্যাচ Room এবং Rules</span>
+        <span class="rules-toggle">▼</span>
+      </div>
+      <div class="rules-body">
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px;margin-bottom:16px">
+          <div class="setting-pill-r"><span>🎮</span> Match Type <span class="spv">NORMAL</span></div>
+          <div class="setting-pill-r"><span>⏱️</span> Match Time <span class="spv">8 MIN</span></div>
+          <div class="setting-pill-r"><span>🧰</span> Injuries <span class="spv">OFF</span></div>
+          <div class="setting-pill-r"><span>⏳</span> Extra Time &amp; PK <span class="spv">OFF</span></div>
+          <div class="setting-pill-r"><span>🔄</span> Sub Intervals <span class="spv">6</span></div>
+          <div class="setting-pill-r"><span>👥</span> Substitutes <span class="spv">6</span></div>
+          <div class="setting-pill-r"><span>🏡</span> Home Condition <span class="spv">NORMAL</span></div>
+          <div class="setting-pill-r"><span>✈️</span> Away Condition <span class="spv">NORMAL</span></div>
+        </div>
+        <div class="rule-row"><strong>Room Create:</strong> যার <span class="rh">AWAY ম্যাচ</span> তার সিদ্ধান্তে ম্যাচ রুম ক্রিয়েট হবে।</div>
+        <div class="rule-row"><span style="color:var(--red)">❌</span> ম্যাচ শেষে রুম সেটিংস সংক্রান্ত অভিযোগ গ্রহণযোগ্য নয়।</div>
+        <div class="rule-row"><span class="rl rl-gold">★</span> ভিডিওতে UID-এর Device-এ <span class="rh">Smart Assist</span> চালু আছে কিনা তা অবশ্যই দেখাতে হবে। Smart Assist-এর অবস্থা <span class="rh">(ON/OFF)</span> স্পষ্টভাবে ভিডিওতে দৃশ্যমান না হলে ভিডিও অগ্রহণযোগ্য বলে বিবেচিত হবে।</div>
+        <div class="rule-row"><span class="rl rl-red">★</span> ভিডিও <span style="color:var(--red);font-weight:600">ভুল বা অগ্রহণযোগ্য</span> প্রমাণিত হলে — অপনেন্টকে <span class="rh">১ ম্যাচের লিড</span> দিয়ে রিম্যাচ খেলতে হবে।</div>
+        <div class="rule-row"><span class="rl rl-red">⛔</span> <strong style="color:var(--red)">ইচ্ছাকৃত Backpass</strong> খেলা সম্পূর্ণ নিষিদ্ধ। অপনেন্ট যদি প্রমাণ করতে পারে যে ইচ্ছাকৃতভাবে backpass খেলা হয়েছে, তাহলে যতটুকু মিনিট backpass খেলা হয়েছে ততটুকু মিনিট পুনরায় খেলতে হবে।</div>
+      </div>
+    </div>
+
+    <!-- 4 -->
+    <div class="rules-section" id="rs4">
+      <div class="rules-header" onclick="toggleRule(this)">
+        <span style="font-size:1.2rem">🔄</span>
+        <span class="rules-title">Substitution ও SWAP সংক্রান্ত</span>
+        <span class="rules-toggle">▼</span>
+      </div>
+      <div class="rules-body">
+        <div style="display:flex;flex-direction:column;gap:0;margin-bottom:14px">
+          <div style="display:flex;gap:14px;padding-bottom:16px;position:relative">
+            <div style="width:12px;height:12px;border-radius:50%;background:var(--primary);flex-shrink:0;margin-top:5px;box-shadow:0 0 8px rgba(113,50,202,0.5);position:relative;z-index:1"></div>
+            <div style="flex:1">
+              <div style="font-family:'Inter',sans-serif;font-weight:700;font-size:13px;color:var(--primary);letter-spacing:0.05em">FIRST DAY — রাত ১০:৪৫</div>
+              <div style="font-size:13px;color:var(--text2);line-height:1.7;margin-top:3px">ফার্স্ট ডে উপস্থিতি ডেডলাইন। Response Time: <span class="rh">১০:৩০ – ১০:৪০</span>। SUB/SWAP ডেডলাইন: রাত <span class="rh">১০:২৯</span>।</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:14px;padding-bottom:4px">
+            <div style="width:12px;height:12px;border-radius:50%;background:var(--primary);flex-shrink:0;margin-top:5px;box-shadow:0 0 8px rgba(113,50,202,0.5)"></div>
+            <div style="flex:1">
+              <div style="font-family:'Inter',sans-serif;font-weight:700;font-size:13px;color:var(--primary);letter-spacing:0.05em">SECOND DAY — রাত ০১:০৫</div>
+              <div style="font-size:13px;color:var(--text2);line-height:1.7;margin-top:3px">সেকেন্ড ডে উপস্থিতি ডেডলাইন। Response Time: <span class="rh">১২:৪৫ – ০১:০০</span>। Sub/Swap ডেডলাইন: রাত <span class="rh">১২:৪৪</span>।</div>
+            </div>
+          </div>
+        </div>
+        <div class="rule-row"><span class="rl rl-green">C</span> SUB লিমিট <span class="rh">সর্বোচ্চ ২টি</span> ও SWAP লিমিট <span class="rh">সর্বোচ্চ ২টি</span>। TYP Sub Card ও TYP Swap Card ব্যবহার বাধ্যতামূলক। Card দেওয়ার <span class="rh">৫ মিনিটের মধ্যে</span> Cancel করা যাবে।</div>
+        <div class="rule-row">🔖 Sub/Swap লিমিট শেষে অপনেন্ট ক্যাপ্টেনের অনুমতি ছাড়া অতিরিক্ত ব্যবহার করলে <span style="color:var(--red);font-weight:600">অটো লস্ট</span> দেওয়া হবে।</div>
+        <div class="rule-row">👥 <strong style="color:var(--red)">সাসপেন্ডেড/রেড কার্ড</strong> — এই ক্যাটাগরির প্লেয়ার দিয়ে ম্যাচ খেলালে <span style="color:var(--red);font-weight:600">অটোলস</span> হবে।</div>
+      </div>
+    </div>
+
+    <!-- 5 -->
+    <div class="rules-section" id="rs5">
+      <div class="rules-header" onclick="toggleRule(this)">
+        <span style="font-size:1.2rem">⚡</span>
+        <span class="rules-title">Auto Win এবং Activity সংক্রান্ত</span>
+        <span class="rules-toggle">▼</span>
+      </div>
+      <div class="rules-body">
+        <div class="rule-row">📃 প্লেয়ার ক্যাটাগরি অনুযায়ী প্রায়োরিটি টাইমের একটিভিটি দেখে রেজাল্ট কাউন্ট হবে। প্রায়োরিটি টাইমে প্রতিপক্ষকে <span class="rh">সর্বনিম্ন ৩ বার</span> মেনশন করতে হবে, প্রতিটি মেনশনের ব্যবধান <span class="rh">মিনিমাম ২ মিনিট</span>। তিনবারের কম হলে Auto Win আবেদন করা যাবে না।</div>
+        <div class="rule-row">🔄 Sub/Swap হলে নতুন খেলোয়াড়কেও একই নিয়মে ৩ বার মেনশন দিতে হবে। পূর্বের খেলোয়াড়ের মেনশন গ্রহণযোগ্য নয়।</div>
+        <div class="rule-row">🧭 ফিক্সড টাইমের পরবর্তী <span class="rh">সর্বোচ্চ ২০ মিনিটের</span> মধ্যে মেনশন না দিলে প্লেয়ার Inactive হিসেবে ধরা হবে।</div>
+        <div class="rule-row">🔖 Sub/Swap লিমিট শেষে অপনেন্ট ক্যাপ্টেনের অনুমতি ছাড়া অতিরিক্ত ব্যবহার করলে <span style="color:var(--red);font-weight:600">অটো লস্ট</span> দেওয়া হবে।</div>
+      </div>
+    </div>
+
+    <!-- 6 -->
+    <div class="rules-section" id="rs6">
+      <div class="rules-header" onclick="toggleRule(this)">
+        <span style="font-size:1.2rem">📶</span>
+        <span class="rules-title">ম্যাচ ল্যাগ এবং রিম্যাচ সংক্রান্ত</span>
+        <span class="rules-toggle">▼</span>
+      </div>
+      <div class="rules-body">
+        <div class="rule-row"><span class="rl rl-gold">A</span> ল্যাগ/সমস্যায় বের হতে হলে বল মাঠের বাহিরে নিয়ে Pause করে বের হতে হবে। গোল ব্যবধানে এগিয়ে থাকলে ভিডিওতে <span class="rh">Device + USER ID</span> দেখাতে হবে।</div>
+        <div class="rule-row"><span class="rl rl-yellow">B</span> ভিডিও প্রমাণ ছাড়া ম্যাচ থেকে বের হলে (ড্র অবস্থায়) <span style="color:var(--yellow)">হলুদ কার্ড</span>। ভিডিও ব্যর্থতায় অপনেন্ট চাইলে পুনরায় ম্যাচ।</div>
+        <div class="rule-row"><span class="rl rl-green">C</span> এগিয়ে থাকা ম্যাচ থেকে বের হলে <span class="rh">ভিডিও + ডিভাইস ইনফো + USER ID</span> বাধ্যতামূলক।</div>
+        <div class="rule-row"><span class="rl rl-red">D</span> ম্যাচে <span style="color:var(--red);font-weight:600">গোল বাতিলের সুযোগ নেই</span>।</div>
+        <div class="rule-row"><span class="rl rl-yellow">E</span> কারণ ও ভিডিও ছাড়া বের হলে বা ডিসকানেক্ট হলে <span style="color:var(--yellow)">হলুদ কার্ড</span>।</div>
+        <div class="rule-row"><span class="rl rl-green">F</span> ম্যাচের সকল গোল যুক্ত হবে। রিম্যাচের নির্ধারিত সময়ের পরের গোল যুক্ত হবে না।</div>
+        <div class="rule-row"><span class="rl rl-red">G</span> ল্যাগ নিয়ম না মেনে পূর্ণ ম্যাচ খেলার পর ল্যাগ অভিযোগ <span style="color:var(--red);font-weight:600">গ্রহণযোগ্য নয়</span>।</div>
+        <div class="rule-row"><span class="rl rl-gold">H</span> রিম্যাচের সময় = <span class="rh">৯৫ মিনিট − খেলা মিনিট</span>।</div>
+        <div class="rule-row"><span class="rl rl-green">I</span> ডিসকানেক্টের আগে গোল ব্যবধানে এগিয়ে থাকার প্রমাণ রাখতে হবে। প্রমাণ না দিলে রিম্যাচ।</div>
+        <div class="rule-row"><span class="rl rl-yellow">J</span> ডেডলাইনে ডিসকানেক্ট হলে পরবর্তী ম্যাচ মেকিং <span class="rh">৫ মিনিটের মধ্যে</span> দিতে হবে।</div>
+        <div class="rule-row"><span class="rl rl-red">K</span> বল মাঠের বাহিরে ও Pause ছাড়া বের হলে অপনেন্টের গোলের প্রমাণ গ্রহণযোগ্য।</div>
+      </div>
+    </div>
+
+    <!-- 7 -->
+    <div class="rules-section" id="rs7">
+      <div class="rules-header" onclick="toggleRule(this)">
+        <span style="font-size:1.2rem">🟨</span>
+        <span class="rules-title">আচরণ ও কার্ড সংক্রান্ত</span>
+        <span class="rules-toggle">▼</span>
+      </div>
+      <div class="rules-body">
+        <div class="rule-row">🚫 পরিস্থিতি অনুযায়ী সতর্কতা/কার্ড দেওয়া হবে। পূর্ব সতর্কতা দেওয়া হবে না।</div>
+        <div class="rule-row">🫂 টিম ও অপনেন্টের সাথে সখ্যতামূলক কথোপকথনে কিছুটা ছাড় দেওয়া হবে।</div>
+        <table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:13px">
+          <thead>
+            <tr>
+              <th style="background:var(--bg3);color:var(--primary);font-family:'Inter',sans-serif;font-size:11px;letter-spacing:0.1em;padding:8px 12px;text-align:left;border-bottom:1px solid var(--border)">কারণ</th>
+              <th style="background:var(--bg3);color:var(--primary);font-family:'Inter',sans-serif;font-size:11px;letter-spacing:0.1em;padding:8px 12px;text-align:left;border-bottom:1px solid var(--border)">কার্ড</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td style="padding:8px 12px;border-bottom:1px solid var(--border);color:var(--text2)">প্রমাণ ছাড়া ডিসকানেক্ট</td><td style="padding:8px 12px;border-bottom:1px solid var(--border)"><span style="color:var(--yellow)">🟨 হলুদ</span></td></tr>
+            <tr><td style="padding:8px 12px;border-bottom:1px solid var(--border);color:var(--text2)">আচরণবিধি লঙ্ঘন, সময়ানুবর্তিতার অভাব, অসাধুতা</td><td style="padding:8px 12px;border-bottom:1px solid var(--border)"><span style="color:var(--yellow)">🟨 হলুদ</span> / <span style="color:var(--red)">🟥 লাল</span></td></tr>
+            <tr><td style="padding:8px 12px;border-bottom:1px solid var(--border);color:var(--text2)">গালিগালাজ, ব্যক্তিগত আক্রমণ, হাহা রিয়েক্ট</td><td style="padding:8px 12px;border-bottom:1px solid var(--border)"><span style="color:var(--yellow)">🟨 হলুদ</span> / <span style="color:var(--red)">🟥 লাল</span></td></tr>
+            <tr><td style="padding:8px 12px;color:var(--text2)">অফিশিয়ালের নির্দেশ অমান্য/অসম্মান</td><td style="padding:8px 12px"><span style="color:var(--red)">🟥 লাল</span></td></tr>
+          </tbody>
+        </table>
+        <div class="rule-row">🟨 একই ম্যাচডেতে দুইবার হলুদ → <span style="color:var(--red);font-weight:600">লাল কার্ড</span>।</div>
+        <div class="rule-row">↖️ রেজাল্টের আগে লাল কার্ড → <span style="color:var(--red);font-weight:600">অটো লস</span>। রেজাল্টের পর → রেজাল্ট অপরিবর্তিত।</div>
+        <div class="rule-row">📵 হলুদ কার্ড রেজাল্ট সাবমিটের পর <span class="rh">২ দিন</span> পর্যন্ত বলবৎ। এর মধ্যে পুনরায় হলুদ → লাল।</div>
+        <div class="rule-row">🟥 লাল কার্ডের জন্য <span style="color:var(--red);font-weight:600">২ ম্যাচ</span> খেলার সুযোগ বন্ধ।</div>
+      </div>
+    </div>
+
+    <!-- 8 -->
+    <div class="rules-section" id="rs8">
+      <div class="rules-header" onclick="toggleRule(this)">
+        <span style="font-size:1.2rem">🎥</span>
+        <span class="rules-title">Auto Clear সম্পর্কিত নিয়মাবলী</span>
+        <span class="rules-toggle">▼</span>
+      </div>
+      <div class="rules-body">
+        <div class="rule-row">🎥 স্পষ্ট ভিডিও প্রমাণ ছাড়া Auto Clear অভিযোগ গ্রহণযোগ্য নয়।</div>
+        <div class="rule-row">⏱️ Auto Clear অভিযোগ প্রমাণিত হলে সেই সময় + শাস্তির সময় যোগ করে রিম্যাচ এবং <span style="color:var(--yellow)">হলুদ কার্ড</span>।</div>
+      </div>
+    </div>
+
+    <!-- 9 -->
+    <div class="rules-section" id="rs9">
+      <div class="rules-header" onclick="toggleRule(this)">
+        <span style="font-size:1.2rem">📹</span>
+        <span class="rules-title">ভিডিও সম্পর্কিত নিয়মাবলি</span>
+        <span class="rules-toggle">▼</span>
+      </div>
+      <div class="rules-body">
+        <div class="rule-row">✅ ম্যাচ <span class="rh">Win/Draw</span> হলে বাধ্যতামূলক ভিডিও। জয়ী ম্যাচে ভিডিও ব্যর্থতায় (0-0) রিম্যাচ। ড্র ম্যাচে ব্যর্থতায় <span style="color:var(--yellow)">হলুদ কার্ড</span> + (1-0) রিম্যাচ।</div>
+        <div class="rule-row">🤝 উভয় পক্ষ ভিডিও না দিলে উভয়ের সম্মতিতে রিম্যাচ, অন্যথায় ড্র বহাল।</div>
+        <div class="rule-row">📳 ব্ল্যাক স্ক্রিন/লোডিং সমস্যায় সেই অবস্থা থেকেই রেকর্ড শুরু করতে হবে। রেকর্ড চালু রেখে বের হয়ে Device Model + User ID + Match History দেখিয়ে ভিডিও সাবমিট।</div>
+        <div class="rule-row">🔍 ভিডিওর ডিভাইস রেজিস্টার্ড ডিভাইসের সাথে না মিললে অভিযোগের ভিত্তিতে অফিশিয়াল সিদ্ধান্ত নেবে।</div>
+        <div class="rule-row">📽️ অন্য ডিভাইসে রেকর্ডের ক্ষেত্রেও Room ID, User ID ও ফোনের মডেল দেখানো বাধ্যতামূলক।</div>
+        <div class="rule-row">⏱️ ম্যাচ শেষের <span class="rh">১৫ মিনিটের মধ্যে</span> গ্রুপে ভিডিও দিতে হবে। নেটওয়ার্ক সমস্যায় ভিডিও সেন্ড অবস্থায় স্ক্রিনশট। মেসেঞ্জার সমস্যায় অফিশিয়ালের WhatsApp-এ পাঠাতে হবে।</div>
+        <div class="rule-row">⏳ ভিডিও সাবমিটের পর <span class="rh">১ ঘণ্টা</span> পর্যন্ত চেক করার সময়। ১ ঘণ্টা পর অভিযোগ গ্রহণযোগ্য নয়।</div>
+        <div class="rule-row">🪫 ভিডিও বিষয়ে কোনো অজুহাত গ্রহণযোগ্য নয়। ম্যাচের আগে চার্জ, স্টোরেজ ও ডাটা নিজ দায়িত্বে ঠিক রাখবেন।</div>
+        <div class="rule-row">👥 ম্যাচের আগে প্রত্যেক প্লেয়ার অপনেন্টের Gaming ID যাচাই করবেন এবং ভিডিও দেওয়ার পর ম্যানেজার-প্লেয়ার উভয়ই চেক করবেন।</div>
+      </div>
+    </div>
+
+    <!-- 10 -->
+    <div class="rules-section" id="rs10">
+      <div class="rules-header" onclick="toggleRule(this)">
+        <span style="font-size:1.2rem">⛔</span>
+        <span class="rules-title">In-Game Red কার্ড + ডিসকানেক্ট নিয়ম</span>
+        <span class="rules-toggle">▼</span>
+      </div>
+      <div class="rules-body">
+        <div class="rule-row">▶️ রেড কার্ড পাওয়ার পর ডিসকানেক্ট হলে হয় <span class="rh">১ জন কম প্লেয়ার</span> নিয়ে খেলতে হবে অথবা প্রতিপক্ষকে <span class="rh">১ গোল অ্যাডভান্টেজ</span> দিয়ে রিম্যাচ। ম্যাচ বাকি মিনিট খেলে শেষ করতে হবে।</div>
+        <div class="rule-row">📴 ডিসকানেক্ট খেলোয়াড় ভিডিও প্রমাণ দিতে ব্যর্থ হলে খেলা <span class="rh">১-০</span> থেকে পুনরায় শুরু। প্রতিপক্ষ আগে লিডে থাকলে সেই গোলও যুক্ত হবে।</div>
+      </div>
+    </div>
+
+    <!-- 11 -->
+    <div class="rules-section" id="rs11">
+      <div class="rules-header" onclick="toggleRule(this)">
+        <span style="font-size:1.2rem">🔄</span>
+        <span class="rules-title">Player Info ও ম্যাচডে Info Change</span>
+        <span class="rules-toggle">▼</span>
+      </div>
+      <div class="rules-body">
+        <div class="rule-row">➤ <strong>Info পরিবর্তন:</strong> বিকাল <span class="rh">৩টার মধ্যে</span> Player Info (User ID, Device) পরিবর্তন করতে হবে।</div>
+        <div class="rule-row">📜 ভুল Info থাকলে সাব-আউট করা যাবে। অপনেন্ট টিম লিডারের অনুমতি ছাড়া ভিন্ন Info দিয়ে ম্যাচ খেললে <span style="color:var(--red);font-weight:600">অটো লস</span>।</div>
+        <div class="rule-row">📜 ডাটাবেজে লিপিবদ্ধ User ID-এর ASAA/ASBB ভুল/মিসিং হলে সমস্যা নেই। কিন্তু নাম্বার অংশ <span class="rh">১০০% মিল</span> না হলে <span style="color:var(--red);font-weight:600">অটো লস</span>।</div>
+      </div>
+    </div>
+
+    <!-- 12 -->
+    <div class="rules-section" id="rs12">
+      <div class="rules-header" onclick="toggleRule(this)">
+        <span style="font-size:1.2rem">🛡️</span>
+        <span class="rules-title">Wall Formation</span>
+        <span class="rules-toggle">▼</span>
+      </div>
+      <div class="rules-body">
+        <div class="rule-row">🛡️ কোনো ধরনের <span style="color:var(--red);font-weight:600">WALL FORMATION</span> বানানো যাবে না। প্রমাণিত হলে অপনেন্ট <span class="rh">+১ গোল বোনাস</span> পাবে। In-game Default Formation (যেমন ৫-২-১-২) Customize ছাড়া ব্যবহার করা যাবে।</div>
+        <div class="rule-row">⏱️ ম্যাচ শুরুর <span class="rh">০-১০ সেকেন্ডের মধ্যে</span> Pause দিয়ে ভিডিওসহ প্রমাণ দিতে হবে। হাফটাইমে চেঞ্জ করলে সেই সময়েই বের হয়ে আপিল। পুরো ম্যাচ খেলে আপিল গ্রহণযোগ্য নয়।</div>
+        <div class="rule-row">✅ <span class="rh">DOUBLE DEFENCE</span> Allow &nbsp;|&nbsp; ✅ <span class="rh">DOUBLE ATTACK</span> Allow</div>
+      </div>
+    </div>
+
+    <!-- 13 -->
+    <div class="rules-section" id="rs13">
+      <div class="rules-header" onclick="toggleRule(this)">
+        <span style="font-size:1.2rem">🚫</span>
+        <span class="rules-title">Player Replace &amp; Ban সংক্রান্ত</span>
+        <span class="rules-toggle">▼</span>
+      </div>
+      <div class="rules-body">
+        <div class="rule-row">➤ ট্যুর্নামেন্ট চলাকালীন প্লেয়ার চলে গেলে সেই Team <span style="color:var(--red);font-weight:600">একজন কম প্লেয়ার</span> নিয়ে খেলবে। Replace দেওয়া হবে না।</div>
+        <div class="rule-row">🚫 <strong style="color:var(--red)">Ban:</strong> অন্যের ম্যাচ খেলে দেওয়া বা Match Result Edit-এর প্রমাণ পাওয়া গেলে সেই <span style="color:var(--red);font-weight:600">Team টুর্নামেন্ট থেকে BAN</span>।</div>
+      </div>
+    </div>
+
+    <!-- 14 -->
+    <div class="rules-section" id="rs14">
+      <div class="rules-header" onclick="toggleRule(this)">
+        <span style="font-size:1.2rem">⚠️</span>
+        <span class="rules-title">MANAGER এর নিরাপত্তা ও সতর্কতা</span>
+        <span class="rules-toggle">▼</span>
+      </div>
+      <div class="rules-body">
+        <div class="rule-row">ম্যানেজার ম্যাচ হারার পর নিজ টিমের কোনো প্লেয়ারকে গালমন্দ বা তুচ্ছতাচ্ছিল্য করতে পারবেন না। প্রমাণসহ অভিযোগ দিলে —<br><br>
+          <span style="color:var(--yellow);font-weight:600">জরিমানা: ১৫/-</span> পরিশোধ করতে হবে অথবা <span style="color:var(--red);font-weight:600">১ ম্যাচের জন্য ম্যানেজার নিষিদ্ধ</span>।
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div style="text-align:center;padding:30px 20px;border-top:1px solid var(--border);margin-top:10px;font-family:'Rubik Glitch',cursive;font-size:1.2rem;letter-spacing:0.2em;color:var(--text3)">
+      TYP <span style="color:var(--primary)">CHAMPIONSHIP</span> — PRESENT
+    </div>
+
   </div>
 </div>
 
@@ -5459,6 +5809,12 @@ document.addEventListener('click', function(e) {
 });
 
 
+// ── RULES PAGE TOGGLE ──
+window.toggleRule = function(header) {
+  const section = header.parentElement;
+  section.classList.toggle('collapsed');
+};
+
 // ── BOTTOM NAV ──
 // ── THEME TOGGLE ──
 (function() {
@@ -5548,6 +5904,9 @@ function showPage(name) {
   }
   if (name === 'tournament') {
     if (typeof switchTrnTab === 'function') switchTrnTab('standings');
+  }
+  if (name === 'rules') {
+    // all sections open by default, nothing extra needed
   }
 }
 </script>
