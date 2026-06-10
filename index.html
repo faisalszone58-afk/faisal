@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>TEXT YOUR PES</title>
+<title>TYP Championship</title>
 <link href="https://fonts.googleapis.com/css2?family=Rubik+Glitch&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -1629,7 +1629,7 @@ select.form-input option { background: var(--card); }
 <div class="page active" id="page-home">
   <div class="hero">
     <div class="hero-badge">🏆 Season 2026 • Active</div>
-    <h1><span class="gold">TEXT</span> <span class="cyan">YOUR PES</span></h1>
+    <h1><span class="gold">TYP</span> <span class="cyan">CHAMPIONSHIP</span></h1>
     <p>Bangladesh-এর সেরা eFootball community। খেলো, জেতো, legend হও।</p>
     <div class="hero-btns" id="heroBtns">
       <button class="btn btn-gold" onclick="showPage('register')">🚀 Join Now</button>
@@ -1681,7 +1681,7 @@ select.form-input option { background: var(--card); }
   <div class="auth-wrap">
     <div class="auth-box">
       <div class="auth-logo">
-        <h2>⚡ TEXT YOUR PES</h2>
+        <h2>⚡ TYP</h2>
         <p>নতুন account তৈরি করুন</p>
       </div>
 
@@ -1778,7 +1778,7 @@ select.form-input option { background: var(--card); }
   <div class="auth-wrap">
     <div class="auth-box">
       <div class="auth-logo">
-        <h2>⚡ TEXT YOUR PES</h2>
+        <h2>⚡ TYP</h2>
         <p>আপনার account-এ login করুন</p>
       </div>
 
@@ -2485,7 +2485,7 @@ select.form-input option { background: var(--card); }
       <div class="admin-header">
         <div>
           <div class="admin-title">🛡️ ADMIN PANEL</div>
-          <div style="font-size:13px;color:var(--text3);margin-top:4px">TEXT YOUR PES Management</div>
+          <div style="font-size:13px;color:var(--text3);margin-top:4px">TYP Championship Management</div>
         </div>
         <span class="admin-badge">ADMIN</span>
       </div>
@@ -2544,7 +2544,7 @@ select.form-input option { background: var(--card); }
           </div>
           <div class="form-group">
             <label class="form-label">Tournament</label>
-            <input type="text" class="form-input" id="mTournament" placeholder="TEXT YOUR PES Season 1" value="TEXT YOUR PES">
+            <input type="text" class="form-input" id="mTournament" placeholder="TYP Championship Season 1" value="TYP Championship">
           </div>
           <button class="btn btn-gold" style="width:100%;margin-top:8px" onclick="addMatchResult()">✅ Save Match Result</button>
         </div>
@@ -3439,9 +3439,6 @@ function updateNavUser() {
   document.getElementById('dropdownName').textContent = currentUserData.name || 'Player';
   document.getElementById('dropdownClub').textContent = currentUserData.club || '—';
   updateBnavAvatar();
-  // Hide Join Now button when logged in
-  const heroBtns = document.getElementById('heroBtns');
-  if (heroBtns) heroBtns.style.display = 'none';
 }
 
 // ── TOGGLE DROPDOWN ──
@@ -3562,8 +3559,7 @@ async function loadProfileFriendlyMatches() {
   if (!currentUserData) return;
   const myName = currentUserData.name;
   try {
-    const res = await fetch('https://typ-championship-default-rtdb.firebaseio.com/friendlyMatches.json');
-    const data = await res.json();
+    const data = await cachedFetch('https://typ-championship-default-rtdb.firebaseio.com/friendlyMatches.json', 3 * 60 * 1000);
     if (!data) { container.innerHTML = '<div style="text-align:center;color:var(--text3);padding:40px">🤝 কোনো friendly match নেই।</div>'; return; }
     const matches = Object.entries(data)
       .map(([id, m]) => ({ id, ...m }))
@@ -3831,6 +3827,8 @@ window.addMatchResult = async function() {
   document.getElementById('mDate').value = '';
   document.getElementById('mRound').value = '';
   setTimeout(() => sucEl.classList.remove('show'), 3000);
+  invalidateCache('matches');
+  window._allUsersCache = []; window._allUsersCacheTime = 0;
   loadAdminMatches();
 };
 
@@ -3855,6 +3853,8 @@ async function loadAdminMatches() {
 window.deleteMatch = async function(id) {
   if (!confirm('এই match delete করবে?')) return;
   await window._set(window._ref(window._db, `matches/${id}`), null);
+  invalidateCache('matches');
+  window._allUsersCache = []; window._allUsersCacheTime = 0;
   loadAdminMatches();
 };
 
@@ -3889,8 +3889,7 @@ window.loadFriendlyLeaderboard = async function() {
   const container = document.getElementById('friendlyLeaderboardTable');
   container.innerHTML = '<div class="text-center" style="padding:40px"><span class="spinner"></span><p style="color:var(--text3);margin-top:12px">Loading...</p></div>';
   try {
-    const _res = await fetch('https://typ-championship-default-rtdb.firebaseio.com/friendlyStats.json');
-    const _fdata = await _res.json();
+    const _fdata = await cachedFetch('https://typ-championship-default-rtdb.firebaseio.com/friendlyStats.json', 5 * 60 * 1000);
     const snap = { exists: () => !!_fdata, forEach: (cb) => _fdata && Object.entries(_fdata).forEach(([k,v]) => cb({ key: k, val: () => v })) };
     if (!snap.exists()) {
       container.innerHTML = '<div class="card text-center" style="padding:60px 20px"><div style="font-size:48px;margin-bottom:12px">🤝</div><p style="color:var(--text3)">এখনো কোনো friendly match হয়নি।</p></div>';
@@ -4175,8 +4174,7 @@ window.loadResultRequests = async function() {
   const container = document.getElementById('resultRequestsList');
   container.innerHTML = '<div class="text-center" style="padding:30px"><span class="spinner"></span></div>';
   try {
-    const _res = await fetch("https://typ-championship-default-rtdb.firebaseio.com/friendlyResultRequests.json");
-    const _data = await _res.json();
+    const _data = await cachedFetch("https://typ-championship-default-rtdb.firebaseio.com/friendlyResultRequests.json", 2 * 60 * 1000);
     if (!_data) { container.innerHTML = "<div style=\"color:var(--text3);padding:20px;text-align:center\">কোনো result submission নেই।</div>"; document.getElementById("pendingResultCount").textContent = "0"; return; }
     const reqs = [];
     Object.entries(_data).forEach(([k, v]) => reqs.push({ id: k, ...v }));
@@ -4254,6 +4252,9 @@ window.approveResult = async function(id) {
   await window._set(window._ref(window._db, 'friendlyResultRequests/' + id + '/approvedAt'), new Date().toISOString());
 
   allUsersCache = [];
+  invalidateCache('friendlyResultRequests');
+  invalidateCache('friendlyStats');
+  invalidateCache('friendlyMatches');
   alert(`✅ Approved! Friendly leaderboard এ result add হয়েছে।`);
   loadResultRequests();
 };
@@ -4263,6 +4264,7 @@ window.declineResult = async function(id) {
   if (!confirm('এই result decline করবে?')) return;
   await window._set(window._ref(window._db, 'friendlyResultRequests/' + id + '/status'), 'declined');
   if (note) await window._set(window._ref(window._db, 'friendlyResultRequests/' + id + '/adminNote'), note);
+  invalidateCache('friendlyResultRequests');
   loadResultRequests();
 };
 
@@ -4460,13 +4462,23 @@ async function loadHomeTopPlayers() {
 async function loadHomeRecentMatches() {
   const container = document.getElementById('homeRecentMatches');
   try {
-    const snap = await window._get(window._ref(window._db, 'matches'));
-    if (!snap.exists()) {
+    // Use cache if available (5 min TTL)
+    const now = Date.now();
+    const CACHE_TTL = 5 * 60 * 1000;
+    let matches = [];
+    if (window._matchesCache && window._matchesCacheTime && (now - window._matchesCacheTime) < CACHE_TTL) {
+      matches = window._matchesCache;
+    } else {
+      const res = await fetch('https://typ-championship-default-rtdb.firebaseio.com/matches.json');
+      const data = await res.json();
+      matches = data ? Object.entries(data).map(([id, val]) => ({ id, ...val })) : [];
+      window._matchesCache = matches;
+      window._matchesCacheTime = now;
+    }
+    if (!matches.length) {
       container.innerHTML = '<div class="card" style="text-align:center;padding:30px;color:var(--text3)">এখনো কোনো match নেই।</div>';
       return;
     }
-    const matches = [];
-    snap.forEach(c => matches.push({ id: c.key, ...c.val() }));
     matches.sort((a,b) => (b.addedAt||b.date||'').localeCompare(a.addedAt||a.date||''));
     const recent = matches.filter(m => m.status === 'completed').slice(0, 5);
 
@@ -4511,15 +4523,40 @@ window.deleteMatchFromHome = async function(id) {
 // 🔍 PUBLIC PROFILE + HOME SEARCH
 // ════════════════════════════════════════
 
+// ── GLOBAL FETCH CACHE ──
+window._fetchCache = window._fetchCache || {};
+async function cachedFetch(url, ttlMs = 10 * 60 * 1000) {
+  const now = Date.now();
+  const cached = window._fetchCache[url];
+  if (cached && (now - cached.time) < ttlMs) return cached.data;
+  const res = await fetch(url);
+  const data = await res.json();
+  window._fetchCache[url] = { data, time: now };
+  return data;
+}
+function invalidateCache(urlPattern) {
+  Object.keys(window._fetchCache).forEach(k => {
+    if (k.includes(urlPattern)) delete window._fetchCache[k];
+  });
+  // also clear users cache
+  if (urlPattern.includes('users')) { window._allUsersCache = []; window._allUsersCacheTime = 0; }
+  if (urlPattern.includes('matches')) { window._matchesCache = null; window._matchesCacheTime = 0; }
+}
+
 async function getAllUsers() {
   const now = Date.now();
-  const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+  const CACHE_TTL = 15 * 60 * 1000; // 15 minutes
   if ((window._allUsersCache||[]).length && window._allUsersCacheTime && (now - window._allUsersCacheTime) < CACHE_TTL) {
     return window._allUsersCache;
   }
-  const res = await fetch('https://typ-championship-default-rtdb.firebaseio.com/users.json');
+  // Fetch only needed fields (exclude heavy/unused fields via shallow + specific paths)
+  const res = await fetch('https://typ-championship-default-rtdb.firebaseio.com/users.json?shallow=false');
   const data = await res.json();
-  window._allUsersCache = data ? Object.entries(data).map(([uid, val]) => ({ uid, ...val })) : [];
+  window._allUsersCache = data ? Object.entries(data).map(([uid, val]) => {
+    // Strip avatarUrl from list cache to save bandwidth — loaded separately when needed
+    const { avatarUrl, ...rest } = val || {};
+    return { uid, avatarUrl, ...rest };
+  }) : [];
   window._allUsersCacheTime = now;
   return window._allUsersCache;
 }
@@ -4925,7 +4962,7 @@ window.downloadStatsCard = async function() {
   ctx.fillStyle = 'rgba(180,180,180,0.7)';
   ctx.font = '20px monospace';
   ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
-  ctx.fillText(`All-Time Official  |  TEXT YOUR PES  |  ${dateStr}`, W / 2, H - 22);
+  ctx.fillText(`All-Time Official  |  TYP Championship  |  ${dateStr}`, W / 2, H - 22);
 
   // ── Export ──
   const link = document.createElement('a');
