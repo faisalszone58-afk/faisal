@@ -4487,7 +4487,7 @@ async function loadHomeRecentMatches() {
       return;
     }
 
-    const isAdmin = currentUser && currentUser.email === 'mf3171352@gmail.com';
+    const isAdmin = currentUser && ['mf3171352@gmail.com', 'arafatkobami@gmail.com'].includes(currentUser.email);
     container.innerHTML = recent.map(m => {
       const hs = parseInt(m.home_score)||0, as_ = parseInt(m.away_score)||0;
       const winSide = hs > as_ ? 'home' : hs < as_ ? 'away' : 'draw';
