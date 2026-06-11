@@ -3020,7 +3020,7 @@ onAuthStateChanged(auth, async (user) => {
     document.getElementById('guestNav').classList.add('hidden');
     document.getElementById('userNav').classList.remove('hidden');
     // Admin link — শুধু তোমার email এর জন্য
-    const adminEmails = ['mf3171352@gmail.com']; // তোমার email
+    const adminEmails = ['mf3171352@gmail.com', 'arafatkobami@gmail.com']; // তোমার email
     if (adminEmails.includes(user.email)) {
       document.getElementById('adminNavLink').style.display = 'block';
     }
