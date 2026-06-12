@@ -1561,17 +1561,17 @@ select.form-input option { background: var(--card); }
 <body>
 
 <!-- ═══════════════ INTRO SCREEN ═══════════════ -->
-<div id="introScreen" style="position:fixed;inset:0;z-index:99999;background:#0a0a0f;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden">
+<div id="introScreen" style="position:fixed;inset:0;z-index:99999;background:#0a0a0f;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;padding:20px;box-sizing:border-box">
   <!-- particles -->
   <canvas id="introCanvas" style="position:absolute;inset:0;width:100%;height:100%"></canvas>
   <!-- content -->
-  <div id="introContent" style="position:relative;text-align:center;z-index:2">
-    <div id="introBolt" style="font-size:64px;opacity:0;transform:scale(0) rotate(-20deg);transition:all 0.6s cubic-bezier(0.34,1.56,0.64,1)">⚡</div>
-    <div id="introTitle" style="font-family:'Rubik Glitch',cursive;font-size:clamp(2.5rem,10vw,5rem);color:#fff;letter-spacing:0.1em;margin-top:8px;opacity:0;transform:translateY(30px);transition:all 0.7s ease 0.3s">
+  <div id="introContent" style="position:relative;text-align:center;z-index:2;width:100%;max-width:420px;padding:0 16px;box-sizing:border-box">
+    <div id="introBolt" style="font-size:52px;opacity:0;transform:scale(0) rotate(-20deg);transition:all 0.6s cubic-bezier(0.34,1.56,0.64,1);line-height:1">⚡</div>
+    <div id="introTitle" style="font-family:'Rubik Glitch',cursive;font-size:clamp(1.8rem,8vw,4rem);color:#fff;letter-spacing:0.05em;margin-top:8px;opacity:0;transform:translateY(30px);transition:all 0.7s ease 0.3s;line-height:1.3;word-break:break-word">
       <span style="color:#7132ca">TEXT</span> YOUR <span style="color:#7132ca">PES</span>
     </div>
-    <div id="introSub" style="font-family:'Inter',sans-serif;font-size:13px;letter-spacing:0.4em;color:rgba(255,255,255,0.4);margin-top:12px;opacity:0;transform:translateY(20px);transition:all 0.6s ease 0.6s;text-transform:uppercase">Bangladesh eFootball Community</div>
-    <div id="introBar" style="margin-top:40px;width:200px;height:3px;background:rgba(255,255,255,0.1);border-radius:99px;overflow:hidden;opacity:0;transition:opacity 0.4s ease 0.8s">
+    <div id="introSub" style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:0.25em;color:rgba(255,255,255,0.4);margin-top:10px;opacity:0;transform:translateY(20px);transition:all 0.6s ease 0.6s;text-transform:uppercase;word-break:break-word">Bangladesh eFootball Community</div>
+    <div id="introBar" style="margin-top:32px;width:min(200px,60vw);height:3px;background:rgba(255,255,255,0.1);border-radius:99px;overflow:hidden;opacity:0;transition:opacity 0.4s ease 0.8s;margin-left:auto;margin-right:auto">
       <div id="introBarFill" style="height:100%;width:0%;background:linear-gradient(90deg,#7132ca,#a855f7);border-radius:99px;transition:width 1.2s ease 0.9s"></div>
     </div>
   </div>
