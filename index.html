@@ -1556,8 +1556,96 @@ select.form-input option { background: var(--card); }
 }
 
 </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 </head>
 <body>
+
+<!-- ═══════════════ INTRO SCREEN ═══════════════ -->
+<div id="introScreen" style="position:fixed;inset:0;z-index:99999;background:#0a0a0f;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden">
+  <!-- particles -->
+  <canvas id="introCanvas" style="position:absolute;inset:0;width:100%;height:100%"></canvas>
+  <!-- content -->
+  <div id="introContent" style="position:relative;text-align:center;z-index:2">
+    <div id="introBolt" style="font-size:64px;opacity:0;transform:scale(0) rotate(-20deg);transition:all 0.6s cubic-bezier(0.34,1.56,0.64,1)">⚡</div>
+    <div id="introTitle" style="font-family:'Rubik Glitch',cursive;font-size:clamp(2.5rem,10vw,5rem);color:#fff;letter-spacing:0.1em;margin-top:8px;opacity:0;transform:translateY(30px);transition:all 0.7s ease 0.3s">
+      <span style="color:#7132ca">TEXT</span> YOUR <span style="color:#7132ca">PES</span>
+    </div>
+    <div id="introSub" style="font-family:'Inter',sans-serif;font-size:13px;letter-spacing:0.4em;color:rgba(255,255,255,0.4);margin-top:12px;opacity:0;transform:translateY(20px);transition:all 0.6s ease 0.6s;text-transform:uppercase">Bangladesh eFootball Community</div>
+    <div id="introBar" style="margin-top:40px;width:200px;height:3px;background:rgba(255,255,255,0.1);border-radius:99px;overflow:hidden;opacity:0;transition:opacity 0.4s ease 0.8s">
+      <div id="introBarFill" style="height:100%;width:0%;background:linear-gradient(90deg,#7132ca,#a855f7);border-radius:99px;transition:width 1.2s ease 0.9s"></div>
+    </div>
+  </div>
+</div>
+
+<style>
+#introScreen { transition: opacity 0.6s ease, transform 0.6s ease; }
+#introScreen.hide { opacity: 0; transform: scale(1.05); pointer-events: none; }
+</style>
+
+<script>
+(function() {
+  // Particle canvas
+  const canvas = document.getElementById('introCanvas');
+  const ctx = canvas.getContext('2d');
+  let particles = [];
+  function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+  resizeCanvas();
+  window.addEventListener('resize', resizeCanvas);
+  for (let i = 0; i < 60; i++) {
+    particles.push({
+      x: Math.random() * window.innerWidth,
+      y: Math.random() * window.innerHeight,
+      r: Math.random() * 2 + 0.5,
+      dx: (Math.random() - 0.5) * 0.4,
+      dy: (Math.random() - 0.5) * 0.4,
+      o: Math.random() * 0.4 + 0.1
+    });
+  }
+  function animParticles() {
+    if (!document.getElementById('introScreen')) return;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particles.forEach(p => {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(113,50,202,${p.o})`;
+      ctx.fill();
+      p.x += p.dx; p.y += p.dy;
+      if (p.x < 0 || p.x > canvas.width) p.dx *= -1;
+      if (p.y < 0 || p.y > canvas.height) p.dy *= -1;
+    });
+    requestAnimationFrame(animParticles);
+  }
+  animParticles();
+
+  // Animate elements in
+  setTimeout(() => {
+    const bolt = document.getElementById('introBolt');
+    bolt.style.opacity = '1';
+    bolt.style.transform = 'scale(1) rotate(0deg)';
+  }, 200);
+  setTimeout(() => {
+    document.getElementById('introTitle').style.opacity = '1';
+    document.getElementById('introTitle').style.transform = 'translateY(0)';
+  }, 400);
+  setTimeout(() => {
+    document.getElementById('introSub').style.opacity = '1';
+    document.getElementById('introSub').style.transform = 'translateY(0)';
+  }, 600);
+  setTimeout(() => {
+    document.getElementById('introBar').style.opacity = '1';
+    document.getElementById('introBarFill').style.width = '100%';
+  }, 800);
+
+  // Hide intro after loading
+  setTimeout(() => {
+    const screen = document.getElementById('introScreen');
+    if (screen) {
+      screen.classList.add('hide');
+      setTimeout(() => { screen.remove(); }, 700);
+    }
+  }, 2800);
+})();
+</script>
 
 <!-- LOADING -->
 <div class="loading-screen" id="loadingScreen">
@@ -2003,6 +2091,19 @@ select.form-input option { background: var(--card); }
       </div>
       <!-- Badges -->
       <div id="ppBadges" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px"></div>
+      <!-- Rating + Form -->
+      <div style="display:flex;align-items:center;gap:16px;margin-top:16px;padding:14px;background:var(--bg3);border-radius:12px">
+        <div id="ppRatingBadge" style="text-align:center;min-width:50px"></div>
+        <div style="flex:1">
+          <div style="font-size:10px;color:var(--text3);letter-spacing:0.1em;font-family:'Inter',sans-serif;margin-bottom:6px">LAST 5 FORM</div>
+          <div id="ppFormBadges" style="display:flex;gap:4px;flex-wrap:wrap"></div>
+        </div>
+      </div>
+      <!-- Performance Graph -->
+      <div style="margin-top:16px">
+        <div style="font-size:11px;color:var(--text3);letter-spacing:0.1em;font-family:'Inter',sans-serif;margin-bottom:8px">📈 PERFORMANCE TREND</div>
+        <div id="ppPerfGraph" style="background:var(--bg3);border-radius:10px;padding:10px"></div>
+      </div>
       <!-- Win Rate bar -->
       <div style="margin-top:16px">
         <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text3);margin-bottom:6px">
@@ -2087,6 +2188,10 @@ select.form-input option { background: var(--card); }
     <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">
       <input type="text" class="form-input" id="rankSearch" placeholder="🔍 Search player..." oninput="filterRanking()" style="flex:1;min-width:200px">
       <button class="btn btn-outline" onclick="loadRanking()">🔄 Sync</button>
+      <div style="display:flex;gap:4px;background:var(--bg3);border-radius:8px;padding:3px">
+        <button id="rankViewTable" onclick="window._rankingView='table';renderRanking(rankingData);this.style.background='var(--primary)';this.style.color='#fff';document.getElementById('rankViewCards').style.background='';document.getElementById('rankViewCards').style.color=''" style="padding:5px 10px;border-radius:6px;border:none;cursor:pointer;font-size:13px;background:var(--primary);color:#fff;transition:all 0.2s">☰</button>
+        <button id="rankViewCards" onclick="window._rankingView='cards';renderRanking(rankingData);this.style.background='var(--primary)';this.style.color='#fff';document.getElementById('rankViewTable').style.background='';document.getElementById('rankViewTable').style.color=''" style="padding:5px 10px;border-radius:6px;border:none;cursor:pointer;font-size:13px;transition:all 0.2s">⊞</button>
+      </div>
     </div>
 
     <div id="rankingTable">
@@ -3020,7 +3125,7 @@ onAuthStateChanged(auth, async (user) => {
     document.getElementById('guestNav').classList.add('hidden');
     document.getElementById('userNav').classList.remove('hidden');
     // Admin link — শুধু তোমার email এর জন্য
-    const adminEmails = ['mf3171352@gmail.com', 'arafatkobami@gmail.com']; // তোমার email
+    const adminEmails = ['mf3171352@gmail.com', 'arafatkobami@gmail.com', 'libae804@gmail.com']; // তোমার email
     if (adminEmails.includes(user.email)) {
       document.getElementById('adminNavLink').style.display = 'block';
     }
@@ -3292,6 +3397,14 @@ window.loadRanking = async function() {
 
 function renderRanking(data) {
   if (!data.length) { document.getElementById('rankingTable').innerHTML = '<div class="card text-center" style="padding:40px;color:var(--text3)">Data নেই।</div>'; return; }
+  
+  const viewMode = window._rankingView || 'table';
+  
+  if (viewMode === 'cards') {
+    renderRankingCards(data);
+    return;
+  }
+  
   const medals = ['🥇','🥈','🥉'];
   const rows = data.map((p, i) => {
     const rank = i + 1;
@@ -3348,6 +3461,57 @@ function renderRanking(data) {
         <tbody>${rows}</tbody>
       </table>
     </div>`;
+}
+
+function renderRankingCards(data) {
+  const medals = ['🥇','🥈','🥉'];
+  const cards = data.map((p, i) => {
+    const rank = i + 1;
+    const m = p.matches||0, w = p.wins||0, d = p.draws||0, l = p.losses||0;
+    const wp = m > 0 ? Math.round((w/m)*100) : 0;
+    const goals = p.goalsFor||0, mvp = p.mvp||0;
+    const score = goals*2 + mvp*3;
+    const gd = goals - (p.goalsAgainst||0);
+    const rating = Math.min(99, Math.max(40, Math.round(50 + w*3 - l*2 + d*0.5 + wp*0.3)));
+    const ratingColor = rating>=85?'#f5c842':rating>=70?'#7ed321':rating>=55?'#7132ca':'#aaa';
+    const cardBg = rank===1?'linear-gradient(135deg,#1a0a2e,#2d1458)':rank===2?'linear-gradient(135deg,#0a1628,#1a2d4a)':rank===3?'linear-gradient(135deg,#1a0a0a,#3a1010)':'linear-gradient(135deg,var(--card),var(--bg2))';
+    const borderCol = rank===1?'#f5c842':rank===2?'#aaa':rank===3?'#cd7f32':'var(--border)';
+    const avatar = p.avatarUrl
+      ? `<img src="${p.avatarUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:8px">`
+      : `<span style="font-size:40px">🎮</span>`;
+
+    return `<div onclick="openPublicProfile('${p.uid}')" style="cursor:pointer;background:${cardBg};border:2px solid ${borderCol};border-radius:16px;padding:16px;position:relative;overflow:hidden;transition:transform 0.2s,box-shadow 0.2s" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 30px rgba(0,0,0,0.4)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+      <!-- Rank badge -->
+      <div style="position:absolute;top:10px;left:10px;font-family:'Inter',sans-serif;font-weight:900;font-size:11px;color:${borderCol};letter-spacing:0.1em">${medals[i]||'#'+rank}</div>
+      <!-- Rating badge -->
+      <div style="position:absolute;top:10px;right:10px;text-align:center;background:rgba(0,0,0,0.5);border-radius:6px;padding:4px 8px;min-width:36px">
+        <div style="font-family:'Inter',sans-serif;font-weight:900;font-size:20px;color:${ratingColor};line-height:1">${rating}</div>
+        <div style="font-size:8px;color:rgba(255,255,255,0.4);letter-spacing:0.1em">OVR</div>
+      </div>
+      <!-- Avatar -->
+      <div style="width:80px;height:80px;border-radius:8px;background:rgba(255,255,255,0.05);border:2px solid ${borderCol}33;display:flex;align-items:center;justify-content:center;margin:20px auto 12px;overflow:hidden">${avatar}</div>
+      <!-- Name -->
+      <div style="text-align:center;font-family:'Inter',sans-serif;font-weight:800;font-size:14px;color:#fff;margin-bottom:2px;letter-spacing:0.02em">${(p.name||'—').toUpperCase()}</div>
+      <div style="text-align:center;font-size:10px;color:rgba(255,255,255,0.4);margin-bottom:12px;letter-spacing:0.15em">${(p.club||'—').toUpperCase()}</div>
+      <!-- Stats row -->
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;border-top:1px solid rgba(255,255,255,0.1);padding-top:10px">
+        <div style="text-align:center">
+          <div style="font-family:'Inter',sans-serif;font-weight:700;font-size:16px;color:#4ade80">${w}</div>
+          <div style="font-size:9px;color:rgba(255,255,255,0.4);letter-spacing:0.1em">WIN</div>
+        </div>
+        <div style="text-align:center;border-left:1px solid rgba(255,255,255,0.1);border-right:1px solid rgba(255,255,255,0.1)">
+          <div style="font-family:'Inter',sans-serif;font-weight:700;font-size:16px;color:#facc15">${goals}</div>
+          <div style="font-size:9px;color:rgba(255,255,255,0.4);letter-spacing:0.1em">GOALS</div>
+        </div>
+        <div style="text-align:center">
+          <div style="font-family:'Inter',sans-serif;font-weight:700;font-size:16px;color:#60a5fa">${score}</div>
+          <div style="font-size:9px;color:rgba(255,255,255,0.4);letter-spacing:0.1em">SCORE</div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('rankingTable').innerHTML = `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px;padding:4px">${cards}</div>`;
 }
 
 window.filterRanking = function() {
@@ -4487,7 +4651,7 @@ async function loadHomeRecentMatches() {
       return;
     }
 
-    const isAdmin = currentUser && ['mf3171352@gmail.com', 'arafatkobami@gmail.com'].includes(currentUser.email);
+    const isAdmin = currentUser && ['mf3171352@gmail.com', 'arafatkobami@gmail.com', 'libae804@gmail.com'].includes(currentUser.email);
     container.innerHTML = recent.map(m => {
       const hs = parseInt(m.home_score)||0, as_ = parseInt(m.away_score)||0;
       const winSide = hs > as_ ? 'home' : hs < as_ ? 'away' : 'draw';
@@ -4574,6 +4738,117 @@ window.openPublicProfile = async function(uid) {
   const goals = p.goalsFor||0, mvp = p.mvp||0;
   const score = goals*2 + mvp*3;
   const wp = m > 0 ? ((w/m)*100).toFixed(1) : '0.0';
+
+  // ── AUTO RATING ──
+  function calcRating(player, allMatches) {
+    const pName = player.name;
+    const recentMatches = allMatches
+      .filter(mx => (mx.home_team === pName || mx.away_team === pName) && mx.status === 'completed')
+      .sort((a,b) => (b.addedAt||b.date||'').localeCompare(a.addedAt||a.date||''))
+      .slice(0, 5);
+    
+    if (!recentMatches.length) return { rating: 50, form: [] };
+    
+    let ratingScore = 50;
+    const form = [];
+    recentMatches.forEach(mx => {
+      const isHome = mx.home_team === pName;
+      const myS = parseInt(isHome ? mx.home_score : mx.away_score) || 0;
+      const oppS = parseInt(isHome ? mx.away_score : mx.home_score) || 0;
+      const diff = myS - oppS;
+      if (myS > oppS) { ratingScore += 8 + Math.min(diff, 3)*2; form.push('W'); }
+      else if (myS === oppS) { ratingScore += 2; form.push('D'); }
+      else { ratingScore -= 5 + Math.min(-diff, 3); form.push('L'); }
+    });
+    // Factor in overall win rate
+    const overallWR = m > 0 ? (w/m) : 0;
+    ratingScore = ratingScore * 0.7 + overallWR * 100 * 0.3;
+    return { rating: Math.min(99, Math.max(40, Math.round(ratingScore))), form };
+  }
+
+  // Load matches for rating + graph
+  let allMatchesForProfile = [];
+  try {
+    const mRes = await fetch('https://typ-championship-default-rtdb.firebaseio.com/matches.json');
+    const mData = await mRes.json();
+    allMatchesForProfile = mData ? Object.entries(mData).map(([id, v]) => ({ id, ...v })) : [];
+  } catch(e) {}
+
+  const { rating, form } = calcRating(p, allMatchesForProfile);
+  const ratingColor = rating >= 85 ? '#f5c842' : rating >= 70 ? '#00e6f6' : rating >= 55 ? '#7132ca' : '#aaa';
+
+  // Inject rating badge near name
+  const ratingEl = document.getElementById('ppRatingBadge');
+  if (ratingEl) {
+    ratingEl.innerHTML = `<span style="font-family:'Inter',sans-serif;font-size:28px;font-weight:900;color:${ratingColor};line-height:1">${rating}</span><span style="font-size:10px;color:var(--text3);display:block;letter-spacing:0.1em;margin-top:2px">RATING</span>`;
+  }
+
+  // Form badges
+  const formEl = document.getElementById('ppFormBadges');
+  if (formEl) {
+    formEl.innerHTML = form.length ? form.map(f => {
+      const fc = f==='W'?'#16a34a':f==='D'?'#ca8a04':'#dc2626';
+      return `<span style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:4px;background:${fc};color:#fff;font-size:11px;font-weight:800;font-family:'Inter',sans-serif">${f}</span>`;
+    }).join('') : '<span style="color:var(--text3);font-size:12px">No recent matches</span>';
+  }
+
+  // ── PERFORMANCE GRAPH ──
+  const graphContainer = document.getElementById('ppPerfGraph');
+  if (graphContainer && allMatchesForProfile.length) {
+    const pName = p.name;
+    const myMatches = allMatchesForProfile
+      .filter(mx => (mx.home_team === pName || mx.away_team === pName) && mx.status === 'completed')
+      .sort((a,b) => (a.addedAt||a.date||'').localeCompare(b.addedAt||b.date||''))
+      .slice(-10);
+
+    if (myMatches.length >= 2) {
+      let runRating = 50;
+      const dataPoints = myMatches.map((mx, i) => {
+        const isHome = mx.home_team === pName;
+        const myS = parseInt(isHome ? mx.home_score : mx.away_score)||0;
+        const oppS = parseInt(isHome ? mx.away_score : mx.home_score)||0;
+        const diff = myS - oppS;
+        if (myS > oppS) runRating = Math.min(99, runRating + 8 + Math.min(diff,3)*2);
+        else if (myS === oppS) runRating = Math.min(99, runRating + 2);
+        else runRating = Math.max(40, runRating - 5 - Math.min(-diff,3));
+        return { x: i+1, y: runRating, result: myS > oppS ? 'W' : myS < oppS ? 'L' : 'D', score: `${myS}-${oppS}` };
+      });
+
+      graphContainer.innerHTML = `<canvas id="perfChartCanvas" height="120"></canvas>`;
+      const cEl = document.getElementById('perfChartCanvas');
+      if (cEl && window.Chart) {
+        new window.Chart(cEl, {
+          type: 'line',
+          data: {
+            labels: dataPoints.map(d => `M${d.x}`),
+            datasets: [{
+              label: 'Form Rating',
+              data: dataPoints.map(d => d.y),
+              borderColor: '#7132ca',
+              backgroundColor: 'rgba(113,50,202,0.15)',
+              borderWidth: 2.5,
+              pointBackgroundColor: dataPoints.map(d => d.result==='W'?'#16a34a':d.result==='L'?'#dc2626':'#ca8a04'),
+              pointRadius: 5,
+              tension: 0.4,
+              fill: true
+            }]
+          },
+          options: {
+            responsive: true,
+            plugins: { legend: { display: false }, tooltip: {
+              callbacks: { label: (ctx) => `Rating: ${ctx.raw} (${dataPoints[ctx.dataIndex].score})` }
+            }},
+            scales: {
+              y: { min: 30, max: 100, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#888', font: { size: 10 } } },
+              x: { grid: { display: false }, ticks: { color: '#888', font: { size: 10 } } }
+            }
+          }
+        });
+      }
+    } else {
+      graphContainer.innerHTML = '<div style="text-align:center;color:var(--text3);font-size:12px;padding:20px">Not enough matches for graph</div>';
+    }
+  }
 
   // Store for download
   window._ppCurrentPlayer = p;
@@ -5891,7 +6166,7 @@ window.bnavProfile = function() {
       <div onclick="showPage('profile');setBottomNav('profile');document.getElementById('bnavProfileMenu').remove()" style="padding:10px 14px;cursor:pointer;border-radius:8px;color:var(--text);font-size:14px;display:flex;align-items:center;gap:8px" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background=''">👤 My Profile</div>
       <div onclick="showPage('tournament');setBottomNav('');document.getElementById('bnavProfileMenu').remove()" style="padding:10px 14px;cursor:pointer;border-radius:8px;color:var(--text);font-size:14px;display:flex;align-items:center;gap:8px" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background=''" >🏟️ Tournament</div>
       <div onclick="showPage('rules');setBottomNav('');document.getElementById('bnavProfileMenu').remove()" style="padding:10px 14px;cursor:pointer;border-radius:8px;color:var(--text);font-size:14px;display:flex;align-items:center;gap:8px" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background=''">📋 Rules</div>
-      ${currentUser && ['mf3171352@gmail.com','arafatkobami@gmail.com'].includes(currentUser.email) ? `<div onclick="showPage('admin');setBottomNav('');document.getElementById('bnavProfileMenu').remove()" style="padding:10px 14px;cursor:pointer;border-radius:8px;color:var(--primary);font-size:14px;display:flex;align-items:center;gap:8px" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background=''">🛡️ Admin Panel</div>` : ''}
+      ${currentUser && ['mf3171352@gmail.com','arafatkobami@gmail.com','libae804@gmail.com'].includes(currentUser.email) ? `<div onclick="showPage('admin');setBottomNav('');document.getElementById('bnavProfileMenu').remove()" style="padding:10px 14px;cursor:pointer;border-radius:8px;color:var(--primary);font-size:14px;display:flex;align-items:center;gap:8px" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background=''">🛡️ Admin Panel</div>` : ''}
       <div style="height:1px;background:var(--border);margin:4px 0"></div>
       <div onclick="logout();document.getElementById('bnavProfileMenu')?.remove()" style="padding:10px 14px;cursor:pointer;border-radius:8px;color:var(--red);font-size:14px;display:flex;align-items:center;gap:8px" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background=''">🚪 Logout</div>
     `;
