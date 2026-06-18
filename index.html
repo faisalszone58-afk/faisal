@@ -4706,6 +4706,7 @@ if (document.readyState !== 'loading') { setTimeout(() => { if (typeof loadHomeP
 
 <script>
 
+const TRN_DB = 'https://typ-championship-default-rtdb.firebaseio.com';
 // ════════════════════════════════════════
 // 🏠 HOME PAGE DATA
 // ════════════════════════════════════════
@@ -4865,12 +4866,26 @@ async function loadHomeLiveMatchday() {
 
 async function loadHomeStats() {
   try {
-    const players = await getAllUsers();
-    if (!players.length) return;
-    const clubs = new Set(players.map(p => p.club).filter(Boolean));
-    document.getElementById('statPlayers').textContent = players.length;
-    document.getElementById('statClubs').textContent = clubs.size;
-  } catch(e) {}
+    const [usersRes, matchesRes] = await Promise.all([
+      fetch('https://typ-championship-default-rtdb.firebaseio.com/users.json?shallow=true'),
+      fetch('https://typ-championship-default-rtdb.firebaseio.com/matches.json?shallow=true')
+    ]);
+    const usersData = await usersRes.json();
+    const matchesData = await matchesRes.json();
+    const playerCount = usersData ? Object.keys(usersData).length : 0;
+    const matchCount  = matchesData ? Object.keys(matchesData).length : 0;
+    document.getElementById('statPlayers').textContent = playerCount || '—';
+    document.getElementById('statMatches').textContent = matchCount  || '—';
+    // clubs needs full data — skip if already cached
+    if ((window._allUsersCache||[]).length) {
+      const clubs = new Set(window._allUsersCache.map(p => p.club).filter(Boolean));
+      document.getElementById('statClubs').textContent = clubs.size || '—';
+    } else {
+      document.getElementById('statClubs').textContent = '—';
+    }
+  } catch(e) {
+    console.error('loadHomeStats error:', e);
+  }
 }
 
 async function loadHomeTopPlayers() {
@@ -5554,7 +5569,6 @@ function roundRect(ctx, x, y, w, h, r) {
 // Firebase path: tournament/
 // ════════════════════════════════════════════════════════
 
-const TRN_DB = 'https://typ-championship-default-rtdb.firebaseio.com';
 let trnTeamsCache = [];
 let trnMatchesCache = [];
 let trnKnockoutCache = {};
