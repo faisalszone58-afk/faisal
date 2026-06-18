@@ -4710,7 +4710,6 @@ if (document.readyState !== 'loading') { setTimeout(() => { if (typeof loadHomeP
 // 🏠 HOME PAGE DATA
 // ════════════════════════════════════════
 async function loadHomePageData() {
-  loadHomeTopPlayers();
   loadHomeRecentMatches();
   loadHomeStats();
   loadHomeLiveMatchday();
@@ -4876,6 +4875,7 @@ async function loadHomeStats() {
 
 async function loadHomeTopPlayers() {
   const container = document.getElementById('homeTopPlayers');
+  if (!container) return;
   try {
     const users = await getAllUsers();
     if (!users.length) { container.innerHTML = '<div style="color:var(--text3);text-align:center;padding:20px">কোনো player নেই।</div>'; return; }
