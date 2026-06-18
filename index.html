@@ -2538,9 +2538,15 @@ select.form-input option { background: var(--card); }
 
         <div class="alert alert-error" id="ssmSaveError" style="margin-top:16px"></div>
         <div class="alert alert-success" id="ssmSaveSuccess" style="margin-top:16px"></div>
-        <button onclick="ssmSaveSeason()" style="margin-top:8px;background:linear-gradient(135deg,#00e676,#00b248);border:none;color:#000;padding:12px 28px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;letter-spacing:1px">
-          💾 SEASON SAVE করো
-        </button>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px">
+          <button onclick="ssmSaveSeason()" style="background:linear-gradient(135deg,#00e676,#00b248);border:none;color:#000;padding:12px 28px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;letter-spacing:1px">
+            💾 SEASON SAVE করো
+          </button>
+          <button onclick="ssmApplyToCurrent()" style="background:linear-gradient(135deg,#7c3aed,#4f1dad);border:none;color:#fff;padding:12px 28px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;letter-spacing:1px">
+            ⚡ Current Season-এ Apply করো
+          </button>
+        </div>
+        <div style="font-size:12px;color:var(--text3);margin-top:8px">⚡ Apply করলে এই season-এর stats সরাসরি player-দের current profile-এ যোগ হবে।</div>
         <div id="ssmStatus" style="margin-top:16px;font-size:13px"></div>
       </div>
 
@@ -3202,8 +3208,9 @@ async function loadRankingSeasonsList(force) {
         ]);
         const n = await nRes.json();
         const a = await aRes.json();
-        if (n) name = n;
-        if (a) archivedAt = a;
+        if (n && typeof n === 'string') name = n;
+        else if (n && typeof n === 'object' && n.seasonName) name = n.seasonName;
+        if (a) archivedAt = typeof a === 'string' ? a : JSON.stringify(a);
       } catch(e) {}
       return { key: k, name, archivedAt };
     }));
@@ -3564,6 +3571,63 @@ window.ssmSaveSeason = async function() {
   }
 };
 
+
+// ── APPLY SEASON STATS TO CURRENT USERS ──
+window.ssmApplyToCurrent = async function() {
+  const statusEl = document.getElementById('ssmStatus');
+  const errEl = document.getElementById('ssmSaveError');
+  const sucEl = document.getElementById('ssmSaveSuccess');
+  errEl.classList.remove('show'); sucEl.classList.remove('show');
+
+  const draftEntries = Object.values(window._ssmDraft || {});
+  if (!draftEntries.length) {
+    errEl.textContent = '❌ আগে player list-এ যুক্ত করো, তারপর Apply করো।';
+    errEl.classList.add('show'); return;
+  }
+
+  if (!confirm(`⚠️ ${draftEntries.length} জন player-এর stats current season-এ ADD হবে (replace না, যোগ হবে)। Continue?`)) return;
+
+  statusEl.innerHTML = '<span style="color:var(--yellow)">⏳ Applying...</span>';
+  try {
+    // Fetch current users
+    const res = await fetch('https://typ-championship-default-rtdb.firebaseio.com/users.json');
+    const usersData = await res.json();
+    const usersMap = usersData ? usersData : {};
+
+    let updated = 0;
+    const promises = draftEntries.map(async p => {
+      // Find user by uid
+      const existing = usersMap[p.uid];
+      if (!existing) return; // skip if player not found in /users
+      const merged = {
+        ...existing,
+        matches:      (existing.matches      || 0) + (p.matches      || 0),
+        wins:         (existing.wins         || 0) + (p.wins         || 0),
+        draws:        (existing.draws        || 0) + (p.draws        || 0),
+        losses:       (existing.losses       || 0) + (p.losses       || 0),
+        goalsFor:     (existing.goalsFor     || 0) + (p.goalsFor     || 0),
+        goalsAgainst: (existing.goalsAgainst || 0) + (p.goalsAgainst || 0),
+        mvp:          (existing.mvp          || 0) + (p.mvp          || 0),
+      };
+      await fetch(`https://typ-championship-default-rtdb.firebaseio.com/users/${p.uid}.json`, {
+        method: 'PATCH', body: JSON.stringify(merged)
+      });
+      updated++;
+    });
+    await Promise.all(promises);
+
+    window._allUsersCache = []; // cache clear
+    statusEl.innerHTML = '';
+    sucEl.textContent = `✅ ${updated} জন player-এর stats current season-এ apply হয়েছে!`;
+    sucEl.classList.add('show');
+    window._ssmDraft = {};
+    ssmRenderDraftList();
+  } catch(e) {
+    statusEl.innerHTML = '';
+    errEl.textContent = '❌ Error: ' + e.message;
+    errEl.classList.add('show');
+  }
+};
 
 // ── MATCHES ──
 window.loadMatches = async function() {
