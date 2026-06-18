@@ -4739,7 +4739,7 @@ window.clearNotice = async function() {
   } catch(e) { st.textContent = '❌ Error: ' + e.message; }
 };
 
-// Load current notice into admin textarea when tab opens
+// Admin tab switcher hook — notice + tournament
 const _origSwitchAdminTab = window.switchAdminTab;
 window.switchAdminTab = function(tab) {
   if (_origSwitchAdminTab) _origSwitchAdminTab(tab);
@@ -4750,6 +4750,7 @@ window.switchAdminTab = function(tab) {
       if (inp && val && val.text) inp.value = val.text;
     }).catch(()=>{});
   }
+  if (tab === 'tournament') loadTrnAdminTeams();
 };
 
 async function loadHomeNotice() {
@@ -6492,13 +6493,7 @@ window.autoSetSemis = async function() {
   loadKnockoutAdmin();
 };
 
-// Hook tournament into admin tab switcher only
-// (showPage is defined in the non-module script below — don't override it here)
-const _origSwitchAdminTab = window.switchAdminTab;
-window.switchAdminTab = function(tab) {
-  _origSwitchAdminTab(tab);
-  if (tab === 'tournament') loadTrnAdminTeams();
-};
+
 
 // ══════════════════════════════════════════
 // 📥 DOWNLOAD FIXTURE AS BEAUTIFUL HTML
