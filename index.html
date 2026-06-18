@@ -621,6 +621,9 @@ select.form-input option { background: var(--card); }
 .badge-w { background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; }
 .badge-d { background: #fefce8; color: #a16207; border: 1px solid #fef08a; }
 .badge-l { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
+[data-theme="dark"] .badge-w { background: rgba(74,222,128,0.15); color: #4ade80; border-color: rgba(74,222,128,0.3); }
+[data-theme="dark"] .badge-d { background: rgba(251,191,36,0.15); color: #fbbf24; border-color: rgba(251,191,36,0.3); }
+[data-theme="dark"] .badge-l { background: rgba(248,113,113,0.15); color: #f87171; border-color: rgba(248,113,113,0.3); }
 
 /* STATS GRID */
 .stats-grid {
@@ -692,49 +695,7 @@ select.form-input option { background: var(--card); }
 .tab-content { display: none; }
 .tab-content.active { display: block; }
 
-/* LOADING */
-.loading-screen {
-  position: fixed;
-  inset: 0;
-  background: rgba(255,255,255,0.7);
-  backdrop-filter: blur(30px);
-  -webkit-backdrop-filter: blur(30px);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  transition: opacity 0.4s;
-}
-
-.loading-logo {
-  font-family: 'Rubik Glitch', cursive;
-  font-size: 18px;
-  color: var(--text);
-  letter-spacing: 0;
-  margin-bottom: 28px;
-  line-height: 1.5;
-}
-
-.loading-bar {
-  width: 140px;
-  height: 1px;
-  background: var(--border);
-  border-radius: 1px;
-  overflow: hidden;
-}
-
-.loading-bar-fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--primary), var(--primary-dark));
-  animation: loadbar 1.2s ease-in-out infinite;
-}
-
-@keyframes loadbar {
-  0% { width: 0; margin-left: 0; }
-  50% { width: 100%; margin-left: 0; }
-  100% { width: 0; margin-left: 100%; }
-}
+/* LOADING — defined below with full styles */
 
 /* USER MENU */
 .user-menu { position: relative; }
@@ -1314,15 +1275,43 @@ select.form-input option { background: var(--card); }
 .loading-screen {
   position: fixed;
   inset: 0;
-  background: rgba(255,255,255,0.85);
-  backdrop-filter: blur(30px);
-  -webkit-backdrop-filter: blur(30px);
+  background: #0a0618;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: 10000;
   transition: opacity 0.5s, visibility 0.5s;
+}
+
+.loading-logo {
+  font-family: 'Rubik Glitch', cursive;
+  font-size: 22px;
+  color: #fff;
+  letter-spacing: 0;
+  margin-bottom: 28px;
+  line-height: 1.5;
+}
+
+.loading-bar {
+  width: 160px;
+  height: 2px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 0;
+}
+
+.loading-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+  animation: loadbar 1.2s ease-in-out infinite;
+}
+
+@keyframes loadbar {
+  0% { width: 0; margin-left: 0; }
+  50% { width: 100%; margin-left: 0; }
+  100% { width: 0; margin-left: 100%; }
 }
 
 .ll {
@@ -1330,6 +1319,7 @@ select.form-input option { background: var(--card); }
   opacity: 0;
   transform: translateY(20px);
   animation: letterPop 0.5s cubic-bezier(0.34,1.56,0.64,1) forwards;
+  color: #fff;
 }
 
 @keyframes letterPop {
@@ -1337,7 +1327,7 @@ select.form-input option { background: var(--card); }
 }
 
 .loading-sub {
-  color: var(--text3);
+  color: rgba(255,255,255,0.45);
   font-size: 11px;
   margin-top: 20px;
   font-family: 'Inter', monospace;
@@ -1561,17 +1551,17 @@ select.form-input option { background: var(--card); }
 <body>
 
 <!-- ═══════════════ INTRO SCREEN ═══════════════ -->
-<div id="introScreen" style="position:fixed;inset:0;z-index:99999;background:#0a0a0f;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;padding:20px;box-sizing:border-box">
+<div id="introScreen" style="position:fixed;inset:0;z-index:99999;background:#0a0a0f;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden">
   <!-- particles -->
   <canvas id="introCanvas" style="position:absolute;inset:0;width:100%;height:100%"></canvas>
   <!-- content -->
-  <div id="introContent" style="position:relative;text-align:center;z-index:2;width:100%;max-width:420px;padding:0 16px;box-sizing:border-box">
-    <div id="introBolt" style="font-size:52px;opacity:0;transform:scale(0) rotate(-20deg);transition:all 0.6s cubic-bezier(0.34,1.56,0.64,1);line-height:1">⚡</div>
-    <div id="introTitle" style="font-family:'Rubik Glitch',cursive;font-size:clamp(1.8rem,8vw,4rem);color:#fff;letter-spacing:0.05em;margin-top:8px;opacity:0;transform:translateY(30px);transition:all 0.7s ease 0.3s;line-height:1.3;word-break:break-word">
+  <div id="introContent" style="position:relative;text-align:center;z-index:2">
+    <div id="introBolt" style="font-size:64px;opacity:0;transform:scale(0) rotate(-20deg);transition:all 0.6s cubic-bezier(0.34,1.56,0.64,1)">⚡</div>
+    <div id="introTitle" style="font-family:'Rubik Glitch',cursive;font-size:clamp(2.5rem,10vw,5rem);color:#fff;letter-spacing:0.1em;margin-top:8px;opacity:0;transform:translateY(30px);transition:all 0.7s ease 0.3s">
       <span style="color:#7132ca">TEXT</span> YOUR <span style="color:#7132ca">PES</span>
     </div>
-    <div id="introSub" style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:0.25em;color:rgba(255,255,255,0.4);margin-top:10px;opacity:0;transform:translateY(20px);transition:all 0.6s ease 0.6s;text-transform:uppercase;word-break:break-word">Bangladesh eFootball Community</div>
-    <div id="introBar" style="margin-top:32px;width:min(200px,60vw);height:3px;background:rgba(255,255,255,0.1);border-radius:99px;overflow:hidden;opacity:0;transition:opacity 0.4s ease 0.8s;margin-left:auto;margin-right:auto">
+    <div id="introSub" style="font-family:'Inter',sans-serif;font-size:13px;letter-spacing:0.4em;color:rgba(255,255,255,0.4);margin-top:12px;opacity:0;transform:translateY(20px);transition:all 0.6s ease 0.6s;text-transform:uppercase">Bangladesh eFootball Community</div>
+    <div id="introBar" style="margin-top:40px;width:200px;height:3px;background:rgba(255,255,255,0.1);border-radius:99px;overflow:hidden;opacity:0;transition:opacity 0.4s ease 0.8s">
       <div id="introBarFill" style="height:100%;width:0%;background:linear-gradient(90deg,#7132ca,#a855f7);border-radius:99px;transition:width 1.2s ease 0.9s"></div>
     </div>
   </div>
@@ -1674,7 +1664,7 @@ select.form-input option { background: var(--card); }
     <span class="bnav-icon">🤝</span>Friendly
   </button>
   <button class="bnav-btn" id="bnav-profile" onclick="bnavProfile()">
-    <span class="bnav-icon" id="bnavProfileIcon">👤</span>Profile
+    <span class="bnav-icon" id="bnavProfileIcon">☰</span>More
   </button>
 </nav>
 
@@ -1689,27 +1679,7 @@ select.form-input option { background: var(--card); }
     <button class="nav-btn" onclick="showPage('friendly')" style="color:var(--green);border-color:rgba(0,230,118,0.3)">🤝 Friendly</button>
     <button class="nav-btn" onclick="showPage('tournament')" style="color:var(--gold);border-color:rgba(124,92,252,0.4)">🏟️ Tournament</button>
     <button class="nav-btn" onclick="showPage('rules')" style="color:var(--red);border-color:rgba(220,38,38,0.3)">📋 Rules</button>
-    <!-- Guest buttons -->
-    <span id="guestNav">
-      <button class="nav-btn" onclick="showPage('login')">Login</button>
-      <button class="nav-btn primary" onclick="showPage('register')">Register</button>
-    </span>
-    <!-- User menu -->
-    <span id="userNav" class="hidden">
-      <div class="user-menu">
-        <div class="user-avatar-btn" onclick="toggleDropdown()" id="navAvatarBtn">👤</div>
-        <div class="user-dropdown" id="userDropdown">
-          <div class="dropdown-user">
-            <div class="dropdown-user-name" id="dropdownName">Player</div>
-            <div class="dropdown-user-club" id="dropdownClub">Club</div>
-          </div>
-          <div class="dropdown-item" onclick="showPage('profile')">👤 My Profile</div>
-          <div class="dropdown-item" onclick="showPage('editProfile')">✏️ Edit Profile</div>
-          <div class="dropdown-item" id="adminNavLink" style="display:none" onclick="showPage('admin')">🛡️ Admin Panel</div>
-          <div class="dropdown-item danger" onclick="logout()">🚪 Logout</div>
-        </div>
-      </div>
-    </span>
+    <button class="nav-btn" onclick="showPage('admin')" style="color:var(--primary);border-color:rgba(124,92,252,0.4)">🛡️ Admin</button>
   </div>
 </nav>
 
@@ -1720,11 +1690,21 @@ select.form-input option { background: var(--card); }
     <h1><span class="gold">TYP</span> <span class="cyan">CHAMPIONSHIP</span></h1>
     <p>Bangladesh-এর সেরা eFootball community। খেলো, জেতো, legend হও।</p>
     <div class="hero-btns" id="heroBtns">
-      <button class="btn btn-gold" onclick="showPage('register')">🚀 Join Now</button>
       <button class="btn btn-outline" onclick="showPage('ranking')">🏆 Leaderboard</button>
     </div>
 
-
+    <!-- NOTICE BAR -->
+    <div id="homeNoticeBar" style="margin:18px auto 0;max-width:520px;background:linear-gradient(135deg,rgba(113,50,202,0.18),rgba(48,28,160,0.12));border:1.5px solid rgba(113,50,202,0.35);border-radius:10px;overflow:hidden;display:none">
+      <div style="display:flex;align-items:center">
+        <div style="background:var(--primary);color:#fff;font-size:11px;font-weight:700;padding:9px 14px;letter-spacing:0.08em;white-space:nowrap;font-family:'Inter',sans-serif">📢 NOTICE</div>
+        <div style="overflow:hidden;flex:1;padding:0 10px">
+          <div id="homeNoticeText" style="white-space:nowrap;font-size:13px;color:var(--text2);font-family:'Inter',sans-serif;display:inline-block;animation:noticeScroll 18s linear infinite">লোড হচ্ছে...</div>
+        </div>
+      </div>
+    </div>
+    <style>
+      @keyframes noticeScroll { 0% { transform:translateX(100%); } 100% { transform:translateX(-100%); } }
+    </style>
     <div class="stats-bar">
       <div class="stat-item">
         <div class="stat-num" id="statPlayers">—</div>
@@ -1745,11 +1725,11 @@ select.form-input option { background: var(--card); }
     </div>
   </div>
 
-  <!-- TOP PLAYERS -->
-  <div class="section" style="padding-top:0">
-    <div class="section-title">🏅 Top Players</div>
-    <div class="section-sub">// Career Score অনুযায়ী সেরা players</div>
-    <div id="homeTopPlayers" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px">
+  <!-- LIVE TOURNAMENT MATCHDAY -->
+  <div class="section" style="padding-top:0" id="liveTrnSection">
+    <div class="section-title">🏆 Tournament Live</div>
+    <div class="section-sub">// চলমান Matchday এর scores</div>
+    <div id="homeLiveMatchday">
       <div style="text-align:center;padding:30px;color:var(--text3)"><span class="spinner"></span></div>
     </div>
   </div>
@@ -1762,277 +1742,12 @@ select.form-input option { background: var(--card); }
       <div style="text-align:center;padding:30px;color:var(--text3)"><span class="spinner"></span></div>
     </div>
   </div>
-</div>
 
-<!-- ═══════════════ REGISTER PAGE ═══════════════ -->
-<div class="page" id="page-register">
-  <div class="auth-wrap">
-    <div class="auth-box">
-      <div class="auth-logo">
-        <h2>⚡ TYP</h2>
-        <p>নতুন account তৈরি করুন</p>
-      </div>
-
-      <div class="alert alert-error" id="regError"></div>
-      <div class="alert alert-success" id="regSuccess"></div>
-
-      <!-- Avatar -->
-      <div class="avatar-upload">
-        <div class="avatar-preview" id="avatarPreview" onclick="document.getElementById('avatarInput').click()">🎮</div>
-        <div class="avatar-info">
-          <p>Profile Photo</p>
-          <span>Click করে photo upload করুন</span>
-          <br><span style="color:var(--text3);font-size:10px;">Max 2MB • JPG, PNG</span>
-        </div>
-      </div>
-      <input type="file" id="avatarInput" accept="image/*" style="display:none" onchange="previewAvatar(this)">
-
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">Full Name *</label>
-          <input type="text" class="form-input" id="regName" placeholder="তোমার নাম">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Username *</label>
-          <input type="text" class="form-input" id="regUsername" placeholder="unique username" oninput="this.value=this.value.toLowerCase().replace(/[^a-z0-9_]/g,'')">
-          <div class="form-hint" id="usernameHint"></div>
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">Email *</label>
-        <input type="email" class="form-input" id="regEmail" placeholder="email@example.com">
-      </div>
-
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">Club Name *</label>
-          <input type="text" class="form-input" id="regClub" placeholder="তোমার club">
-        </div>
-        <div class="form-group">
-          <label class="form-label">District *</label>
-          <select class="form-input" id="regDistrict">
-            <option value="">Select District</option>
-            <option>Dhaka</option><option>Chittagong</option><option>Sylhet</option>
-            <option>Rajshahi</option><option>Khulna</option><option>Barishal</option>
-            <option>Rangpur</option><option>Mymensingh</option><option>Comilla</option>
-            <option>Narayanganj</option><option>Gazipur</option><option>Tangail</option>
-            <option>Bogura</option><option>Jessore</option><option>Dinajpur</option>
-            <option>Faridpur</option><option>Pabna</option><option>Noakhali</option>
-            <option>Cox's Bazar</option><option>Brahmanbaria</option><option>Feni</option>
-            <option>Lakshmipur</option><option>Chandpur</option><option>Narsingdi</option>
-            <option>Munshiganj</option><option>Manikganj</option><option>Shariatpur</option>
-            <option>Madaripur</option><option>Gopalganj</option><option>Narail</option>
-            <option>Magura</option><option>Jhenaidah</option><option>Chuadanga</option>
-            <option>Kushtia</option><option>Meherpur</option><option>Satkhira</option>
-            <option>Bagerhat</option><option>Pirojpur</option><option>Patuakhali</option>
-            <option>Barguna</option><option>Bhola</option><option>Jhalokathi</option>
-            <option>Kishoreganj</option><option>Netrokona</option><option>Jamalpur</option>
-            <option>Sherpur</option><option>Sunamganj</option><option>Habiganj</option>
-            <option>Moulvibazar</option><option>Kurigram</option><option>Gaibandha</option>
-            <option>Lalmonirhat</option><option>Nilphamari</option><option>Panchagarh</option>
-            <option>Thakurgaon</option><option>Joypurhat</option><option>Naogaon</option>
-            <option>Chapainawabganj</option><option>Natore</option><option>Sirajganj</option>
-            <option>Rajbari</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">Password *</label>
-          <input type="password" class="form-input" id="regPass" placeholder="Min 6 characters">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Confirm Password *</label>
-          <input type="password" class="form-input" id="regPass2" placeholder="Repeat password">
-        </div>
-      </div>
-
-      <button class="btn btn-gold btn-full" onclick="register()" id="regBtn">
-        🚀 Create Account
-      </button>
-
-      <div class="form-divider">or</div>
-      <div class="text-center">
-        Already have account? <span class="form-link" onclick="showPage('login')">Login করুন</span>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ═══════════════ LOGIN PAGE ═══════════════ -->
-<div class="page" id="page-login">
-  <div class="auth-wrap">
-    <div class="auth-box">
-      <div class="auth-logo">
-        <h2>⚡ TYP</h2>
-        <p>আপনার account-এ login করুন</p>
-      </div>
-
-      <div class="alert alert-error" id="loginError"></div>
-
-      <div class="form-group">
-        <label class="form-label">Email</label>
-        <input type="email" class="form-input" id="loginEmail" placeholder="email@example.com">
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">Password</label>
-        <input type="password" class="form-input" id="loginPass" placeholder="Password" onkeydown="if(event.key==='Enter')login()">
-        <div class="mt-8 text-center">
-          <span class="form-link" onclick="resetPassword()" style="font-size:12px;">🔑 Forgot password?</span>
-        </div>
-      </div>
-
-      <button class="btn btn-gold btn-full" onclick="login()" id="loginBtn">
-        ⚡ Login
-      </button>
-
-      <div class="form-divider">or</div>
-      <div class="text-center">
-        Account নেই? <span class="form-link" onclick="showPage('register')">Register করুন</span>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ═══════════════ PROFILE PAGE ═══════════════ -->
-<div class="page" id="page-profile">
-  <div class="profile-hero">
-    <div class="profile-banner" id="profileBanner"></div>
-    <div class="profile-inner">
-      <div class="profile-avatar-wrap">
-        <div class="avatar-ring"></div>
-        <div class="avatar-ring-inner"></div>
-        <div class="profile-avatar" id="profileAvatar">🎮</div>
-      </div>
-      <div class="profile-info">
-        <div class="profile-rank" id="profileRank"># — • TYP PLAYER</div>
-        <div class="profile-name" id="profileName">Player Name</div>
-        <div class="profile-meta">
-          <span>🏟️ <span id="profileClub">—</span></span>
-          <span>📍 <span id="profileDistrict">—</span></span>
-          <span>📅 <span id="profileJoined">—</span></span>
-        </div>
-        <div class="form-badge" id="profileForm"></div>
-      </div>
-      <button class="btn btn-outline-gold" onclick="showPage('editProfile')" style="align-self:flex-start">✏️ Edit</button>
-    </div>
-  </div>
-
-  <div class="section">
-    <!-- Stats -->
-    <div class="stats-grid" id="profileStats">
-      <div class="stat-card"><div class="stat-card-num" id="pM">—</div><div class="stat-card-label">Matches</div></div>
-      <div class="stat-card"><div class="stat-card-num" id="pW">—</div><div class="stat-card-label">Wins</div></div>
-      <div class="stat-card"><div class="stat-card-num" id="pD">—</div><div class="stat-card-label">Draws</div></div>
-      <div class="stat-card"><div class="stat-card-num" id="pL">—</div><div class="stat-card-label">Losses</div></div>
-      <div class="stat-card"><div class="stat-card-num" id="pWP">—</div><div class="stat-card-label">Win %</div></div>
-      <div class="stat-card"><div class="stat-card-num" id="pGF">—</div><div class="stat-card-label">Goals For</div></div>
-      <div class="stat-card"><div class="stat-card-num" id="pGA">—</div><div class="stat-card-label">Goals Against</div></div>
-      <div class="stat-card"><div class="stat-card-num" id="pCS">—</div><div class="stat-card-label">Clean Sheets</div></div>
-      <div class="stat-card"><div class="stat-card-num" id="pMOTM">—</div><div class="stat-card-label">MOTM</div></div>
-      <div class="stat-card"><div class="stat-card-num" id="pPTS" style="color:var(--primary)">—</div><div class="stat-card-label">Points</div></div>
-    </div>
-
-    <!-- Progress bars -->
-    <div class="card" id="profileProgressBars" style="margin-bottom:20px;display:none">
-      <div class="stat-bar-row">
-        <span class="stat-bar-label">Win Rate</span>
-        <div class="stat-bar-track"><div class="stat-bar-fill" id="barWin"></div></div>
-        <span class="stat-bar-val" id="barWinVal">0%</span>
-      </div>
-      <div class="stat-bar-row">
-        <span class="stat-bar-label">Clean Sheet</span>
-        <div class="stat-bar-track"><div class="stat-bar-fill" id="barCS"></div></div>
-        <span class="stat-bar-val" id="barCSVal">0%</span>
-      </div>
-      <div class="stat-bar-row">
-        <span class="stat-bar-label">Draw Rate</span>
-        <div class="stat-bar-track"><div class="stat-bar-fill" id="barDraw" style="background:linear-gradient(90deg,#ca8a04,#a16207)"></div></div>
-        <span class="stat-bar-val" id="barDrawVal">0%</span>
-      </div>
-    </div>
-
-    <!-- Tabs -->
-    <div class="tabs">
-      <button class="tab-btn active" onclick="switchTab('overview')">Overview</button>
-      <button class="tab-btn" onclick="switchTab('achievements')">Achievements</button>
-      <button class="tab-btn" onclick="switchTab('friendly')">🤝 Friendly</button>
-    </div>
-
-    <div class="tab-content active" id="tab-overview">
-      <div class="card">
-        <div id="noStatsMsg" style="text-align:center;color:var(--text3);padding:40px 0;">
-          <div style="font-size:48px;margin-bottom:12px">📊</div>
-          <p>Stats এখনও নেই।</p>
-          <p style="font-size:13px;margin-top:6px">Admin stats update করলে এখানে দেখাবে।</p>
-        </div>
-        <div id="statsDetail" class="hidden">
-          <div style="color:var(--text2);font-size:14px;line-height:2">
-            <div>🎯 <strong>Win Rate:</strong> <span id="detWR">—</span></div>
-            <div>⚽ <strong>Avg Goals/Match:</strong> <span id="detAvgG">—</span></div>
-            <div>🛡️ <strong>Clean Sheet Rate:</strong> <span id="detCSR">—</span></div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="tab-content" id="tab-achievements">
-      <div id="achievementsGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px"></div>
-    </div>
-
-    <div class="tab-content" id="tab-friendly">
-      <div id="friendlyMatchesList"><div style="text-align:center;color:var(--text3);padding:40px 0">🤝 কোনো friendly match নেই।</div></div>
-    </div>
-  </div>
-</div>
-
-<!-- ═══════════════ EDIT PROFILE PAGE ═══════════════ -->
-<div class="page" id="page-editProfile">
-  <div class="auth-wrap">
-    <div class="auth-box" style="max-width:500px">
-      <div class="auth-logo">
-        <h2>✏️ Edit Profile</h2>
-        <p>তোমার তথ্য আপডেট করো</p>
-      </div>
-      <div class="alert alert-error" id="editError"></div>
-      <div class="alert alert-success" id="editSuccess"></div>
-
-      <div class="avatar-upload">
-        <div class="avatar-preview" id="editAvatarPreview" onclick="document.getElementById('editAvatarInput').click()">🎮</div>
-        <div class="avatar-info">
-          <p>Click করে photo change করুন</p>
-        </div>
-      </div>
-      <input type="file" id="editAvatarInput" accept="image/*" style="display:none" onchange="previewEditAvatar(this)">
-
-      <div class="form-group">
-        <label class="form-label">Full Name</label>
-        <input type="text" class="form-input" id="editName">
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">Club Name</label>
-          <input type="text" class="form-input" id="editClub">
-        </div>
-        <div class="form-group">
-          <label class="form-label">District</label>
-          <select class="form-input" id="editDistrict">
-            <option value="">Select</option>
-            <option>Dhaka</option><option>Chittagong</option><option>Sylhet</option>
-            <option>Rajshahi</option><option>Khulna</option><option>Barishal</option>
-            <option>Rangpur</option><option>Mymensingh</option><option>Comilla</option>
-            <option>Narayanganj</option><option>Gazipur</option>
-          </select>
-        </div>
-      </div>
-      <div style="display:flex;gap:10px">
-        <button class="btn btn-gold" style="flex:1" onclick="saveProfile()">💾 Save</button>
-        <button class="btn btn-outline" style="flex:1" onclick="showPage('profile')">Cancel</button>
-      </div>
-    </div>
+  <!-- RULES BUTTON -->
+  <div class="section" style="padding-top:0;padding-bottom:80px">
+    <button onclick="showPage('rules')" style="width:100%;padding:16px;background:linear-gradient(135deg,var(--primary),var(--primary-dark));border:none;border-radius:12px;color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;display:flex;align-items:center;justify-content:center;gap:10px;letter-spacing:0.02em">
+      📋 Rules &amp; Regulations দেখো
+    </button>
   </div>
 </div>
 
@@ -2187,19 +1902,24 @@ select.form-input option { background: var(--card); }
 
     <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">
       <input type="text" class="form-input" id="rankSearch" placeholder="🔍 Search player..." oninput="filterRanking()" style="flex:1;min-width:200px">
-      <button class="btn btn-outline" onclick="loadRanking()">🔄 Sync</button>
+      <select class="form-input" id="rankSeasonFilter" onchange="onRankSeasonChange()" style="min-width:170px;max-width:240px;flex-shrink:0">
+        <option value="main">🏆 Main Ranking (All-Time)</option>
+        <option value="current">🔴 Current Season</option>
+      </select>
+      <button class="btn btn-outline" onclick="refreshRankingView()">🔄 Sync</button>
       <div style="display:flex;gap:4px;background:var(--bg3);border-radius:8px;padding:3px">
         <button id="rankViewTable" onclick="window._rankingView='table';renderRanking(rankingData);this.style.background='var(--primary)';this.style.color='#fff';document.getElementById('rankViewCards').style.background='';document.getElementById('rankViewCards').style.color=''" style="padding:5px 10px;border-radius:6px;border:none;cursor:pointer;font-size:13px;background:var(--primary);color:#fff;transition:all 0.2s">☰</button>
         <button id="rankViewCards" onclick="window._rankingView='cards';renderRanking(rankingData);this.style.background='var(--primary)';this.style.color='#fff';document.getElementById('rankViewTable').style.background='';document.getElementById('rankViewTable').style.color=''" style="padding:5px 10px;border-radius:6px;border:none;cursor:pointer;font-size:13px;transition:all 0.2s">⊞</button>
       </div>
     </div>
 
+    <div id="rankSeasonBanner" style="display:none;margin-bottom:14px;padding:10px 14px;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:10px;font-size:12px;font-weight:600"></div>
+
     <div id="rankingTable">
       <div class="card text-center" style="padding:60px 20px">
         <div style="font-size:48px;margin-bottom:12px">📊</div>
-        <p style="color:var(--text3)">Google Sheets CSV URL set করুন code-এ SHEET_URL variable-এ।</p>
-        <p style="color:var(--text3);font-size:13px;margin-top:8px">তারপর Sync button চাপলে data load হবে।</p>
-        <button class="btn btn-gold mt-16" onclick="loadRanking()">🔄 Load Ranking</button>
+        <p style="color:var(--text3)">Loading হচ্ছে...</p>
+        <button class="btn btn-gold mt-16" onclick="loadMainRanking()">🔄 Load Ranking</button>
       </div>
     </div>
   </div>
@@ -2271,10 +1991,16 @@ select.form-input option { background: var(--card); }
 
   <!-- FIXTURES TAB -->
   <div class="trn-content" id="trntab-fixtures">
-    <div style="display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap">
-      <button class="nav-btn active" id="fixFilterAll" onclick="filterFixtures('all',this)">All</button>
-      <button class="nav-btn" id="fixFilterPending" onclick="filterFixtures('pending',this)">Upcoming</button>
-      <button class="nav-btn" id="fixFilterDone" onclick="filterFixtures('done',this)">Completed</button>
+    <div style="display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;align-items:center;justify-content:space-between">
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="nav-btn active" id="fixFilterAll" onclick="filterFixtures('all',this)">All</button>
+        <button class="nav-btn" id="fixFilterPending" onclick="filterFixtures('pending',this)">Upcoming</button>
+        <button class="nav-btn" id="fixFilterDone" onclick="filterFixtures('done',this)">Completed</button>
+      </div>
+      <button onclick="downloadFixturePDF()" style="display:flex;align-items:center;gap:7px;padding:9px 18px;border-radius:10px;border:none;cursor:pointer;font-size:13px;font-weight:700;font-family:'Inter',sans-serif;background:linear-gradient(135deg,#7132CA,#301CA0);color:#fff;box-shadow:0 4px 16px rgba(113,50,202,0.35);transition:all 0.2s;letter-spacing:0.01em" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 6px 24px rgba(113,50,202,0.5)'" onmouseout="this.style.transform='';this.style.boxShadow='0 4px 16px rgba(113,50,202,0.35)'">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Download Fixture
+      </button>
     </div>
     <div id="trnFixturesList">
       <div style="text-align:center;padding:60px;color:var(--text3)"><span class="spinner"></span> Loading...</div>
@@ -2600,15 +2326,20 @@ select.form-input option { background: var(--card); }
         <div class="admin-tab" onclick="switchAdminTab('addmatch')">➕ Add Match Result</div>
         <div class="admin-tab" onclick="switchAdminTab('friendlymgmt')">🤝 Friendly Requests</div>
         <div class="admin-tab" onclick="switchAdminTab('seasonreset')">🔄 Season Reset</div>
+        <div class="admin-tab" onclick="switchAdminTab('seasonstats')">📅 Season Stats</div>
         <div class="admin-tab" onclick="switchAdminTab('resultmgmt')">📤 Result Requests <span id="pendingResultCount" style="background:var(--red);color:#fff;border-radius:10px;padding:1px 6px;font-size:11px;margin-left:4px">0</span></div>
         <div class="admin-tab" onclick="switchAdminTab('tournament')">🏟️ Tournament</div>
+        <div class="admin-tab" onclick="switchAdminTab('notice')">📢 Notice</div>
       </div>
 
       <!-- PLAYERS TAB -->
       <div class="admin-section active" id="adminTab-players">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px">
           <div style="font-size:14px;color:var(--text2)">Total: <span id="adminPlayerCount" style="color:var(--cyan);font-weight:700">0</span> players</div>
-          <input type="text" class="form-input" style="max-width:240px" placeholder="🔍 Player search..." oninput="filterAdminPlayers(this.value)" id="adminSearchInput">
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+            <input type="text" class="form-input" style="max-width:200px" placeholder="🔍 Player search..." oninput="filterAdminPlayers(this.value)" id="adminSearchInput">
+            <button class="btn btn-gold" onclick="openAddPlayerModal()" style="padding:9px 16px;font-size:13px;white-space:nowrap">➕ Add Player</button>
+          </div>
         </div>
         <div id="adminPlayersList">
           <div class="text-center" style="padding:40px;color:var(--text3)"><span class="spinner"></span></div>
@@ -2739,6 +2470,80 @@ select.form-input option { background: var(--card); }
         <div id="resetStatus" style="margin-top:16px;font-size:13px"></div>
       </div>
 
+      <!-- SEASON STATS MANAGER TAB -->
+      <div class="admin-section" id="adminTab-seasonstats">
+        <div style="font-size:15px;font-weight:700;color:var(--gold);margin-bottom:8px">📅 Season Stats Manager</div>
+        <p style="font-size:13px;color:var(--text3);margin-bottom:20px">পুরোনো / আগের season-এর player stats এখানে manually যুক্ত করো। প্রতিটা player আগে থেকে registered (Players tab থেকে Add Player করা) থাকতে হবে — uid দিয়ে link হবে, যাতে Main Ranking-এ সব season-এর stats ঠিকভাবে যোগ হয়।</p>
+
+        <div class="card" style="max-width:640px">
+          <div class="form-group">
+            <label class="form-label">Season বেছে নাও / নতুন বানাও</label>
+            <select class="form-input" id="ssmSeasonSelect" onchange="ssmOnSeasonSelectChange()">
+              <option value="__new__">➕ নতুন Season বানাও</option>
+            </select>
+          </div>
+          <div class="form-group" id="ssmNewSeasonWrap">
+            <label class="form-label">নতুন Season-এর নাম</label>
+            <input type="text" class="form-input" id="ssmNewSeasonName" placeholder="যেমন: Season 7">
+          </div>
+
+          <div style="border-top:1px solid var(--border);margin:18px 0"></div>
+
+          <div class="form-group" style="position:relative">
+            <label class="form-label">Player খুঁজে নাও</label>
+            <input type="text" class="form-input" id="ssmPlayerSearch" placeholder="🔍 Player নাম লেখো..." oninput="ssmSearchPlayers(this.value)" autocomplete="off">
+            <div id="ssmPlayerSuggestions" style="display:none;position:absolute;top:100%;left:0;right:0;z-index:20;background:var(--card);border:1px solid var(--border);border-radius:10px;margin-top:4px;max-height:220px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,0,0,0.4)"></div>
+          </div>
+          <div id="ssmSelectedPlayer" style="display:none;font-size:13px;color:var(--green);margin-bottom:14px;padding:8px 12px;background:rgba(0,230,118,0.08);border-radius:8px"></div>
+
+          <div class="match-add-grid">
+            <div class="form-group">
+              <label class="form-label">Matches</label>
+              <input type="number" class="form-input" id="ssmMatches" min="0" value="0">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Wins</label>
+              <input type="number" class="form-input" id="ssmWins" min="0" value="0">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Draws</label>
+              <input type="number" class="form-input" id="ssmDraws" min="0" value="0">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Losses</label>
+              <input type="number" class="form-input" id="ssmLosses" min="0" value="0">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Goals For</label>
+              <input type="number" class="form-input" id="ssmGoalsFor" min="0" value="0">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Goals Against</label>
+              <input type="number" class="form-input" id="ssmGoalsAgainst" min="0" value="0">
+            </div>
+            <div class="form-group">
+              <label class="form-label">MVP</label>
+              <input type="number" class="form-input" id="ssmMvp" min="0" value="0">
+            </div>
+          </div>
+
+          <div class="alert alert-error" id="ssmAddError"></div>
+          <button class="btn btn-gold" style="width:100%;margin-top:8px" onclick="ssmAddPlayerToDraft()">➕ এই Player-কে List-এ যুক্ত করো</button>
+        </div>
+
+        <div style="margin-top:24px">
+          <div style="font-size:14px;font-weight:700;color:var(--text2);margin-bottom:12px">📋 যুক্ত হওয়া Players (Save করার আগে দেখে নাও)</div>
+          <div id="ssmDraftList"><div style="color:var(--text3);font-size:13px">এখনো কোনো player যুক্ত করা হয়নি।</div></div>
+        </div>
+
+        <div class="alert alert-error" id="ssmSaveError" style="margin-top:16px"></div>
+        <div class="alert alert-success" id="ssmSaveSuccess" style="margin-top:16px"></div>
+        <button onclick="ssmSaveSeason()" style="margin-top:8px;background:linear-gradient(135deg,#00e676,#00b248);border:none;color:#000;padding:12px 28px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;letter-spacing:1px">
+          💾 SEASON SAVE করো
+        </button>
+        <div id="ssmStatus" style="margin-top:16px;font-size:13px"></div>
+      </div>
+
       <div class="admin-section" id="adminTab-resultmgmt">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">
           <div style="font-size:15px;font-weight:700;color:var(--cyan)">📤 Player Submitted Friendly Results</div>
@@ -2763,7 +2568,7 @@ select.form-input option { background: var(--card); }
       <button class="tab-btn active" onclick="switchFriendlyTab('leaderboard')">🏆 Leaderboard</button>
       <button class="tab-btn" onclick="switchFriendlyTab('challenge')">📤 Submit Result</button>
       <button class="tab-btn" onclick="switchFriendlyTab('results')">📋 Results</button>
-      <button class="tab-btn" onclick="switchFriendlyTab('myrequests')">📨 My Submissions</button>
+      <button class="tab-btn" onclick="switchFriendlyTab('myrequests')">📨 All Submissions</button>
     </div>
 
     <!-- LEADERBOARD TAB -->
@@ -2783,36 +2588,45 @@ select.form-input option { background: var(--card); }
 
     <!-- CHALLENGE TAB — Result Submit System -->
     <div class="tab-content" id="ftab-challenge" style="padding-top:20px">
-      <div id="challengeLoginGate" class="card text-center" style="padding:40px">
-        <div style="font-size:48px;margin-bottom:12px">🔒</div>
-        <p style="color:var(--text3);margin-bottom:16px">Result submit করতে login করুন।</p>
-        <button class="btn btn-gold" onclick="showPage('login')">⚡ Login</button>
-      </div>
-      <div id="challengeForm" style="display:none">
+      <div id="challengeForm">
         <div style="max-width:560px;margin:0 auto">
 
-          <!-- STEP 1: Search Opponent -->
+          <!-- STEP 1: Select Player 1 -->
           <div class="card" id="step1Card" style="border-color:rgba(0,230,118,0.3);margin-bottom:16px">
-            <div style="font-size:15px;font-weight:700;color:var(--green);margin-bottom:14px">🔍 STEP 1 — Opponent খোঁজো</div>
+            <div style="font-size:15px;font-weight:700;color:var(--green);margin-bottom:14px">🔍 STEP 1 — Player 1 খোঁজো</div>
             <div style="display:flex;gap:8px">
-              <input type="text" class="form-input" id="opponentSearchInput" placeholder="Name বা @username লিখো..." oninput="searchOpponentLive()" style="flex:1">
-              <button class="btn" style="background:rgba(0,230,118,0.15);border:1px solid var(--green);color:var(--green);padding:10px 16px;border-radius:8px;font-weight:700;cursor:pointer;white-space:nowrap" onclick="searchOpponentLive()">🔍</button>
+              <input type="text" class="form-input" id="player1SearchInput" placeholder="Name বা @username লিখো..." oninput="searchPlayer1Live()" style="flex:1">
+              <button class="btn" style="background:rgba(0,230,118,0.15);border:1px solid var(--green);color:var(--green);padding:10px 16px;border-radius:8px;font-weight:700;cursor:pointer;white-space:nowrap" onclick="searchPlayer1Live()">🔍</button>
             </div>
-            <div id="opponentSearchResults" style="margin-top:10px"></div>
+            <div id="player1SearchResults" style="margin-top:10px"></div>
           </div>
 
-          <!-- STEP 2: Selected Opponent + Score -->
-          <div class="card" id="step2Card" style="border-color:rgba(0,212,255,0.3);display:none">
-            <div style="font-size:15px;font-weight:700;color:var(--cyan);margin-bottom:14px">⚽ STEP 2 — Result দাও</div>
+          <!-- STEP 2: Select Player 2 (Opponent) -->
+          <div class="card" id="step2Card" style="border-color:rgba(0,212,255,0.3);display:none;margin-bottom:16px">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+              <div style="font-size:15px;font-weight:700;color:var(--cyan)">🔍 STEP 2 — Player 2 খোঁজো</div>
+              <span style="font-size:12px;color:var(--text3);cursor:pointer" onclick="clearPlayer1Selection()">← Back</span>
+            </div>
+            <div id="player1SelectedPreview" style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--bg3);border-radius:8px;margin-bottom:12px"></div>
+            <div style="display:flex;gap:8px">
+              <input type="text" class="form-input" id="player2SearchInput" placeholder="Name বা @username লিখো..." oninput="searchPlayer2Live()" style="flex:1">
+              <button class="btn" style="background:rgba(0,212,255,0.15);border:1px solid var(--cyan);color:var(--cyan);padding:10px 16px;border-radius:8px;font-weight:700;cursor:pointer;white-space:nowrap" onclick="searchPlayer2Live()">🔍</button>
+            </div>
+            <div id="player2SearchResults" style="margin-top:10px"></div>
+          </div>
+
+          <!-- STEP 3: Score + Submit -->
+          <div class="card" id="step3Card" style="border-color:rgba(245,166,35,0.3);display:none">
+            <div style="font-size:15px;font-weight:700;color:var(--gold);margin-bottom:14px">⚽ STEP 3 — Result দাও</div>
             <div class="alert alert-error" id="challengeError"></div>
             <div class="alert alert-success" id="challengeSuccess"></div>
 
             <!-- Match preview -->
             <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px;padding:14px;background:var(--bg3);border-radius:10px;border:1px solid var(--border)">
-              <!-- My side -->
+              <!-- Player 1 -->
               <div style="flex:1;text-align:center">
                 <div id="myAvatarPreview" style="width:50px;height:50px;border-radius:50%;background:var(--bg2);border:2px solid var(--gold);margin:0 auto 6px;display:flex;align-items:center;justify-content:center;font-size:22px;overflow:hidden">🎮</div>
-                <div id="myNamePreview" style="font-weight:700;font-size:13px;color:var(--gold)">You</div>
+                <div id="myNamePreview" style="font-weight:700;font-size:13px;color:var(--gold)">Player 1</div>
                 <div id="myClubPreview" style="font-size:11px;color:var(--text3)"></div>
               </div>
               <!-- Score inputs -->
@@ -2824,10 +2638,10 @@ select.form-input option { background: var(--card); }
                   <input type="number" id="oppScore" min="0" max="99" placeholder="0" style="width:56px;background:var(--bg2);border:2px solid var(--cyan);border-radius:8px;padding:10px 4px;color:var(--cyan);font-family:'Inter',sans-serif;font-size:24px;font-weight:700;text-align:center;outline:none">
                 </div>
               </div>
-              <!-- Opponent side -->
+              <!-- Player 2 -->
               <div style="flex:1;text-align:center">
                 <div id="oppAvatarPreview" style="width:50px;height:50px;border-radius:50%;background:var(--bg2);border:2px solid var(--cyan);margin:0 auto 6px;display:flex;align-items:center;justify-content:center;font-size:22px;overflow:hidden">🎮</div>
-                <div id="oppNamePreview" style="font-weight:700;font-size:13px;color:var(--cyan)">Opponent</div>
+                <div id="oppNamePreview" style="font-weight:700;font-size:13px;color:var(--cyan)">Player 2</div>
                 <div id="oppClubPreview" style="font-size:11px;color:var(--text3)"></div>
               </div>
             </div>
@@ -2845,7 +2659,7 @@ select.form-input option { background: var(--card); }
               <button class="btn" style="flex:1;background:rgba(255,71,87,0.1);border:1px solid var(--red);color:var(--red);padding:11px;border-radius:8px;font-weight:700;cursor:pointer" onclick="clearOpponentSelection()">← Back</button>
               <button class="btn" style="flex:2;background:linear-gradient(135deg,#00e676,#00b248);color:#000;padding:13px;border-radius:8px;border:none;font-weight:700;font-size:15px;cursor:pointer" onclick="submitFriendlyResult()">📤 Submit Result (Admin Approval)</button>
             </div>
-            <p style="font-size:11px;color:var(--text3);text-align:center;margin-top:10px">⚠️ Admin approve করলেই দুজনের profile এ result add হবে।</p>
+            <p style="font-size:11px;color:var(--text3);text-align:center;margin-top:10px">⚠️ Admin approve করলেই দুজনের friendly stats এ result add হবে।</p>
           </div>
 
         </div>
@@ -2863,15 +2677,28 @@ select.form-input option { background: var(--card); }
       </div>
     </div>
 
-    <!-- MY REQUESTS TAB -->
+    <!-- ALL SUBMISSIONS TAB -->
     <div class="tab-content" id="ftab-myrequests" style="padding-top:20px">
-      <div id="myRequestsLoginGate" class="card text-center" style="padding:40px">
-        <div style="font-size:48px;margin-bottom:12px">🔒</div>
-        <p style="color:var(--text3);margin-bottom:16px">তোমার requests দেখতে login করুন।</p>
-        <button class="btn btn-gold" onclick="showPage('login')">⚡ Login</button>
-      </div>
-      <div id="myRequestsList" style="display:none"></div>
+      <div id="myRequestsList"></div>
     </div>
+  </div>
+</div>
+
+
+<!-- ADMIN NOTICE SECTION -->
+<div class="admin-section" id="adminTab-notice">
+  <div style="max-width:560px">
+    <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:6px">📢 Homepage Notice</div>
+    <div style="font-size:13px;color:var(--text3);margin-bottom:16px">Homepage এ scrolling notice bar এ যা দেখাবে। খালি রাখলে notice bar লুকানো থাকবে।</div>
+    <div class="form-group">
+      <label class="form-label">Notice Text</label>
+      <textarea class="form-input" id="noticeInput" rows="3" placeholder="e.g. Season 2 registration শুরু হয়েছে! যোগাযোগ করুন admin এর সাথে।" style="resize:vertical"></textarea>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:12px">
+      <button class="btn btn-gold" onclick="saveNotice()" style="padding:10px 28px">💾 Save Notice</button>
+      <button class="btn btn-outline" onclick="clearNotice()" style="padding:10px 20px;color:var(--red);border-color:var(--red)">🗑️ Clear</button>
+    </div>
+    <div id="noticeSaveStatus" style="margin-top:10px;font-size:13px;color:var(--green)"></div>
   </div>
 </div>
 
@@ -2919,6 +2746,7 @@ select.form-input option { background: var(--card); }
     <div id="trnMatchEntryArea"></div>
     <div style="margin-top:12px;display:none" id="trnSaveMatchBtnWrap">
       <button class="btn btn-gold" onclick="saveTrnMatchResults()" style="padding:10px 24px">💾 Save All Results</button>
+      <button class="btn btn-outline" onclick="downloadMatchdayResultCard()" style="padding:10px 20px;margin-left:8px;background:linear-gradient(135deg,rgba(113,50,202,0.12),rgba(48,28,160,0.12));border:1.5px solid var(--gold);color:var(--gold)">📸 Export Result Card</button>
       <span id="trnMatchSaveStatus" style="margin-left:12px;font-size:13px;color:var(--green)"></span>
     </div>
   </div>
@@ -2948,6 +2776,18 @@ select.form-input option { background: var(--card); }
     <div class="form-group">
       <label class="form-label">Team Emoji / Icon</label>
       <input type="text" class="form-input" id="newTeamEmoji" placeholder="🦁" maxlength="4">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Team Logo (optional)</label>
+      <div style="display:flex;align-items:center;gap:12px">
+        <div id="teamLogoPreview" style="width:64px;height:64px;border-radius:12px;border:2px dashed var(--border);display:flex;align-items:center;justify-content:center;font-size:28px;background:var(--bg3);overflow:hidden;flex-shrink:0">🏟️</div>
+        <div style="flex:1">
+          <label for="teamLogoInput" style="display:inline-block;padding:8px 16px;background:rgba(99,102,241,0.12);border:1px solid var(--primary);color:var(--primary);border-radius:8px;cursor:pointer;font-size:13px;font-weight:600">📁 Choose Image</label>
+          <input type="file" id="teamLogoInput" accept="image/*" style="display:none" onchange="previewTeamLogo(this)">
+          <div style="font-size:11px;color:var(--text3);margin-top:6px">JPG, PNG — ImgBB তে upload হবে</div>
+          <input type="hidden" id="teamLogoUrl">
+        </div>
+      </div>
     </div>
     <div class="form-group">
       <label class="form-label">Select Players (8 starters + 3 subs = 11 max)</label>
@@ -2989,10 +2829,143 @@ select.form-input option { background: var(--card); }
   </div>
 </div>
 
+<!-- ADMIN: EDIT PLAYER PROFILE MODAL -->
+<div class="modal-overlay" id="adminEditProfileModal">
+  <div class="modal-box" style="max-width:480px">
+    <div class="modal-title">👤 Edit Player Profile</div>
+    <input type="hidden" id="adminEditUid">
+
+    <div class="avatar-upload">
+      <div class="avatar-preview" id="adminEditAvatarPreview" onclick="document.getElementById('adminEditAvatarInput').click()">🎮</div>
+      <div class="avatar-info">
+        <p>Click করে photo change করো</p>
+        <span style="color:var(--text3);font-size:10px;">Max 2MB • JPG, PNG</span>
+      </div>
+    </div>
+    <input type="file" id="adminEditAvatarInput" accept="image/*" style="display:none" onchange="previewAdminEditAvatar(this)">
+
+    <div class="form-group">
+      <label class="form-label">Full Name</label>
+      <input type="text" class="form-input" id="adminEditName">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Username</label>
+      <input type="text" class="form-input" id="adminEditUsername" oninput="this.value=this.value.toLowerCase().replace(/[^a-z0-9_]/g,'')">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Club Name</label>
+        <input type="text" class="form-input" id="adminEditClub">
+      </div>
+      <div class="form-group">
+        <label class="form-label">District</label>
+        <select class="form-input" id="adminEditDistrict">
+          <option value="">Select</option>
+          <option>Dhaka</option><option>Chittagong</option><option>Sylhet</option>
+          <option>Rajshahi</option><option>Khulna</option><option>Barishal</option>
+          <option>Rangpur</option><option>Mymensingh</option><option>Comilla</option>
+          <option>Narayanganj</option><option>Gazipur</option><option>Tangail</option>
+          <option>Bogura</option><option>Jessore</option><option>Dinajpur</option>
+          <option>Faridpur</option><option>Pabna</option><option>Noakhali</option>
+          <option>Cox's Bazar</option><option>Brahmanbaria</option><option>Feni</option>
+          <option>Lakshmipur</option><option>Chandpur</option><option>Narsingdi</option>
+          <option>Munshiganj</option><option>Manikganj</option><option>Shariatpur</option>
+          <option>Madaripur</option><option>Gopalganj</option><option>Narail</option>
+          <option>Magura</option><option>Jhenaidah</option><option>Chuadanga</option>
+          <option>Kushtia</option><option>Meherpur</option><option>Satkhira</option>
+          <option>Bagerhat</option><option>Pirojpur</option><option>Patuakhali</option>
+          <option>Barguna</option><option>Bhola</option><option>Jhalokathi</option>
+          <option>Kishoreganj</option><option>Netrokona</option><option>Jamalpur</option>
+          <option>Sherpur</option><option>Sunamganj</option><option>Habiganj</option>
+          <option>Moulvibazar</option><option>Kurigram</option><option>Gaibandha</option>
+          <option>Lalmonirhat</option><option>Nilphamari</option><option>Panchagarh</option>
+          <option>Thakurgaon</option><option>Joypurhat</option><option>Naogaon</option>
+          <option>Chapainawabganj</option><option>Natore</option><option>Sirajganj</option>
+          <option>Rajbari</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="alert alert-error" id="adminEditError"></div>
+    <div class="alert alert-success" id="adminEditSuccess"></div>
+
+    <div style="display:flex;gap:10px;margin-top:10px">
+      <button class="btn btn-gold" style="flex:1" onclick="saveAdminEditProfile()">💾 Save Profile</button>
+      <button class="btn btn-outline" style="flex:1" onclick="closeAdminEditProfile()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN: ADD NEW PLAYER MODAL -->
+<div class="modal-overlay" id="adminAddPlayerModal">
+  <div class="modal-box" style="max-width:480px">
+    <div class="modal-title">➕ Add New Player</div>
+
+    <div class="avatar-upload">
+      <div class="avatar-preview" id="addPlayerAvatarPreview" onclick="document.getElementById('addPlayerAvatarInput').click()">🎮</div>
+      <div class="avatar-info">
+        <p>Profile Photo (optional)</p>
+        <span style="color:var(--text3);font-size:10px;">Max 2MB • JPG, PNG</span>
+      </div>
+    </div>
+    <input type="file" id="addPlayerAvatarInput" accept="image/*" style="display:none" onchange="previewAddPlayerAvatar(this)">
+
+    <div class="form-group">
+      <label class="form-label">Full Name *</label>
+      <input type="text" class="form-input" id="addPlayerName" placeholder="Player নাম">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Username *</label>
+      <input type="text" class="form-input" id="addPlayerUsername" placeholder="unique username" oninput="this.value=this.value.toLowerCase().replace(/[^a-z0-9_]/g,'')">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Club Name *</label>
+        <input type="text" class="form-input" id="addPlayerClub" placeholder="Club">
+      </div>
+      <div class="form-group">
+        <label class="form-label">District *</label>
+        <select class="form-input" id="addPlayerDistrict">
+          <option value="">Select</option>
+          <option>Dhaka</option><option>Chittagong</option><option>Sylhet</option>
+          <option>Rajshahi</option><option>Khulna</option><option>Barishal</option>
+          <option>Rangpur</option><option>Mymensingh</option><option>Comilla</option>
+          <option>Narayanganj</option><option>Gazipur</option><option>Tangail</option>
+          <option>Bogura</option><option>Jessore</option><option>Dinajpur</option>
+          <option>Faridpur</option><option>Pabna</option><option>Noakhali</option>
+          <option>Cox's Bazar</option><option>Brahmanbaria</option><option>Feni</option>
+          <option>Lakshmipur</option><option>Chandpur</option><option>Narsingdi</option>
+          <option>Munshiganj</option><option>Manikganj</option><option>Shariatpur</option>
+          <option>Madaripur</option><option>Gopalganj</option><option>Narail</option>
+          <option>Magura</option><option>Jhenaidah</option><option>Chuadanga</option>
+          <option>Kushtia</option><option>Meherpur</option><option>Satkhira</option>
+          <option>Bagerhat</option><option>Pirojpur</option><option>Patuakhali</option>
+          <option>Barguna</option><option>Bhola</option><option>Jhalokathi</option>
+          <option>Kishoreganj</option><option>Netrokona</option><option>Jamalpur</option>
+          <option>Sherpur</option><option>Sunamganj</option><option>Habiganj</option>
+          <option>Moulvibazar</option><option>Kurigram</option><option>Gaibandha</option>
+          <option>Lalmonirhat</option><option>Nilphamari</option><option>Panchagarh</option>
+          <option>Thakurgaon</option><option>Joypurhat</option><option>Naogaon</option>
+          <option>Chapainawabganj</option><option>Natore</option><option>Sirajganj</option>
+          <option>Rajbari</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="alert alert-error" id="addPlayerError"></div>
+    <div class="alert alert-success" id="addPlayerSuccess"></div>
+
+    <div style="display:flex;gap:10px;margin-top:10px">
+      <button class="btn btn-gold" style="flex:1" onclick="saveNewPlayer()">✅ Create Player</button>
+      <button class="btn btn-outline" style="flex:1" onclick="closeAddPlayerModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+
 <!-- FIREBASE SDK -->
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, sendPasswordResetEmail, setPersistence, browserLocalPersistence } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 import { getDatabase, ref, set, get, child } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
 
 // ════════════════════════════════════════
@@ -3014,13 +2987,8 @@ const firebaseConfig = {
 
 // INIT
 const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-// Persist login across sessions
-setPersistence(auth, browserLocalPersistence).catch(e => console.warn('Persistence:', e));
 const db = getDatabase(app);
 
-let currentUser = null;
-let currentUserData = null;
 let rankingData = [];
 let matchesData = [];
 let editAvatarBase64 = null;
@@ -3034,18 +3002,7 @@ window._get = get;
 window._set = set;
 window._child = child;
 window._allUsersCache = allUsersCache;
-
-// Shared state: second script can access currentUser/currentUserData via window
-Object.defineProperty(window, 'currentUser', {
-  get: () => currentUser,
-  set: (v) => { currentUser = v; },
-  configurable: true
-});
-Object.defineProperty(window, 'currentUserData', {
-  get: () => currentUserData,
-  set: (v) => { currentUserData = v; },
-  configurable: true
-});
+window._isAdminSession = false;
 
 // ── LOADING SCREEN PARTICLES ──
 (function() {
@@ -3077,7 +3034,7 @@ Object.defineProperty(window, 'currentUserData', {
     particles.forEach(p => {
       ctx.beginPath();
       ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(113,50,202,${p.a})`;
+      ctx.fillStyle = `rgba(163,116,232,${p.a})`;
       ctx.fill();
       p.x += p.vx; p.y += p.vy;
       if (p.x < 0 || p.x > W) p.vx *= -1;
@@ -3101,273 +3058,40 @@ Object.defineProperty(window, 'currentUserData', {
   window._stopLoadingText = () => clearInterval(interval);
 })();
 
-// ── AUTH STATE ──
-
-onAuthStateChanged(auth, async (user) => {
-  document.getElementById('loadingScreen').style.opacity = '0';
+// ── PAGE INIT (no auth) ──
+(function initApp() {
+  // Minimum 1.5s loading screen so animation is visible
   setTimeout(() => {
-    document.getElementById('loadingScreen').style.display = 'none';
-    if (window._stopLoadingParticles) window._stopLoadingParticles();
-    if (window._stopLoadingText) window._stopLoadingText();
-  }, 500);
-  document.getElementById('mainNav').classList.remove('hidden');
-  // Show bottom nav after loading
-  const bnav = document.getElementById('bottomNav');
-  if (bnav) bnav.classList.remove('nav-hidden');
-
-  if (user) {
-    currentUser = user;
-    const snap = await window._get(window._child(window._ref(window._db), `users/${user.uid}`));
-    if (snap.exists()) {
-      currentUserData = snap.val();
-      updateNavUser();
-    }
-    document.getElementById('guestNav').classList.add('hidden');
-    document.getElementById('userNav').classList.remove('hidden');
-    // Admin link — শুধু তোমার email এর জন্য
-    const adminEmails = ['mf3171352@gmail.com', 'arafatkobami@gmail.com', 'libae804@gmail.com']; // তোমার email
-    if (adminEmails.includes(user.email)) {
-      document.getElementById('adminNavLink').style.display = 'block';
-    }
-    // Home page refresh করো (admin delete button দেখাতে)
-    if (document.getElementById('page-home').classList.contains('active')) loadHomePageData();
-    // Friendly page already open হলে gate সরিয়ে দাও
-    const cg = document.getElementById('challengeLoginGate');
-    const cf = document.getElementById('challengeForm');
-    const mg = document.getElementById('myRequestsLoginGate');
-    const ml = document.getElementById('myRequestsList');
-    if (cg) cg.style.display = 'none';
-    if (cf) cf.style.display = 'block';
-    if (mg) mg.style.display = 'none';
-    if (ml) ml.style.display = 'block';
-  } else {
-    currentUser = null;
-    currentUserData = null;
-    document.getElementById('guestNav').classList.remove('hidden');
-    document.getElementById('userNav').classList.add('hidden');
-  }
-});
-
-// ── REGISTER ──
-window.register = async function() {
-  const name = document.getElementById('regName').value.trim();
-  const username = document.getElementById('regUsername').value.trim();
-  const email = document.getElementById('regEmail').value.trim();
-  const club = document.getElementById('regClub').value.trim();
-  const district = document.getElementById('regDistrict').value;
-  const pass = document.getElementById('regPass').value;
-  const pass2 = document.getElementById('regPass2').value;
-  const errEl = document.getElementById('regError');
-  const sucEl = document.getElementById('regSuccess');
-
-  errEl.classList.remove('show'); sucEl.classList.remove('show');
-
-  if (!name || !username || !email || !club || !district || !pass) {
-    errEl.textContent = '❌ সব field পূরণ করুন।'; errEl.classList.add('show'); return;
-  }
-  if (pass !== pass2) {
-    errEl.textContent = '❌ Password match করেনি।'; errEl.classList.add('show'); return;
-  }
-  if (pass.length < 6) {
-    errEl.textContent = '❌ Password কমপক্ষে ৬ character।'; errEl.classList.add('show'); return;
-  }
-
-  // Check username unique
-  const usernameSnap = await window._get(window._child(window._ref(window._db), `usernames/${username}`));
-  if (usernameSnap.exists()) {
-    errEl.textContent = '❌ এই username already নেওয়া হয়েছে।'; errEl.classList.add('show'); return;
-  }
-
-  const btn = document.getElementById('regBtn');
-  btn.innerHTML = '<span class="spinner"></span> Creating...'; btn.disabled = true;
-
-  try {
-    const cred = await createUserWithEmailAndPassword(auth, email, pass);
-    const uid = cred.user.uid;
-    const joinDate = new Date().toLocaleDateString('en-BD');
-
-    const userData = {
-      uid, name, username, email, club, district,
-      avatarUrl: regAvatarBase64 || '',
-      joinDate,
-      matches: 0, wins: 0, draws: 0, losses: 0,
-      goalsFor: 0, goalsAgainst: 0, cleanSheets: 0, motm: 0,
-      rank: 0, points: 0
-    };
-
-    await window._set(window._ref(window._db, `users/${uid}`), userData);
-    await window._set(window._ref(window._db, `usernames/${username}`), uid);
-
-    window._allUsersCache = [];
-    currentUserData = userData;
-    sucEl.textContent = '✅ Account তৈরি হয়েছে! Welcome ' + name + '!';
-    sucEl.classList.add('show');
-    setTimeout(() => { showPage('profile'); loadProfileData(); }, 1500);
-  } catch(e) {
-    let msg = '❌ Error: ' + e.message;
-    if (e.code === 'auth/email-already-in-use') msg = '❌ এই email already registered।';
-    errEl.textContent = msg; errEl.classList.add('show');
-  }
-
-  btn.innerHTML = '🚀 Create Account'; btn.disabled = false;
-};
-
-// ── LOGIN ──
-window.login = async function() {
-  const email = document.getElementById('loginEmail').value.trim();
-  const pass = document.getElementById('loginPass').value;
-  const errEl = document.getElementById('loginError');
-  errEl.classList.remove('show');
-
-  if (!email || !pass) {
-    errEl.textContent = '❌ Email ও password দিন।'; errEl.classList.add('show'); return;
-  }
-
-  const btn = document.getElementById('loginBtn');
-  btn.innerHTML = '<span class="spinner"></span> Logging in...'; btn.disabled = true;
-
-  try {
-    await setPersistence(auth, browserLocalPersistence).catch(()=>{});
-    await signInWithEmailAndPassword(auth, email, pass);
-    const snap = await window._get(window._child(window._ref(window._db), `users/${auth.currentUser.uid}`));
-    if (snap.exists()) { currentUserData = snap.val(); updateNavUser(); }
-    showPage('profile'); loadProfileData();
-  } catch(e) {
-    let msg = '❌ Login failed.';
-    if (e.code === 'auth/invalid-credential' || e.code === 'auth/wrong-password') msg = '❌ Email বা password ভুল।';
-    if (e.code === 'auth/user-not-found') msg = '❌ Account পাওয়া যায়নি।';
-    if (e.code === 'auth/too-many-requests') msg = '❌ অনেক চেষ্টা হয়েছে। পরে try করুন।';
-    errEl.textContent = msg; errEl.classList.add('show');
-  }
-
-  btn.innerHTML = '⚡ Login'; btn.disabled = false;
-};
-
-// ── LOGOUT ──
-window.logout = async function() {
-  await signOut(auth);
-  currentUser = null; currentUserData = null;
-  document.getElementById('userDropdown').classList.remove('show');
-  showPage('home');
-};
-
-// ── RESET PASSWORD ──
-window.resetPassword = async function() {
-  const email = document.getElementById('loginEmail').value.trim();
-  if (!email) { alert('Email address টাইপ করুন।'); return; }
-  try {
-    await sendPasswordResetEmail(auth, email);
-    alert('✅ Password reset email পাঠানো হয়েছে!');
-  } catch(e) { alert('❌ Error: ' + e.message); }
-};
-
-// ── LOAD PROFILE ──
-window.loadProfileData = function() {
-  if (!currentUserData) return;
-  const d = currentUserData;
-
-  // Header
-  const avatarEl = document.getElementById('profileAvatar');
-  if (d.avatarUrl) avatarEl.innerHTML = `<img src="${d.avatarUrl}">`;
-  else avatarEl.textContent = '🎮';
-
-  document.getElementById('profileRank').textContent = `#${d.rank || '—'} • TYP PLAYER`;
-  document.getElementById('profileName').textContent = d.name;
-  document.getElementById('profileClub').textContent = d.club;
-  document.getElementById('profileDistrict').textContent = d.district;
-  document.getElementById('profileJoined').textContent = 'Joined ' + d.joinDate;
-
-  // Stats
-  const m = d.matches || 0, w = d.wins || 0, dr = d.draws || 0, l = d.losses || 0;
-  const gf = d.goalsFor || 0, ga = d.goalsAgainst || 0, cs = d.cleanSheets || 0;
-  const motm = d.motm || 0;
-  const pts = (w * 3) + (dr * 1);
-  const wp = m > 0 ? ((w/m)*100).toFixed(1) : '0.0';
-
-  document.getElementById('pM').textContent = m;
-  document.getElementById('pW').textContent = w;
-  document.getElementById('pD').textContent = dr;
-  document.getElementById('pL').textContent = l;
-  document.getElementById('pWP').textContent = wp + '%';
-  document.getElementById('pGF').textContent = gf;
-  document.getElementById('pGA').textContent = ga;
-  document.getElementById('pCS').textContent = cs;
-  document.getElementById('pMOTM').textContent = motm;
-  document.getElementById('pPTS').textContent = pts;
-
-  // Progress bars
-  if (m > 0 && typeof updateProfileProgressBars === 'function') {
-    updateProfileProgressBars(w, dr, m, cs);
-  }
-
-  // Details
-  if (m > 0) {
-    document.getElementById('noStatsMsg').classList.add('hidden');
-    document.getElementById('statsDetail').classList.remove('hidden');
-    document.getElementById('detWR').textContent = wp + '%';
-    document.getElementById('detAvgG').textContent = (gf/m).toFixed(2);
-    document.getElementById('detCSR').textContent = ((cs/m)*100).toFixed(1) + '%';
-  }
-
-  // Achievements
-  buildAchievements(d);
-
-  // Edit form prefill
-  document.getElementById('editName').value = d.name || '';
-  document.getElementById('editClub').value = d.club || '';
-  document.getElementById('editDistrict').value = d.district || '';
-  const ea = document.getElementById('editAvatarPreview');
-  if (d.avatarUrl) ea.innerHTML = `<img src="${d.avatarUrl}">`;
-};
-
-// ── ACHIEVEMENTS ──
-function buildAchievements(d) {
-  const grid = document.getElementById('achievementsGrid');
-  const achievements = [
-    { icon: '⚽', label: 'First Match', condition: d.matches >= 1, color: '#00e676' },
-    { icon: '🏆', label: '10 Wins', condition: d.wins >= 10, color: '#f5a623' },
-    { icon: '🔥', label: '50 Wins', condition: d.wins >= 50, color: '#f5a623' },
-    { icon: '👑', label: '100 Wins', condition: d.wins >= 100, color: '#ffd166' },
-    { icon: '🛡️', label: '10 Clean Sheets', condition: d.cleanSheets >= 10, color: '#00d4ff' },
-    { icon: '🎯', label: 'MOTM Award', condition: d.motm >= 1, color: '#ff6b9d' },
-    { icon: '⭐', label: '50 Matches', condition: d.matches >= 50, color: '#111' },
-    { icon: '💎', label: '100 Matches', condition: d.matches >= 100, color: '#111' },
-  ];
-  grid.innerHTML = achievements.map(a => `
-    <div class="card" style="text-align:center;padding:20px 12px;opacity:${a.condition?1:0.3};${a.condition?`border-color:${a.color}33`:''};transition:all 0.2s">
-      <div style="font-size:32px;margin-bottom:8px">${a.icon}</div>
-      <div style="font-size:12px;font-weight:700;color:${a.condition?a.color:'var(--text3)'};">${a.label}</div>
-      ${a.condition ? '<div style="font-size:10px;color:var(--green);margin-top:4px">✅ Earned</div>' : '<div style="font-size:10px;color:var(--text3);margin-top:4px">Locked</div>'}
-    </div>
-  `).join('');
-}
-
-// ── SAVE PROFILE ──
-window.saveProfile = async function() {
-  if (!currentUser) return;
-  const name = document.getElementById('editName').value.trim();
-  const club = document.getElementById('editClub').value.trim();
-  const district = document.getElementById('editDistrict').value;
-  const errEl = document.getElementById('editError');
-  const sucEl = document.getElementById('editSuccess');
-  errEl.classList.remove('show'); sucEl.classList.remove('show');
-
-  if (!name || !club || !district) {
-    errEl.textContent = '❌ সব field পূরণ করুন।'; errEl.classList.add('show'); return;
-  }
-
-  const updates = { name, club, district };
-  if (editAvatarBase64) updates.avatarUrl = editAvatarBase64;
-
-  await window._set(window._ref(window._db, `users/${currentUser.uid}`), { ...currentUserData, ...updates });
-  window._allUsersCache = [];
-  currentUserData = { ...currentUserData, ...updates };
-  updateNavUser();
-  sucEl.textContent = '✅ Profile update হয়েছে!'; sucEl.classList.add('show');
-  setTimeout(() => { showPage('profile'); loadProfileData(); }, 1200);
-};
+    const ls = document.getElementById('loadingScreen');
+    ls.style.opacity = '0';
+    setTimeout(() => {
+      ls.style.display = 'none';
+      if (window._stopLoadingParticles) window._stopLoadingParticles();
+      if (window._stopLoadingText) window._stopLoadingText();
+    }, 500);
+    document.getElementById('mainNav').classList.remove('hidden');
+    const bnav = document.getElementById('bottomNav');
+    if (bnav) bnav.classList.remove('nav-hidden');
+  }, 1500);
+})();
 
 // ── RANKING ──
+const RANKING_DB = 'https://typ-championship-default-rtdb.firebaseio.com';
+
+// Shared sort: Points (W=3,D=1) first, then score (goals*2 + mvp*3)
+function sortRankingData(arr) {
+  arr.sort((a, b) => {
+    const pa = (a.wins||0)*3 + (a.draws||0)*1;
+    const pb = (b.wins||0)*3 + (b.draws||0)*1;
+    if (pb !== pa) return pb - pa;
+    const sa = (a.goalsFor||0)*2 + (a.mvp||0)*3;
+    const sb = (b.goalsFor||0)*2 + (b.mvp||0)*3;
+    return sb - sa;
+  });
+  return arr;
+}
+
+// Current season (live) leaderboard only
 window.loadRanking = async function() {
   const container = document.getElementById('rankingTable');
   container.innerHTML = '<div class="text-center" style="padding:40px"><span class="spinner"></span><p style="color:var(--text3);margin-top:12px">Loading...</p></div>';
@@ -3378,15 +3102,9 @@ window.loadRanking = async function() {
       return;
     }
     rankingData = [...users];
-    // Points (W=3,D=1) first, then score (goals*2 + mvp*3)
-    rankingData.sort((a, b) => {
-      const pa = (a.wins||0)*3 + (a.draws||0)*1;
-      const pb = (b.wins||0)*3 + (b.draws||0)*1;
-      if (pb !== pa) return pb - pa;
-      const sa = (a.goalsFor||0)*2 + (a.mvp||0)*3;
-      const sb = (b.goalsFor||0)*2 + (b.mvp||0)*3;
-      return sb - sa;
-    });
+    sortRankingData(rankingData);
+    window._rankingMode = 'current';
+    window._currentViewedSeasonName = null;
     renderRanking(rankingData);
     document.getElementById('statPlayers').textContent = rankingData.length;
   } catch(e) {
@@ -3395,7 +3113,144 @@ window.loadRanking = async function() {
   }
 };
 
+// Main Ranking = cumulative all-time stats across current + every archived season, summed by uid
+window.loadMainRanking = async function() {
+  const container = document.getElementById('rankingTable');
+  container.innerHTML = '<div class="text-center" style="padding:40px"><span class="spinner"></span><p style="color:var(--text3);margin-top:12px">All-time stats যোগ হচ্ছে...</p></div>';
+  try {
+    const liveUsers = await getAllUsers();
+    const seasonsRes = await fetch(`${RANKING_DB}/seasons.json?shallow=true`);
+    const seasonsKeysObj = await seasonsRes.json();
+    const seasonKeys = seasonsKeysObj ? Object.keys(seasonsKeysObj) : [];
+
+    const archivedPlayersArrays = await Promise.all(seasonKeys.map(async k => {
+      try {
+        const r = await fetch(`${RANKING_DB}/seasons/${k}/players.json`);
+        const d = await r.json();
+        return d ? Object.entries(d).map(([uid, val]) => ({ uid, ...(val||{}) })) : [];
+      } catch(e) { return []; }
+    }));
+
+    const totals = {};
+    function addToTotal(p) {
+      if (!p.uid) return;
+      if (!totals[p.uid]) {
+        totals[p.uid] = { uid: p.uid, name: p.name, club: p.club, district: p.district, avatarUrl: p.avatarUrl,
+          matches:0, wins:0, draws:0, losses:0, goalsFor:0, goalsAgainst:0, mvp:0 };
+      }
+      const t = totals[p.uid];
+      t.matches += (p.matches||0); t.wins += (p.wins||0); t.draws += (p.draws||0); t.losses += (p.losses||0);
+      t.goalsFor += (p.goalsFor||0); t.goalsAgainst += (p.goalsAgainst||0); t.mvp += (p.mvp||0);
+    }
+    liveUsers.forEach(addToTotal);
+    archivedPlayersArrays.forEach(arr => arr.forEach(addToTotal));
+
+    rankingData = Object.values(totals);
+    if (!rankingData.length) {
+      container.innerHTML = '<div class="card text-center" style="padding:40px;color:var(--text3)">কোনো player data নেই।</div>';
+      return;
+    }
+    sortRankingData(rankingData);
+    window._rankingMode = 'main';
+    window._currentViewedSeasonName = null;
+    renderRanking(rankingData);
+    document.getElementById('statPlayers').textContent = rankingData.length;
+  } catch(e) {
+    console.error('Main ranking error:', e);
+    container.innerHTML = `<div class="card text-center" style="padding:40px;color:var(--red)">❌ Data load হয়নি। Error: ${e.message}</div>`;
+  }
+};
+
+// A specific past archived season's leaderboard only
+window.loadArchivedSeasonRanking = async function(seasonKey) {
+  const container = document.getElementById('rankingTable');
+  container.innerHTML = '<div class="text-center" style="padding:40px"><span class="spinner"></span><p style="color:var(--text3);margin-top:12px">Archive load হচ্ছে...</p></div>';
+  try {
+    const res = await fetch(`${RANKING_DB}/seasons/${seasonKey}/players.json`);
+    const data = await res.json();
+    if (!data) {
+      container.innerHTML = '<div class="card text-center" style="padding:40px;color:var(--text3)">এই season এর কোনো player data পাওয়া যায়নি।</div>';
+      return;
+    }
+    rankingData = Object.entries(data).map(([uid, val]) => ({ uid, ...(val||{}) }));
+    sortRankingData(rankingData);
+    window._rankingMode = 'archived';
+    const cached = (window._rankingSeasonsCache||[]).find(s => s.key === seasonKey);
+    window._currentViewedSeasonName = cached ? cached.name : seasonKey.replace(/_/g,' ');
+    renderRanking(rankingData);
+  } catch(e) {
+    console.error('Archived season load error:', e);
+    container.innerHTML = `<div class="card text-center" style="padding:40px;color:var(--red)">❌ Load হয়নি। Error: ${e.message}</div>`;
+  }
+};
+
+// Populate the season filter dropdown (cached, with display names + sorted by recency)
+window._rankingSeasonsCache = null;
+async function loadRankingSeasonsList(force) {
+  if (!force && window._rankingSeasonsCache) { renderSeasonOptions(window._rankingSeasonsCache); return window._rankingSeasonsCache; }
+  try {
+    const res = await fetch(`${RANKING_DB}/seasons.json?shallow=true`);
+    const data = await res.json();
+    const keys = data ? Object.keys(data) : [];
+    const list = await Promise.all(keys.map(async k => {
+      let name = k.replace(/_/g, ' ');
+      let archivedAt = '';
+      try {
+        const [nRes, aRes] = await Promise.all([
+          fetch(`${RANKING_DB}/seasons/${k}/seasonName.json`),
+          fetch(`${RANKING_DB}/seasons/${k}/archivedAt.json`)
+        ]);
+        const n = await nRes.json();
+        const a = await aRes.json();
+        if (n) name = n;
+        if (a) archivedAt = a;
+      } catch(e) {}
+      return { key: k, name, archivedAt };
+    }));
+    list.sort((a, b) => (b.archivedAt||'').localeCompare(a.archivedAt||''));
+    window._rankingSeasonsCache = list;
+    renderSeasonOptions(list);
+    return list;
+  } catch(e) {
+    console.error('Seasons list load error:', e);
+    return [];
+  }
+}
+function renderSeasonOptions(list) {
+  const sel = document.getElementById('rankSeasonFilter');
+  if (!sel) return;
+  const prevVal = sel.value || 'main';
+  sel.innerHTML = '<option value="main">🏆 Main Ranking (All-Time)</option><option value="current">🔴 Current Season</option>' +
+    list.map(s => `<option value="${s.key}">📁 ${s.name}</option>`).join('');
+  sel.value = (prevVal === 'main' || prevVal === 'current' || list.find(s => s.key === prevVal)) ? prevVal : 'main';
+}
+window.onRankSeasonChange = function() {
+  const sel = document.getElementById('rankSeasonFilter');
+  const val = sel ? sel.value : 'main';
+  if (val === 'main') loadMainRanking();
+  else if (val === 'current') loadRanking();
+  else loadArchivedSeasonRanking(val);
+};
+window.refreshRankingView = function() {
+  loadRankingSeasonsList(true);
+  window.onRankSeasonChange();
+};
+
 function renderRanking(data) {
+  const banner = document.getElementById('rankSeasonBanner');
+  if (banner) {
+    if (window._rankingMode === 'archived') {
+      banner.style.display = 'block';
+      banner.style.borderColor = 'var(--yellow)'; banner.style.color = 'var(--yellow)';
+      banner.innerHTML = `📁 আর্কাইভ করা সিজন দেখছো: <b>${window._currentViewedSeasonName||''}</b> — এটা read-only history।`;
+    } else if (window._rankingMode === 'current') {
+      banner.style.display = 'block';
+      banner.style.borderColor = 'var(--cyan)'; banner.style.color = 'var(--cyan)';
+      banner.innerHTML = `🔴 চলতি Season-এর live ranking দেখছো।`;
+    } else {
+      banner.style.display = 'none';
+    }
+  }
   if (!data.length) { document.getElementById('rankingTable').innerHTML = '<div class="card text-center" style="padding:40px;color:var(--text3)">Data নেই।</div>'; return; }
   
   const viewMode = window._rankingView || 'table';
@@ -3520,6 +3375,196 @@ window.filterRanking = function() {
   renderRanking(filtered);
 };
 
+// ══════════════════════════════════════════
+// SEASON STATS MANAGER (admin: purono season-er player stats manually add)
+// ══════════════════════════════════════════
+window._ssmDraft = {}; // uid -> player stat entry (current unsaved list)
+window._ssmSelectedUid = null;
+
+window.ssmInit = async function() {
+  document.getElementById('ssmSaveError').classList.remove('show');
+  document.getElementById('ssmSaveSuccess').classList.remove('show');
+  document.getElementById('ssmStatus').innerHTML = '';
+  const sel = document.getElementById('ssmSeasonSelect');
+  sel.innerHTML = '<option value="__new__">➕ নতুন Season বানাও</option><option value="" disabled>Loading existing seasons...</option>';
+  const list = await loadRankingSeasonsList(true);
+  sel.innerHTML = '<option value="__new__">➕ নতুন Season বানাও</option>' +
+    list.map(s => `<option value="${s.key}">📁 ${s.name}</option>`).join('');
+  ssmOnSeasonSelectChange();
+  // Reset draft + form when switching to this tab fresh
+  window._ssmDraft = {};
+  window._ssmSelectedUid = null;
+  document.getElementById('ssmPlayerSearch').value = '';
+  document.getElementById('ssmSelectedPlayer').style.display = 'none';
+  ssmRenderDraftList();
+};
+
+window.ssmOnSeasonSelectChange = function() {
+  const val = document.getElementById('ssmSeasonSelect').value;
+  document.getElementById('ssmNewSeasonWrap').style.display = (val === '__new__') ? 'block' : 'none';
+};
+
+window.ssmSearchPlayers = async function(query) {
+  const box = document.getElementById('ssmPlayerSuggestions');
+  const q = query.trim().toLowerCase();
+  if (!q) { box.style.display = 'none'; box.innerHTML = ''; return; }
+  const users = await getAllUsers();
+  const matches = users.filter(u => (u.name||'').toLowerCase().includes(q) || (u.username||'').toLowerCase().includes(q)).slice(0, 8);
+  if (!matches.length) {
+    box.innerHTML = '<div style="padding:10px 14px;font-size:13px;color:var(--text3)">কোনো registered player পাওয়া যায়নি। আগে Players tab থেকে Add Player করো।</div>';
+    box.style.display = 'block';
+    return;
+  }
+  box.innerHTML = matches.map(u => `
+    <div onclick='ssmSelectPlayer(${JSON.stringify(u.uid)})' style="padding:10px 14px;cursor:pointer;border-bottom:1px solid var(--border);font-size:13px" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background=''">
+      <div style="font-weight:600;color:var(--text)">${u.name||'—'}</div>
+      <div style="font-size:11px;color:var(--text3)">${u.club||'—'} • ${u.district||'—'}</div>
+    </div>`).join('');
+  box.style.display = 'block';
+};
+
+window.ssmSelectPlayer = async function(uid) {
+  const users = await getAllUsers();
+  const u = users.find(x => x.uid === uid);
+  if (!u) return;
+  window._ssmSelectedUid = uid;
+  window._ssmSelectedPlayerInfo = u;
+  document.getElementById('ssmPlayerSearch').value = '';
+  document.getElementById('ssmPlayerSuggestions').style.display = 'none';
+  const sel = document.getElementById('ssmSelectedPlayer');
+  sel.style.display = 'block';
+  sel.innerHTML = `✅ Selected: <b>${u.name||'—'}</b> (${u.club||'—'} • ${u.district||'—'})`;
+};
+
+window.ssmAddPlayerToDraft = function() {
+  const errEl = document.getElementById('ssmAddError');
+  errEl.classList.remove('show');
+  if (!window._ssmSelectedUid) {
+    errEl.textContent = '❌ আগে একজন player select করো (search box থেকে)।'; errEl.classList.add('show'); return;
+  }
+  const u = window._ssmSelectedPlayerInfo;
+  const entry = {
+    uid: window._ssmSelectedUid,
+    name: u.name||'', club: u.club||'', district: u.district||'', avatarUrl: u.avatarUrl||'',
+    matches: parseInt(document.getElementById('ssmMatches').value)||0,
+    wins: parseInt(document.getElementById('ssmWins').value)||0,
+    draws: parseInt(document.getElementById('ssmDraws').value)||0,
+    losses: parseInt(document.getElementById('ssmLosses').value)||0,
+    goalsFor: parseInt(document.getElementById('ssmGoalsFor').value)||0,
+    goalsAgainst: parseInt(document.getElementById('ssmGoalsAgainst').value)||0,
+    mvp: parseInt(document.getElementById('ssmMvp').value)||0
+  };
+  window._ssmDraft[entry.uid] = entry;
+  ssmRenderDraftList();
+
+  // Reset the entry form for next player
+  window._ssmSelectedUid = null;
+  window._ssmSelectedPlayerInfo = null;
+  document.getElementById('ssmSelectedPlayer').style.display = 'none';
+  document.getElementById('ssmPlayerSearch').value = '';
+  ['ssmMatches','ssmWins','ssmDraws','ssmLosses','ssmGoalsFor','ssmGoalsAgainst','ssmMvp'].forEach(id => document.getElementById(id).value = '0');
+};
+
+window.ssmRemoveDraftEntry = function(uid) {
+  delete window._ssmDraft[uid];
+  ssmRenderDraftList();
+};
+
+function ssmRenderDraftList() {
+  const wrap = document.getElementById('ssmDraftList');
+  const entries = Object.values(window._ssmDraft);
+  if (!entries.length) {
+    wrap.innerHTML = '<div style="color:var(--text3);font-size:13px">এখনো কোনো player যুক্ত করা হয়নি।</div>';
+    return;
+  }
+  const rows = entries.map(p => `
+    <tr>
+      <td style="padding:8px 12px;font-size:13px;font-weight:600">${p.name}</td>
+      <td style="padding:8px 12px;font-size:12px;color:var(--text3)">${p.club||'—'}</td>
+      <td style="padding:8px 12px;text-align:center;font-size:13px">${p.matches}</td>
+      <td style="padding:8px 12px;text-align:center;font-size:13px;color:var(--green)">${p.wins}</td>
+      <td style="padding:8px 12px;text-align:center;font-size:13px">${p.draws}</td>
+      <td style="padding:8px 12px;text-align:center;font-size:13px;color:var(--red)">${p.losses}</td>
+      <td style="padding:8px 12px;text-align:center;font-size:13px;color:var(--yellow)">${p.goalsFor}</td>
+      <td style="padding:8px 12px;text-align:center;font-size:13px;color:var(--gold)">${p.mvp}</td>
+      <td style="padding:8px 12px;text-align:center"><button onclick="ssmRemoveDraftEntry('${p.uid}')" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:14px">✕</button></td>
+    </tr>`).join('');
+  wrap.innerHTML = `
+    <div style="overflow-x:auto;border-radius:10px;border:1px solid var(--border)">
+      <table style="width:100%;border-collapse:collapse;background:var(--card);min-width:560px">
+        <thead><tr style="border-bottom:1px solid var(--border)">
+          <th style="padding:8px 12px;text-align:left;font-size:11px;color:var(--text3)">PLAYER</th>
+          <th style="padding:8px 12px;text-align:left;font-size:11px;color:var(--text3)">CLUB</th>
+          <th style="padding:8px 12px;text-align:center;font-size:11px;color:var(--text3)">M</th>
+          <th style="padding:8px 12px;text-align:center;font-size:11px;color:var(--text3)">W</th>
+          <th style="padding:8px 12px;text-align:center;font-size:11px;color:var(--text3)">D</th>
+          <th style="padding:8px 12px;text-align:center;font-size:11px;color:var(--text3)">L</th>
+          <th style="padding:8px 12px;text-align:center;font-size:11px;color:var(--text3)">GF</th>
+          <th style="padding:8px 12px;text-align:center;font-size:11px;color:var(--text3)">MVP</th>
+          <th style="padding:8px 12px"></th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
+}
+
+window.ssmSaveSeason = async function() {
+  const errEl = document.getElementById('ssmSaveError');
+  const sucEl = document.getElementById('ssmSaveSuccess');
+  const statusEl = document.getElementById('ssmStatus');
+  errEl.classList.remove('show'); sucEl.classList.remove('show');
+
+  const seasonSelectVal = document.getElementById('ssmSeasonSelect').value;
+  const isNew = seasonSelectVal === '__new__';
+  const newName = document.getElementById('ssmNewSeasonName').value.trim();
+
+  if (isNew && !newName) {
+    errEl.textContent = '❌ নতুন season-এর নাম দিতে হবে।'; errEl.classList.add('show'); return;
+  }
+  const draftEntries = Object.values(window._ssmDraft);
+  if (!draftEntries.length) {
+    errEl.textContent = '❌ অন্তত একজন player যুক্ত করো list-এ।'; errEl.classList.add('show'); return;
+  }
+
+  const seasonKey = isNew ? newName.replace(/\s+/g, '_') : seasonSelectVal;
+  statusEl.innerHTML = '<span style="color:var(--yellow)">⏳ Save হচ্ছে...</span>';
+
+  try {
+    // Existing season hole tar purono data ene merge korbo, na hole fresh banabo
+    let existing = null;
+    if (!isNew) {
+      const exRes = await fetch(`${RANKING_DB}/seasons/${seasonKey}.json`);
+      existing = await exRes.json();
+    }
+    const existingPlayers = (existing && existing.players) ? existing.players : {};
+    const newPlayersMap = {};
+    draftEntries.forEach(p => { newPlayersMap[p.uid] = p; });
+
+    const payload = {
+      archivedAt: (existing && existing.archivedAt) || new Date().toISOString(),
+      seasonName: (existing && existing.seasonName) || (isNew ? newName : seasonKey.replace(/_/g,' ')),
+      players: { ...existingPlayers, ...newPlayersMap },
+      matches: (existing && existing.matches) || {},
+      friendlyMatches: (existing && existing.friendlyMatches) || {}
+    };
+
+    await fetch(`${RANKING_DB}/seasons/${seasonKey}.json`, { method: 'PUT', body: JSON.stringify(payload) });
+
+    sucEl.textContent = `✅ "${payload.seasonName}" season-এ ${draftEntries.length} জন player-এর stats save হয়েছে!`;
+    sucEl.classList.add('show');
+    statusEl.innerHTML = '';
+    window._ssmDraft = {};
+    ssmRenderDraftList();
+    document.getElementById('ssmNewSeasonName').value = '';
+    await ssmInit(); // cache refresh + dropdown re-render shob ekhane hoye jay
+  } catch(e) {
+    console.error('Season stats save error:', e);
+    statusEl.innerHTML = '';
+    errEl.textContent = `❌ Save হয়নি। Error: ${e.message}`; errEl.classList.add('show');
+  }
+};
+
+
 // ── MATCHES ──
 window.loadMatches = async function() {
   const container = document.getElementById('matchesList');
@@ -3595,23 +3640,8 @@ function parseCSV(text) {
   });
 }
 
-// ── NAV USER UPDATE ──
-function updateNavUser() {
-  if (!currentUserData) return;
-  const btn = document.getElementById('navAvatarBtn');
-  if (currentUserData.avatarUrl) btn.innerHTML = `<img src="${currentUserData.avatarUrl}">`;
-  document.getElementById('dropdownName').textContent = currentUserData.name || 'Player';
-  document.getElementById('dropdownClub').textContent = currentUserData.club || '—';
-  updateBnavAvatar();
-}
-
-// ── TOGGLE DROPDOWN ──
-window.toggleDropdown = function() {
-  document.getElementById('userDropdown').classList.toggle('show');
-};
-document.addEventListener('click', e => {
-  if (!e.target.closest('.user-menu')) document.getElementById('userDropdown').classList.remove('show');
-  // Ripple effect
+// ── RIPPLE EFFECT ──
+document.addEventListener('click', function(e) {
   const btn = e.target.closest('.btn, .nav-btn, .btn-gold, .btn-outline, .tab-btn, .bnav-btn');
   if (btn) {
     const ripple = document.createElement('span');
@@ -3623,24 +3653,6 @@ document.addEventListener('click', e => {
     setTimeout(() => ripple.remove(), 600);
   }
 });
-
-// Profile progress bars
-function updateProfileProgressBars(wins, draws, matches, cleanSheets) {
-  const el = document.getElementById('profileProgressBars');
-  if (!el || !matches) return;
-  el.style.display = 'block';
-  const wp = Math.round((wins / matches) * 100);
-  const dp = Math.round((draws / matches) * 100);
-  const csp = Math.round((cleanSheets / matches) * 100);
-  setTimeout(() => {
-    document.getElementById('barWin').style.width = wp + '%';
-    document.getElementById('barWinVal').textContent = wp + '%';
-    document.getElementById('barDraw').style.width = dp + '%';
-    document.getElementById('barDrawVal').textContent = dp + '%';
-    document.getElementById('barCS').style.width = csp + '%';
-    document.getElementById('barCSVal').textContent = csp + '%';
-  }, 300);
-}
 
 // ── IMGBB UPLOAD ──
 const IMGBB_KEY = 'e981fe62829ed3f63d0a6cc4d6bd6e67';
@@ -3657,100 +3669,29 @@ async function uploadToImgBB(file) {
   throw new Error('ImgBB upload failed');
 }
 
-// ── AVATAR PREVIEW (Register) ──
-window.previewAvatar = async function(input) {
+// ── AVATAR PREVIEW (Admin Edit Player) ──
+window.previewAdminEditAvatar = async function(input) {
   const file = input.files[0];
   if (!file) return;
   if (file.size > 2*1024*1024) { alert('File size 2MB এর বেশি।'); return; }
 
-  // Show local preview immediately
   const reader = new FileReader();
   reader.onload = e => {
-    document.getElementById('avatarPreview').innerHTML = `<img src="${e.target.result}">`;
+    document.getElementById('adminEditAvatarPreview').innerHTML = `<img src="${e.target.result}">`;
   };
   reader.readAsDataURL(file);
 
-  // Upload to ImgBB
   try {
-    document.getElementById('avatarPreview').style.opacity = '0.6';
+    document.getElementById('adminEditAvatarPreview').style.opacity = '0.6';
     const url = await uploadToImgBB(file);
-    regAvatarBase64 = url; // এখন URL, base64 না
-    document.getElementById('avatarPreview').style.opacity = '1';
-  } catch(e) {
-    alert('❌ Photo upload হয়নি। Photo ছাড়াই register করা যাবে।');
-    regAvatarBase64 = null;
-    document.getElementById('avatarPreview').style.opacity = '1';
-  }
-};
-
-// ── AVATAR PREVIEW (Edit Profile) ──
-window.previewEditAvatar = async function(input) {
-  const file = input.files[0];
-  if (!file) return;
-  if (file.size > 2*1024*1024) { alert('File size 2MB এর বেশি।'); return; }
-
-  // Show local preview immediately
-  const reader = new FileReader();
-  reader.onload = e => {
-    document.getElementById('editAvatarPreview').innerHTML = `<img src="${e.target.result}">`;
-  };
-  reader.readAsDataURL(file);
-
-  // Upload to ImgBB
-  try {
-    document.getElementById('editAvatarPreview').style.opacity = '0.6';
-    const url = await uploadToImgBB(file);
-    editAvatarBase64 = url; // এখন URL, base64 না
-    document.getElementById('editAvatarPreview').style.opacity = '1';
+    window._adminEditAvatarUrl = url;
+    document.getElementById('adminEditAvatarPreview').style.opacity = '1';
   } catch(e) {
     alert('❌ Photo upload হয়নি।');
-    editAvatarBase64 = null;
-    document.getElementById('editAvatarPreview').style.opacity = '1';
+    window._adminEditAvatarUrl = null;
+    document.getElementById('adminEditAvatarPreview').style.opacity = '1';
   }
 };
-
-// ── TABS ──
-window.switchTab = function(name) {
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-  document.querySelector(`[onclick="switchTab('${name}')"]`).classList.add('active');
-  document.getElementById('tab-' + name).classList.add('active');
-  if (name === 'friendly') loadProfileFriendlyMatches();
-};
-
-async function loadProfileFriendlyMatches() {
-  const container = document.getElementById('friendlyMatchesList');
-  if (!currentUserData) return;
-  const myName = currentUserData.name;
-  try {
-    const data = await cachedFetch('https://typ-championship-default-rtdb.firebaseio.com/friendlyMatches.json', 3 * 60 * 1000);
-    if (!data) { container.innerHTML = '<div style="text-align:center;color:var(--text3);padding:40px">🤝 কোনো friendly match নেই।</div>'; return; }
-    const matches = Object.entries(data)
-      .map(([id, m]) => ({ id, ...m }))
-      .filter(m => m.home_team === myName || m.away_team === myName)
-      .sort((a, b) => (b.addedAt||'').localeCompare(a.addedAt||''));
-    if (!matches.length) { container.innerHTML = '<div style="text-align:center;color:var(--text3);padding:40px">🤝 কোনো friendly match নেই।</div>'; return; }
-    container.innerHTML = matches.map(m => {
-      const isHome = m.home_team === myName;
-      const myScore = isHome ? m.home_score : m.away_score;
-      const oppScore = isHome ? m.away_score : m.home_score;
-      const oppName = isHome ? m.away_team : m.home_team;
-      const result = myScore > oppScore ? 'W' : myScore < oppScore ? 'L' : 'D';
-      const rc = result === 'W' ? 'var(--green)' : result === 'L' ? 'var(--red)' : 'var(--yellow)';
-      return `<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:12px">
-        <div style="font-size:13px;color:var(--text2)">${m.date||'—'}</div>
-        <div style="flex:1;text-align:center">
-          <div style="font-weight:700;font-size:15px">${myName} <span style="color:var(--text3)">vs</span> ${oppName}</div>
-          <div style="font-size:20px;font-weight:900;color:var(--cyan);margin-top:4px">${myScore} - ${oppScore}</div>
-          ${m.note ? `<div style="font-size:11px;color:var(--text3);margin-top:2px">${m.note}</div>` : ''}
-        </div>
-        <div style="font-size:18px;font-weight:900;color:${rc};background:rgba(0,0,0,0.2);padding:6px 12px;border-radius:8px">${result}</div>
-      </div>`;
-    }).join('');
-  } catch(e) {
-    container.innerHTML = '<div style="text-align:center;color:var(--red);padding:20px">Error loading.</div>';
-  }
-}
 
 // ════════════════════════════════════════
 // 🛡️ ADMIN PANEL
@@ -3762,6 +3703,7 @@ window.adminLogin = function() {
   const pass = document.getElementById('adminPassInput').value;
   const errEl = document.getElementById('adminLoginError');
   if (pass === ADMIN_PASSWORD) {
+    window._isAdminSession = true;
     document.getElementById('adminLoginSection').style.display = 'none';
     document.getElementById('adminDashSection').style.display = 'block';
     loadAllPlayers();
@@ -3780,6 +3722,7 @@ window.switchAdminTab = function(tab) {
   if (tab === 'addmatch') loadAdminMatches();
   if (tab === 'friendlymgmt') loadFriendlyRequests();
   if (tab === 'resultmgmt') loadResultRequests();
+  if (tab === 'seasonstats') ssmInit();
 };
 
 // ══════════════════════════════════════════
@@ -3876,6 +3819,7 @@ function renderAdminPlayers(players) {
         <div class="player-admin-meta">🏟️ ${p.club||'—'} • 📍 ${p.district||'—'} • M:${p.matches||0} W:${p.wins||0} D:${p.draws||0} L:${p.losses||0} • PTS:${p.points||0}</div>
       </div>
       <div class="player-admin-actions">
+        <button class="btn-admin-edit" onclick="openAdminEditProfile('${p.uid}')">👤 Edit Profile</button>
         <button class="btn-admin-edit" onclick="openStatsModal('${p.uid}')">✏️ Edit Stats</button>
         <button class="btn-admin-del" onclick="deletePlayer('${p.uid}','${(p.name||'').replace(/'/g,'')}')" >🗑️ Delete</button>
       </div>
@@ -3940,6 +3884,145 @@ window.savePlayerStats = async function() {
   closeStatsModal();
   renderAdminPlayers(allPlayersCache);
   alert('✅ Stats save হয়েছে!');
+};
+
+// ── Admin: Open Edit Profile Modal ──
+window.openAdminEditProfile = function(uid) {
+  const p = allPlayersCache.find(x => x.uid === uid);
+  if (!p) return;
+  document.getElementById('adminEditUid').value = uid;
+  document.getElementById('adminEditName').value = p.name || '';
+  document.getElementById('adminEditUsername').value = p.username || '';
+  document.getElementById('adminEditClub').value = p.club || '';
+  document.getElementById('adminEditDistrict').value = p.district || '';
+  const prev = document.getElementById('adminEditAvatarPreview');
+  prev.innerHTML = p.avatarUrl ? `<img src="${p.avatarUrl}">` : '🎮';
+  window._adminEditAvatarUrl = p.avatarUrl || null;
+  document.getElementById('adminEditError').classList.remove('show');
+  document.getElementById('adminEditSuccess').classList.remove('show');
+  document.getElementById('adminEditProfileModal').classList.add('show');
+};
+
+window.closeAdminEditProfile = function() {
+  document.getElementById('adminEditProfileModal').classList.remove('show');
+  window._adminEditAvatarUrl = null;
+};
+
+window.saveAdminEditProfile = async function() {
+  const uid = document.getElementById('adminEditUid').value;
+  const name = document.getElementById('adminEditName').value.trim();
+  const username = document.getElementById('adminEditUsername').value.trim();
+  const club = document.getElementById('adminEditClub').value.trim();
+  const district = document.getElementById('adminEditDistrict').value;
+  const errEl = document.getElementById('adminEditError');
+  const sucEl = document.getElementById('adminEditSuccess');
+  errEl.classList.remove('show'); sucEl.classList.remove('show');
+
+  if (!name || !username || !club || !district) {
+    errEl.textContent = '❌ সব field পূরণ করুন।'; errEl.classList.add('show'); return;
+  }
+
+  const p = allPlayersCache.find(x => x.uid === uid);
+  if (!p) return;
+
+  const updates = {
+    ...p,
+    name,
+    username,
+    club,
+    district,
+    avatarUrl: window._adminEditAvatarUrl || p.avatarUrl || ''
+  };
+
+  // If username changed, update usernames node
+  if (p.username && p.username !== username) {
+    await window._set(window._ref(window._db, `usernames/${p.username}`), null);
+    await window._set(window._ref(window._db, `usernames/${username}`), uid);
+  }
+
+  await window._set(window._ref(window._db, `users/${uid}`), updates);
+  window._allUsersCache = [];
+  const idx = allPlayersCache.findIndex(x => x.uid === uid);
+  if (idx !== -1) allPlayersCache[idx] = updates;
+
+  sucEl.textContent = '✅ Profile save হয়েছে!'; sucEl.classList.add('show');
+  setTimeout(() => { closeAdminEditProfile(); renderAdminPlayers(allPlayersCache); }, 1200);
+};
+
+// ── Admin: Add New Player Modal ──
+window.openAddPlayerModal = function() {
+  document.getElementById('addPlayerName').value = '';
+  document.getElementById('addPlayerUsername').value = '';
+  document.getElementById('addPlayerClub').value = '';
+  document.getElementById('addPlayerDistrict').value = '';
+  document.getElementById('addPlayerAvatarPreview').innerHTML = '🎮';
+  window._addPlayerAvatarUrl = null;
+  document.getElementById('addPlayerError').classList.remove('show');
+  document.getElementById('addPlayerSuccess').classList.remove('show');
+  document.getElementById('adminAddPlayerModal').classList.add('show');
+};
+
+window.closeAddPlayerModal = function() {
+  document.getElementById('adminAddPlayerModal').classList.remove('show');
+  window._addPlayerAvatarUrl = null;
+};
+
+window.previewAddPlayerAvatar = async function(input) {
+  const file = input.files[0];
+  if (!file) return;
+  if (file.size > 2*1024*1024) { alert('File size 2MB এর বেশি।'); return; }
+  const reader = new FileReader();
+  reader.onload = e => {
+    document.getElementById('addPlayerAvatarPreview').innerHTML = `<img src="${e.target.result}">`;
+  };
+  reader.readAsDataURL(file);
+  try {
+    document.getElementById('addPlayerAvatarPreview').style.opacity = '0.6';
+    const url = await uploadToImgBB(file);
+    window._addPlayerAvatarUrl = url;
+    document.getElementById('addPlayerAvatarPreview').style.opacity = '1';
+  } catch(e) {
+    alert('❌ Photo upload হয়নি।');
+    window._addPlayerAvatarUrl = null;
+    document.getElementById('addPlayerAvatarPreview').style.opacity = '1';
+  }
+};
+
+window.saveNewPlayer = async function() {
+  const name = document.getElementById('addPlayerName').value.trim();
+  const username = document.getElementById('addPlayerUsername').value.trim().toLowerCase();
+  const club = document.getElementById('addPlayerClub').value.trim();
+  const district = document.getElementById('addPlayerDistrict').value;
+  const errEl = document.getElementById('addPlayerError');
+  const sucEl = document.getElementById('addPlayerSuccess');
+  errEl.classList.remove('show'); sucEl.classList.remove('show');
+
+  if (!name || !username || !club || !district) {
+    errEl.textContent = '❌ Name, Username, Club, District সব দিতে হবে।'; errEl.classList.add('show'); return;
+  }
+
+  // Check username uniqueness
+  const existSnap = await window._get(window._ref(window._db, `usernames/${username}`));
+  if (existSnap.exists()) {
+    errEl.textContent = '❌ এই username আগে থেকেই নেওয়া আছে।'; errEl.classList.add('show'); return;
+  }
+
+  const uid = 'player_' + Date.now() + '_' + Math.random().toString(36).slice(2,7);
+  const playerData = {
+    uid, name, username, club, district,
+    avatarUrl: window._addPlayerAvatarUrl || '',
+    matches: 0, wins: 0, draws: 0, losses: 0,
+    goalsFor: 0, goalsAgainst: 0, cleanSheets: 0,
+    motm: 0, mvp: 0, rank: 0, points: 0,
+    createdAt: new Date().toISOString()
+  };
+
+  await window._set(window._ref(window._db, `users/${uid}`), playerData);
+  await window._set(window._ref(window._db, `usernames/${username}`), uid);
+  window._allUsersCache = [];
+
+  sucEl.textContent = `✅ "${name}" player create হয়েছে!`; sucEl.classList.add('show');
+  setTimeout(() => { closeAddPlayerModal(); loadAllPlayers(); }, 1500);
 };
 
 window.deletePlayer = async function(uid, name) {
@@ -4035,17 +4118,7 @@ window.switchFriendlyTab = function(name) {
   document.querySelector(`[onclick="switchFriendlyTab('${name}')"]`).classList.add('active');
   document.getElementById('ftab-' + name).classList.add('active');
   if (name === 'results') loadFriendlyResults();
-  if (currentUser) {
-    const cg = document.getElementById('challengeLoginGate');
-    const cf = document.getElementById('challengeForm');
-    const mg = document.getElementById('myRequestsLoginGate');
-    const ml = document.getElementById('myRequestsList');
-    if (cg) cg.style.display = 'none';
-    if (cf) cf.style.display = 'block';
-    if (mg) mg.style.display = 'none';
-    if (ml) ml.style.display = 'block';
-    if (name === 'myrequests') loadMyRequests();
-  }
+  if (name === 'myrequests') loadMyRequests();
 };
 
 // ── Friendly Leaderboard ──
@@ -4172,23 +4245,23 @@ window.loadFriendlyResults = async function() {
   }
 };
 
-// ── Opponent Search (Live) ──
-let selectedOpponent = null;
+// ── Player 1 Search (Live) ──
+let selectedPlayer1 = null;
+let selectedPlayer2 = null;
 
-window.searchOpponentLive = async function() {
-  const q = document.getElementById('opponentSearchInput').value.trim().toLowerCase();
-  const container = document.getElementById('opponentSearchResults');
+window.searchPlayer1Live = async function() {
+  const q = document.getElementById('player1SearchInput').value.trim().toLowerCase();
+  const container = document.getElementById('player1SearchResults');
 
   if (q.length < 1) { container.innerHTML = ''; return; }
 
   container.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:8px">🔄 Loading players...</div>';
   const allUsers = await getAllUsers();
-  window._allUsersCache = allUsers; // keep for selectOpponent
+  window._allUsersCache = allUsers;
 
-  const filtered = allUsers.filter(p => {
-    if (currentUser && p.uid === currentUser.uid) return false; // exclude self
-    return (p.name||'').toLowerCase().includes(q) || (p.username||'').toLowerCase().includes(q) || (p.club||'').toLowerCase().includes(q);
-  }).slice(0, 8);
+  const filtered = allUsers.filter(p =>
+    (p.name||'').toLowerCase().includes(q) || (p.username||'').toLowerCase().includes(q) || (p.club||'').toLowerCase().includes(q)
+  ).slice(0, 8);
 
   if (!filtered.length) {
     container.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:8px">❌ কোনো player পাওয়া যায়নি।</div>';
@@ -4196,7 +4269,7 @@ window.searchOpponentLive = async function() {
   }
 
   container.innerHTML = filtered.map(p => `
-    <div onclick="selectOpponent('${p.uid}')" style="display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:8px;border:1px solid var(--border);margin-bottom:6px;cursor:pointer;background:var(--bg3);transition:all 0.15s" onmouseover="this.style.borderColor='var(--green)'" onmouseout="this.style.borderColor='var(--border)'">
+    <div onclick="selectPlayer1('${p.uid}')" style="display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:8px;border:1px solid var(--border);margin-bottom:6px;cursor:pointer;background:var(--bg3);transition:all 0.15s" onmouseover="this.style.borderColor='var(--green)'" onmouseout="this.style.borderColor='var(--border)'">
       <div style="width:38px;height:38px;border-radius:50%;background:var(--bg2);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:16px;overflow:hidden;flex-shrink:0">
         ${p.avatarUrl ? `<img src="${p.avatarUrl}" style="width:100%;height:100%;object-fit:cover">` : '🎮'}
       </div>
@@ -4210,30 +4283,102 @@ window.searchOpponentLive = async function() {
   `).join('');
 };
 
-window.selectOpponent = function(uid) {
+window.selectPlayer1 = function(uid) {
   const p = (window._allUsersCache||[]).find(x => x.uid === uid);
   if (!p) return;
-  selectedOpponent = p;
+  selectedPlayer1 = p;
 
-  // Fill step 2 preview
-  const myAvEl = document.getElementById('myAvatarPreview');
-  const oppAvEl = document.getElementById('oppAvatarPreview');
-  if (currentUserData?.avatarUrl) myAvEl.innerHTML = `<img src="${currentUserData.avatarUrl}" style="width:100%;height:100%;object-fit:cover">`;
-  if (p.avatarUrl) oppAvEl.innerHTML = `<img src="${p.avatarUrl}" style="width:100%;height:100%;object-fit:cover">`;
-  document.getElementById('myNamePreview').textContent = currentUserData?.name || 'You';
-  document.getElementById('myClubPreview').textContent = currentUserData?.club || '';
-  document.getElementById('oppNamePreview').textContent = p.name || '—';
-  document.getElementById('oppClubPreview').textContent = p.club || '';
+  document.getElementById('player1SelectedPreview').innerHTML = `
+    <div style="width:36px;height:36px;border-radius:50%;background:var(--bg2);border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:16px;overflow:hidden;flex-shrink:0">
+      ${p.avatarUrl ? `<img src="${p.avatarUrl}" style="width:100%;height:100%;object-fit:cover">` : '🎮'}
+    </div>
+    <div style="flex:1;min-width:0">
+      <div style="font-weight:700;font-size:14px;color:var(--gold)">${p.name||'—'} <span style="color:var(--text3);font-weight:400;font-size:12px">@${p.username||'—'}</span></div>
+      <div style="font-size:11px;color:var(--text3)">🏟️ ${p.club||'—'}</div>
+    </div>
+  `;
 
-  // Show step 2
+  document.getElementById('player1SearchInput').value = '';
+  document.getElementById('player1SearchResults').innerHTML = '';
   document.getElementById('step1Card').style.display = 'none';
   document.getElementById('step2Card').style.display = 'block';
 };
 
-window.clearOpponentSelection = function() {
-  selectedOpponent = null;
+window.clearPlayer1Selection = function() {
+  selectedPlayer1 = null;
+  selectedPlayer2 = null;
   document.getElementById('step1Card').style.display = 'block';
   document.getElementById('step2Card').style.display = 'none';
+  document.getElementById('step3Card').style.display = 'none';
+  document.getElementById('player2SearchInput').value = '';
+  document.getElementById('player2SearchResults').innerHTML = '';
+};
+
+// ── Player 2 Search (Live) ──
+window.searchPlayer2Live = async function() {
+  const q = document.getElementById('player2SearchInput').value.trim().toLowerCase();
+  const container = document.getElementById('player2SearchResults');
+
+  if (q.length < 1) { container.innerHTML = ''; return; }
+
+  container.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:8px">🔄 Loading players...</div>';
+  const allUsers = await getAllUsers();
+  window._allUsersCache = allUsers;
+
+  const filtered = allUsers.filter(p => {
+    if (selectedPlayer1 && p.uid === selectedPlayer1.uid) return false; // exclude player 1
+    return (p.name||'').toLowerCase().includes(q) || (p.username||'').toLowerCase().includes(q) || (p.club||'').toLowerCase().includes(q);
+  }).slice(0, 8);
+
+  if (!filtered.length) {
+    container.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:8px">❌ কোনো player পাওয়া যায়নি।</div>';
+    return;
+  }
+
+  container.innerHTML = filtered.map(p => `
+    <div onclick="selectPlayer2('${p.uid}')" style="display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:8px;border:1px solid var(--border);margin-bottom:6px;cursor:pointer;background:var(--bg3);transition:all 0.15s" onmouseover="this.style.borderColor='var(--cyan)'" onmouseout="this.style.borderColor='var(--border)'">
+      <div style="width:38px;height:38px;border-radius:50%;background:var(--bg2);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:16px;overflow:hidden;flex-shrink:0">
+        ${p.avatarUrl ? `<img src="${p.avatarUrl}" style="width:100%;height:100%;object-fit:cover">` : '🎮'}
+      </div>
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:700;font-size:14px;color:var(--text)">${p.name||'—'} <span style="color:var(--text3);font-weight:400;font-size:12px">@${p.username||'—'}</span></div>
+        <div style="font-size:11px;color:var(--text3)">🏟️ ${p.club||'—'} • 📍 ${p.district||'—'}</div>
+        <div style="font-size:11px;color:var(--text3)">M:${p.matches||0} W:${p.wins||0} D:${p.draws||0} L:${p.losses||0}</div>
+      </div>
+      <div style="font-size:13px;color:var(--cyan)">➜ Select</div>
+    </div>
+  `).join('');
+};
+
+window.selectPlayer2 = function(uid) {
+  const p = (window._allUsersCache||[]).find(x => x.uid === uid);
+  if (!p) return;
+  selectedPlayer2 = p;
+
+  // Fill step 3 preview
+  const myAvEl = document.getElementById('myAvatarPreview');
+  const oppAvEl = document.getElementById('oppAvatarPreview');
+  myAvEl.innerHTML = selectedPlayer1.avatarUrl ? `<img src="${selectedPlayer1.avatarUrl}" style="width:100%;height:100%;object-fit:cover">` : '🎮';
+  oppAvEl.innerHTML = p.avatarUrl ? `<img src="${p.avatarUrl}" style="width:100%;height:100%;object-fit:cover">` : '🎮';
+  document.getElementById('myNamePreview').textContent = selectedPlayer1.name || '—';
+  document.getElementById('myClubPreview').textContent = selectedPlayer1.club || '';
+  document.getElementById('oppNamePreview').textContent = p.name || '—';
+  document.getElementById('oppClubPreview').textContent = p.club || '';
+
+  document.getElementById('step2Card').style.display = 'none';
+  document.getElementById('step3Card').style.display = 'block';
+};
+
+window.clearOpponentSelection = function() {
+  selectedPlayer1 = null;
+  selectedPlayer2 = null;
+  document.getElementById('step1Card').style.display = 'block';
+  document.getElementById('step2Card').style.display = 'none';
+  document.getElementById('step3Card').style.display = 'none';
+  document.getElementById('player1SearchInput').value = '';
+  document.getElementById('player1SearchResults').innerHTML = '';
+  document.getElementById('player2SearchInput').value = '';
+  document.getElementById('player2SearchResults').innerHTML = '';
   document.getElementById('myScore').value = '';
   document.getElementById('oppScore').value = '';
   document.getElementById('challengeDate').value = '';
@@ -4242,10 +4387,9 @@ window.clearOpponentSelection = function() {
   document.getElementById('challengeSuccess').classList.remove('show');
 };
 
-// ── Submit Friendly Result (Player) ──
+// ── Submit Friendly Result ──
 window.submitFriendlyResult = async function() {
-  if (!currentUser || !currentUserData) { alert('Login করুন।'); return; }
-  if (!selectedOpponent) { alert('Opponent select করুন।'); return; }
+  if (!selectedPlayer1 || !selectedPlayer2) { alert('দুজন player select করুন।'); return; }
 
   const myS = document.getElementById('myScore').value;
   const oppS = document.getElementById('oppScore').value;
@@ -4263,16 +4407,15 @@ window.submitFriendlyResult = async function() {
   const oppResult = ms < os ? 'w' : ms > os ? 'l' : 'd';
 
   const resultData = {
-    submittedBy: currentUser.uid,
-    submitterName: currentUserData.name,
-    submitterUsername: currentUserData.username || '',
-    submitterClub: currentUserData.club || '—',
-    submitterAvatar: '',
-    opponentUid: selectedOpponent.uid,
-    opponentName: selectedOpponent.name,
-    opponentUsername: selectedOpponent.username || '',
-    opponentClub: selectedOpponent.club || '—',
-    opponentAvatar: '',
+    submitterName: selectedPlayer1.name,
+    submitterUsername: selectedPlayer1.username || '',
+    submitterClub: selectedPlayer1.club || '—',
+    submitterAvatar: selectedPlayer1.avatarUrl || '',
+    opponentUid: selectedPlayer2.uid,
+    opponentName: selectedPlayer2.name,
+    opponentUsername: selectedPlayer2.username || '',
+    opponentClub: selectedPlayer2.club || '—',
+    opponentAvatar: selectedPlayer2.avatarUrl || '',
     submitterScore: ms,
     opponentScore: os,
     submitterResult: myResult,
@@ -4284,43 +4427,36 @@ window.submitFriendlyResult = async function() {
 
   try {
     await window._set(window._ref(window._db, 'friendlyResultRequests/' + Date.now()), resultData);
-    sucEl.textContent = '✅ Result submit হয়েছে! Admin approve করলে profile এ যোগ হবে।';
+    sucEl.textContent = '✅ Result submit হয়েছে! Admin approve করলে friendly stats এ যোগ হবে।';
     sucEl.classList.add('show');
     setTimeout(() => {
       clearOpponentSelection();
       sucEl.classList.remove('show');
-      loadMyRequests();
     }, 3000);
   } catch(e) {
     errEl.textContent = '❌ Error: ' + e.message; errEl.classList.add('show');
   }
 };
 
-// ── My Submissions (updated) ──
+// ── All Submissions ──
 window.loadMyRequests = async function() {
-  if (!currentUser) return;
   const container = document.getElementById('myRequestsList');
   container.innerHTML = '<div class="text-center" style="padding:30px"><span class="spinner"></span></div>';
   try {
     const snap = await window._get(window._ref(window._db, 'friendlyResultRequests'));
     if (!snap.exists()) { container.innerHTML = '<div class="card text-center" style="padding:40px;color:var(--text3)">কোনো submission নেই।</div>'; return; }
-    const myReqs = [];
-    snap.forEach(c => {
-      const d = { id: c.key, ...c.val() };
-      if (d.submittedBy === currentUser.uid) myReqs.push(d);
-    });
-    myReqs.sort((a,b) => (b.submittedAt||'').localeCompare(a.submittedAt||''));
-    if (!myReqs.length) { container.innerHTML = '<div class="card text-center" style="padding:40px;color:var(--text3)">তুমি এখনো কোনো result submit করোনি।</div>'; return; }
-    container.innerHTML = myReqs.map(r => {
+    const reqs = [];
+    snap.forEach(c => reqs.push({ id: c.key, ...c.val() }));
+    reqs.sort((a,b) => (b.submittedAt||'').localeCompare(a.submittedAt||''));
+    if (!reqs.length) { container.innerHTML = '<div class="card text-center" style="padding:40px;color:var(--text3)">কোনো submission নেই।</div>'; return; }
+    container.innerHTML = reqs.map(r => {
       const statusColor = r.status === 'accepted' ? 'var(--green)' : r.status === 'declined' ? 'var(--red)' : 'var(--yellow)';
       const statusLabel = r.status === 'accepted' ? '✅ Approved' : r.status === 'declined' ? '❌ Declined' : '⏳ Pending';
-      const resColor = r.submitterResult === 'w' ? 'var(--green)' : r.submitterResult === 'l' ? 'var(--red)' : 'var(--yellow)';
-      const resLabel = r.submitterResult === 'w' ? '🏆 WIN' : r.submitterResult === 'l' ? '💀 LOSS' : '🤝 DRAW';
       return `<div class="card" style="margin-bottom:12px;border-color:rgba(0,230,118,0.2)">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px">
           <div>
-            <div style="font-weight:700;font-size:14px">vs <span style="color:var(--cyan)">${r.opponentName}</span> <span style="font-size:12px;color:var(--text3)">@${r.opponentUsername||'—'}</span></div>
-            <div style="font-size:13px;font-weight:700;color:${resColor};margin-top:4px">${resLabel} &nbsp; <span style="color:var(--gold);font-family:'Inter',sans-serif;font-size:18px">${r.submitterScore} – ${r.opponentScore}</span></div>
+            <div style="font-weight:700;font-size:14px"><span style="color:var(--gold)">${r.submitterName}</span> <span style="color:var(--text3)">vs</span> <span style="color:var(--cyan)">${r.opponentName}</span></div>
+            <div style="font-size:13px;font-weight:700;margin-top:4px"><span style="color:var(--gold);font-family:'Inter',sans-serif;font-size:18px">${r.submitterScore} – ${r.opponentScore}</span></div>
             <div style="font-size:11px;color:var(--text3);margin-top:3px">📅 ${r.date||'—'} ${r.note ? '• '+r.note : ''}</div>
           </div>
           <div style="font-size:12px;font-weight:700;color:${statusColor};padding:4px 12px;border-radius:20px;border:1px solid ${statusColor};background:${statusColor}22">${statusLabel}</div>
@@ -4577,6 +4713,155 @@ async function loadHomePageData() {
   loadHomeTopPlayers();
   loadHomeRecentMatches();
   loadHomeStats();
+  loadHomeLiveMatchday();
+  loadHomeNotice();
+}
+
+window.saveNotice = async function() {
+  const txt = document.getElementById('noticeInput').value.trim();
+  const st = document.getElementById('noticeSaveStatus');
+  try {
+    await window._set(window._ref(window._db, 'notice'), { text: txt });
+    st.textContent = '✅ Saved!';
+    setTimeout(() => st.textContent = '', 3000);
+    loadHomeNotice();
+  } catch(e) { st.textContent = '❌ Error: ' + e.message; }
+};
+
+window.clearNotice = async function() {
+  const st = document.getElementById('noticeSaveStatus');
+  try {
+    await window._set(window._ref(window._db, 'notice'), { text: '' });
+    document.getElementById('noticeInput').value = '';
+    st.textContent = '✅ Cleared!';
+    setTimeout(() => st.textContent = '', 3000);
+    loadHomeNotice();
+  } catch(e) { st.textContent = '❌ Error: ' + e.message; }
+};
+
+// Load current notice into admin textarea when tab opens
+const _origSwitchAdminTab = window.switchAdminTab;
+window.switchAdminTab = function(tab) {
+  if (_origSwitchAdminTab) _origSwitchAdminTab(tab);
+  if (tab === 'notice') {
+    window._get(window._ref(window._db, 'notice')).then(snap => {
+      const val = snap.val();
+      const inp = document.getElementById('noticeInput');
+      if (inp && val && val.text) inp.value = val.text;
+    }).catch(()=>{});
+  }
+};
+
+async function loadHomeNotice() {
+  try {
+    const snap = await window._get(window._ref(window._db, 'notice'));
+    const bar = document.getElementById('homeNoticeBar');
+    const txt = document.getElementById('homeNoticeText');
+    if (!bar || !txt) return;
+    const val = snap.val();
+    if (val && val.text && val.text.trim()) {
+      txt.textContent = val.text.trim();
+      bar.style.display = 'block';
+    } else {
+      bar.style.display = 'none';
+    }
+  } catch(e) { /* silent */ }
+}
+
+async function loadHomeLiveMatchday() {
+  const container = document.getElementById('homeLiveMatchday');
+  const section = document.getElementById('liveTrnSection');
+  if (!container) return;
+  try {
+    // Fetch tournament data fresh
+    const [teamsSnap, matchesSnap] = await Promise.all([
+      fetch(`${TRN_DB}/tournament/teams.json`).then(r => r.json()),
+      fetch(`${TRN_DB}/tournament/matches.json`).then(r => r.json())
+    ]);
+    const teams = teamsSnap ? Object.entries(teamsSnap).map(([id,v]) => ({id,...v})) : [];
+    const matches = matchesSnap ? Object.entries(matchesSnap).map(([id,v]) => ({id,...v})) : [];
+
+    if (!teams.length || !matches.length) {
+      section.style.display = 'none';
+      return;
+    }
+
+    const teamMap = {};
+    teams.forEach(t => { teamMap[t.id] = t; });
+
+    // Find the latest matchday that has any results entered
+    const played = matches.filter(m => m.homeScore !== undefined || m.awayScore !== undefined);
+    const fixtures = matches.filter(m => m.homeScore === undefined && m.awayScore === undefined);
+
+    // Determine current/latest active matchday
+    let currentDay = null;
+    if (played.length) {
+      // Get the latest day that has results
+      const days = [...new Set(played.map(m => m.day))].sort((a,b) => b - a);
+      currentDay = days[0];
+    } else if (fixtures.length) {
+      // No results yet, show day 1
+      const days = [...new Set(fixtures.map(m => m.day))].sort((a,b) => a - b);
+      currentDay = days[0];
+    }
+
+    if (currentDay === null) { section.style.display = 'none'; return; }
+
+    const dayMatches = matches.filter(m => m.day === currentDay);
+
+    // Group by matchday within the day
+    const mds = [...new Set(dayMatches.map(m => m.matchday))].sort((a,b) => a - b);
+
+    let html = `<div style="margin-bottom:10px;display:flex;align-items:center;gap:8px">
+      <span style="background:var(--green);color:#fff;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:1px">DAY ${currentDay}</span>
+      <span style="color:var(--text3);font-size:12px">${played.filter(m => m.day === currentDay).length > 0 ? '🔴 Live / Completed' : '🕐 Upcoming'}</span>
+    </div>`;
+
+    mds.forEach(md => {
+      const mdMatches = dayMatches.filter(m => m.matchday === md);
+      const home = teamMap[mdMatches[0]?.homeTeam];
+      const away = teamMap[mdMatches[0]?.awayTeam];
+      if (!home || !away) return;
+
+      const homeWins = mdMatches.filter(m => m.homeScore !== undefined && m.homeScore > m.awayScore).length;
+      const awayWins = mdMatches.filter(m => m.awayScore !== undefined && m.awayScore > m.homeScore).length;
+      const played_count = mdMatches.filter(m => m.homeScore !== undefined).length;
+      const total = mdMatches.length;
+      const hasResults = played_count > 0;
+
+      html += `<div style="background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:10px">
+        <div style="font-size:11px;color:var(--text3);margin-bottom:10px;font-weight:600;letter-spacing:1px">MATCHDAY ${md} &nbsp;·&nbsp; ${played_count}/${total} bouts</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+          <div style="flex:1;text-align:center">
+            <div style="width:52px;height:52px;border-radius:10px;border:1px solid var(--border);background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:26px;overflow:hidden;margin:0 auto 6px">
+              ${home.logo ? `<img src="${home.logo}" style="width:100%;height:100%;object-fit:cover;border-radius:9px">` : (home.emoji||'🏟️')}
+            </div>
+            <div style="font-size:13px;font-weight:700;color:var(--text)">${home.name||'—'}</div>
+            <div style="font-size:11px;color:var(--text3)">${home.manager||''}</div>
+          </div>
+          <div style="text-align:center;min-width:80px">
+            ${hasResults
+              ? `<div style="font-size:28px;font-weight:900;font-family:'Inter',monospace;color:var(--cyan)">${homeWins} <span style="color:var(--text3);font-size:18px">–</span> ${awayWins}</div>
+                 <div style="font-size:10px;color:var(--text3);margin-top:2px">wins</div>`
+              : `<div style="font-size:20px;color:var(--text3)">vs</div>`}
+          </div>
+          <div style="flex:1;text-align:center">
+            <div style="width:52px;height:52px;border-radius:10px;border:1px solid var(--border);background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:26px;overflow:hidden;margin:0 auto 6px">
+              ${away.logo ? `<img src="${away.logo}" style="width:100%;height:100%;object-fit:cover;border-radius:9px">` : (away.emoji||'🏟️')}
+            </div>
+            <div style="font-size:13px;font-weight:700;color:var(--text)">${away.name||'—'}</div>
+            <div style="font-size:11px;color:var(--text3)">${away.manager||''}</div>
+          </div>
+        </div>
+      </div>`;
+    });
+
+    container.innerHTML = html;
+    section.style.display = '';
+  } catch(e) {
+    console.error('Live matchday error:', e);
+    section.style.display = 'none';
+  }
 }
 
 async function loadHomeStats() {
@@ -4651,7 +4936,7 @@ async function loadHomeRecentMatches() {
       return;
     }
 
-    const isAdmin = currentUser && ['mf3171352@gmail.com', 'arafatkobami@gmail.com', 'libae804@gmail.com'].includes(currentUser.email);
+    const isAdmin = !!window._isAdminSession;
     container.innerHTML = recent.map(m => {
       const hs = parseInt(m.home_score)||0, as_ = parseInt(m.away_score)||0;
       const winSide = hs > as_ ? 'home' : hs < as_ ? 'away' : 'draw';
@@ -5672,6 +5957,9 @@ function renderAdminTeamsList() {
   container.innerHTML = trnTeamsCache.map(t => `
     <div style="display:flex;align-items:center;gap:12px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin-bottom:10px">
       <div style="width:36px;height:36px;border-radius:50%;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">${t.emoji||'🏟️'}</div>
+      <div style="width:44px;height:44px;border-radius:10px;border:1px solid var(--border);background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:24px;overflow:hidden;flex-shrink:0">
+        ${t.logo ? `<img src="${t.logo}" style="width:100%;height:100%;object-fit:cover;border-radius:9px">` : (t.emoji||'🏟️')}
+      </div>
       <div style="flex:1">
         <div style="font-weight:700;font-size:14px;color:var(--text)">${t.name}</div>
         <div style="font-size:12px;color:var(--text3)">👑 ${t.manager||'—'} • ${(t.players||[]).filter(p=>p.isStarter).length}/8 starters · ${(t.players||[]).filter(p=>!p.isStarter).length}/3 subs</div>
@@ -5691,6 +5979,10 @@ window.openCreateTeamModal = async function() {
   document.getElementById('newTeamName').value = '';
   document.getElementById('newTeamManager').value = '';
   document.getElementById('newTeamEmoji').value = '🏟️';
+  document.getElementById('teamLogoUrl').value = '';
+  document.getElementById('teamLogoPreview').innerHTML = '🏟️';
+  document.getElementById('teamLogoPreview').style.border = '2px dashed var(--border)';
+  document.getElementById('teamLogoInput').value = '';
   document.getElementById('createTeamError').textContent = '';
   _playerPickSelected = [];
   await loadPlayerPickList();
@@ -5705,6 +5997,16 @@ window.openEditTeamModal = async function(teamId) {
   document.getElementById('newTeamName').value = t.name || '';
   document.getElementById('newTeamManager').value = t.manager || '';
   document.getElementById('newTeamEmoji').value = t.emoji || '🏟️';
+  document.getElementById('teamLogoUrl').value = t.logo || '';
+  const prevEl = document.getElementById('teamLogoPreview');
+  if (t.logo) {
+    prevEl.innerHTML = `<img src="${t.logo}" style="width:100%;height:100%;object-fit:cover;border-radius:10px">`;
+    prevEl.style.border = '2px solid var(--primary)';
+  } else {
+    prevEl.innerHTML = '🏟️';
+    prevEl.style.border = '2px dashed var(--border)';
+  }
+  document.getElementById('teamLogoInput').value = '';
   document.getElementById('createTeamError').textContent = '';
   _playerPickSelected = (t.players || []).map(p => p.uid);
   await loadPlayerPickList();
@@ -5766,6 +6068,18 @@ function updatePlayerPickCount() {
   if (el) el.textContent = `${_playerPickSelected.length} selected (${Math.min(_playerPickSelected.length,8)} starters + ${Math.max(0,_playerPickSelected.length-8)} subs)`;
 }
 
+function previewTeamLogo(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const prev = document.getElementById('teamLogoPreview');
+    prev.innerHTML = `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;border-radius:10px">`;
+    prev.style.border = '2px solid var(--primary)';
+  };
+  reader.readAsDataURL(file);
+}
+
 window.saveTeam = async function() {
   const name = document.getElementById('newTeamName').value.trim();
   const manager = document.getElementById('newTeamManager').value.trim();
@@ -5781,15 +6095,44 @@ window.saveTeam = async function() {
   });
 
   const teamId = document.getElementById('editTeamId').value;
+  errEl.textContent = '';
+
+  // Upload logo if new file selected
+  let logoUrl = document.getElementById('teamLogoUrl').value || '';
+  const logoFile = document.getElementById('teamLogoInput').files[0];
+  if (logoFile) {
+    errEl.textContent = '⏳ Logo upload হচ্ছে...';
+    try {
+      logoUrl = await uploadToImgBB(logoFile);
+    } catch(e) {
+      errEl.textContent = '❌ Logo upload failed. Try again.';
+      return;
+    }
+    errEl.textContent = '';
+  }
+
   const payload = { name, manager, emoji, players, updatedAt: new Date().toISOString() };
+  if (logoUrl) payload.logo = logoUrl;
 
   if (teamId) {
-    await fetch(`${TRN_DB}/tournament/teams/${teamId}.json`, { method: 'PATCH', body: JSON.stringify(payload) });
+    const res = await fetch(`${TRN_DB}/tournament/teams/${teamId}.json`, { method: 'PATCH', body: JSON.stringify(payload) });
+    if (!res.ok) {
+      const errText = await res.text();
+      errEl.textContent = `❌ Save failed (${res.status}): ${errText}`;
+      return;
+    }
   } else {
-    await fetch(`${TRN_DB}/tournament/teams.json`, { method: 'POST', body: JSON.stringify(payload) });
+    const res = await fetch(`${TRN_DB}/tournament/teams.json`, { method: 'POST', body: JSON.stringify(payload) });
+    if (!res.ok) {
+      const errText = await res.text();
+      errEl.textContent = `❌ Save failed (${res.status}): ${errText}`;
+      return;
+    }
   }
 
   document.getElementById('createTeamModal').classList.remove('show');
+  // Small delay to let Firebase propagate before re-fetching
+  await new Promise(r => setTimeout(r, 500));
   await fetchTrnData();
   renderAdminTeamsList();
   // Auto-generate fixtures if 8 teams
@@ -5806,6 +6149,7 @@ window.saveTeam = async function() {
 window.deleteTeam = async function(id, name) {
   if (!confirm(`"${name}" team delete করবে?`)) return;
   await fetch(`${TRN_DB}/tournament/teams/${id}.json`, { method: 'DELETE' });
+  await new Promise(r => setTimeout(r, 500));
   await fetchTrnData();
   renderAdminTeamsList();
 };
@@ -5871,19 +6215,29 @@ async function generateFixtures() {
     });
   });
 
-  // Save all fixtures to Firebase
-  for (const f of allFixtures) {
-    await fetch(`${TRN_DB}/tournament/matches.json`, { method: 'POST', body: JSON.stringify(f) });
+  // Save all fixtures to Firebase in one batch PUT
+  const batchObj = {};
+  allFixtures.forEach((f, i) => { batchObj[`fixture_${Date.now()}_${i}`] = f; });
+  const putRes = await fetch(`${TRN_DB}/tournament/matches.json`, { method: 'PUT', body: JSON.stringify(batchObj) });
+  if (!putRes.ok) {
+    const err = await putRes.text();
+    alert('❌ Fixture save failed: ' + err);
+    return;
   }
+  await new Promise(r => setTimeout(r, 500));
   await fetchTrnData();
   alert(`✅ Fixtures generated!\n7 দিন × 4 matchday × 8 bout = ${allFixtures.length} total bouts`);
 }
 
 window.confirmRegenerateFixtures = async function() {
   if (!confirm('⚠️ সব পুরনো fixtures delete হয়ে নতুন করে তৈরি হবে। Continue?')) return;
+  // Save teams before delete (fetchTrnData after DELETE may mess cache)
+  const savedTeams = [...trnTeamsCache];
   // Delete all existing matches
   await fetch(`${TRN_DB}/tournament/matches.json`, { method: 'DELETE' });
-  await fetchTrnData();
+  await new Promise(r => setTimeout(r, 800));
+  // Restore teams cache in case fetchTrnData cleared it
+  trnTeamsCache = savedTeams;
   await generateFixtures();
   loadTrnMatchdays();
 };
@@ -5912,27 +6266,57 @@ window.loadMatchdayForEntry = function() {
   const teamMap = {};
   trnTeamsCache.forEach(t => { teamMap[t.id] = t; });
 
+  // Build player options for each team
+  const allUsers = window._trnAllUsers || [];
+
   area.innerHTML = matches.map(m => {
     const ht = teamMap[m.homeTeam] || {};
     const at = teamMap[m.awayTeam] || {};
     const done = m.status === 'completed';
-    return `<div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:10px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+
+    // Home team player options
+    const htPlayers = (ht.players || []);
+    const atPlayers = (at.players || []);
+
+    const homeOpts = htPlayers.map(p =>
+      `<option value="${p.uid}" ${p.uid === m.player1uid ? 'selected' : ''}>${p.name}</option>`
+    ).join('');
+    const awayOpts = atPlayers.map(p =>
+      `<option value="${p.uid}" ${p.uid === m.player2uid ? 'selected' : ''}>${p.name}</option>`
+    ).join('');
+
+    return `<div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:10px">
       <input type="hidden" class="trn-match-id" value="${m.id}">
-      <div style="flex:1;min-width:100px;font-size:13px;color:var(--text2);font-weight:600">
-        ${ht.emoji||'🏟️'} ${m.player1||'P1'} <span style="color:var(--text3)">(${ht.name||'?'})</span>
+      ${m.boutNumber ? `<div style="font-size:10px;color:var(--text3);font-family:'Inter',sans-serif;margin-bottom:8px;letter-spacing:1px">BOUT ${m.boutNumber} — ${ht.emoji||'🏟️'} ${ht.name||'?'} vs ${at.emoji||'🏟️'} ${at.name||'?'}</div>` : ''}
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <!-- Home Player -->
+        <div style="flex:1;min-width:120px">
+          <div style="font-size:10px;color:var(--cyan);margin-bottom:4px;font-family:'Inter',sans-serif">🏠 HOME PLAYER</div>
+          <select class="form-input trn-player1-select" data-id="${m.id}" style="font-size:12px;padding:7px 10px">
+            <option value="">-- Select --</option>
+            ${homeOpts}
+          </select>
+        </div>
+        <!-- Score -->
+        <div style="display:flex;align-items:center;gap:6px;padding-top:16px">
+          <input type="number" min="0" max="99" value="${done ? m.homeScore : ''}" placeholder="0"
+            class="form-input trn-score-home" data-id="${m.id}"
+            style="width:56px;text-align:center;padding:8px 4px;font-size:18px;font-weight:700">
+          <span style="color:var(--text3);font-weight:700;font-size:16px">—</span>
+          <input type="number" min="0" max="99" value="${done ? m.awayScore : ''}" placeholder="0"
+            class="form-input trn-score-away" data-id="${m.id}"
+            style="width:56px;text-align:center;padding:8px 4px;font-size:18px;font-weight:700">
+        </div>
+        <!-- Away Player -->
+        <div style="flex:1;min-width:120px">
+          <div style="font-size:10px;color:var(--gold);margin-bottom:4px;font-family:'Inter',sans-serif;text-align:right">AWAY PLAYER 🏟️</div>
+          <select class="form-input trn-player2-select" data-id="${m.id}" style="font-size:12px;padding:7px 10px">
+            <option value="">-- Select --</option>
+            ${awayOpts}
+          </select>
+        </div>
       </div>
-      <div style="display:flex;align-items:center;gap:8px">
-        <input type="number" min="0" max="99" value="${done?m.homeScore:''}" placeholder="0"
-          class="form-input trn-score-home" data-id="${m.id}" style="width:60px;text-align:center;padding:8px 6px">
-        <span style="color:var(--text3);font-weight:700">—</span>
-        <input type="number" min="0" max="99" value="${done?m.awayScore:''}" placeholder="0"
-          class="form-input trn-score-away" data-id="${m.id}" style="width:60px;text-align:center;padding:8px 6px">
-      </div>
-      <div style="flex:1;min-width:100px;font-size:13px;color:var(--text2);font-weight:600;text-align:right">
-        <span style="color:var(--text3)">(${at.name||'?'})</span> ${m.player2||'P2'} ${at.emoji||'🏟️'}
-      </div>
-      ${m.boutNumber ? `<div style="font-size:10px;color:var(--text3);width:100%;text-align:center;font-family:'Inter',sans-serif">BOUT ${m.boutNumber}</div>` : ''}
-      ${done ? '<div style="font-size:11px;color:var(--green);font-family:\'Share Tech Mono\',monospace;width:100%;text-align:center">✅ DONE</div>' : ''}
+      ${done ? '<div style="font-size:11px;color:var(--green);margin-top:8px;text-align:center">✅ SAVED — Re-enter to update</div>' : ''}
     </div>`;
   }).join('');
 
@@ -5944,22 +6328,53 @@ window.saveTrnMatchResults = async function() {
   statusEl.textContent = '⏳ Saving...';
   const homeInputs = document.querySelectorAll('.trn-score-home');
   let saved = 0;
+
+  // Load all users for profile update
+  const allUsers = await getAllUsers();
+  const userMap = {};
+  allUsers.forEach(u => { userMap[u.uid] = u; });
+
   for (const inp of homeInputs) {
     const id = inp.dataset.id;
     const hs = inp.value.trim();
     const awayInp = document.querySelector(`.trn-score-away[data-id="${id}"]`);
     const as_ = awayInp ? awayInp.value.trim() : '';
     if (hs === '' || as_ === '') continue;
+
+    const homeScore = parseInt(hs);
+    const awayScore = parseInt(as_);
+
+    // Get selected players
+    const p1Sel = document.querySelector(`.trn-player1-select[data-id="${id}"]`);
+    const p2Sel = document.querySelector(`.trn-player2-select[data-id="${id}"]`);
+    const p1uid = p1Sel ? p1Sel.value : '';
+    const p2uid = p2Sel ? p2Sel.value : '';
+
+    // Get previous match data to check if already saved (to avoid double counting)
+    const prevMatch = trnMatchesCache.find(m => m.id === id);
+    const alreadySaved = prevMatch?.status === 'completed';
+
+    // Save to Firebase tournament matches
     await fetch(`${TRN_DB}/tournament/matches/${id}.json`, {
       method: 'PATCH',
-      body: JSON.stringify({ homeScore: parseInt(hs), awayScore: parseInt(as_), status: 'completed', updatedAt: new Date().toISOString() })
+      body: JSON.stringify({
+        homeScore, awayScore,
+        player1uid: p1uid,
+        player2uid: p2uid,
+        status: 'completed',
+        updatedAt: new Date().toISOString()
+      })
     });
+
+    // Tournament bouts do NOT affect main player W/D/L stats — only team matchday points count
     saved++;
   }
+
+  window._allUsersCache = [];
   await fetchTrnData();
   loadTrnMatchdays();
-  statusEl.textContent = `✅ ${saved} match saved!`;
-  setTimeout(() => statusEl.textContent = '', 3000);
+  statusEl.textContent = `✅ ${saved} bout saved!`;
+  setTimeout(() => statusEl.textContent = '', 4000);
 };
 
 // ── Knockout Admin ──
@@ -6071,6 +6486,719 @@ window.switchAdminTab = function(tab) {
   if (tab === 'tournament') loadTrnAdminTeams();
 };
 
+// ══════════════════════════════════════════
+// 📥 DOWNLOAD FIXTURE AS BEAUTIFUL HTML
+// ══════════════════════════════════════════
+window.downloadFixturePDF = function() {
+  const teamMap = {};
+  trnTeamsCache.forEach(t => { teamMap[t.id] = t; });
+  const fixtures = trnAllFixtures && trnAllFixtures.length ? trnAllFixtures : trnMatchesCache;
+
+  if (!fixtures || !fixtures.length) {
+    alert('⚠️ Fixture data নেই। আগে Fixtures tab load করুন।');
+    return;
+  }
+
+  // Group by matchday
+  const grouped = {};
+  fixtures.forEach(m => {
+    const key = m.matchday || 'Matchday ?';
+    if (!grouped[key]) grouped[key] = [];
+    grouped[key].push(m);
+  });
+
+  const totalMatches = fixtures.length;
+  const completedMatches = fixtures.filter(m => m.status === 'completed').length;
+  const pendingMatches = totalMatches - completedMatches;
+  const today = new Date().toLocaleDateString('en-BD', { year: 'numeric', month: 'long', day: 'numeric' });
+
+  // Build matchday HTML
+  const matchdayHtml = Object.entries(grouped).map(([day, ms]) => {
+    // Figure out home and away teams for this matchday group
+    const sampleMatch = ms[0];
+    const ht = teamMap[sampleMatch.homeTeam] || { name: sampleMatch.homeTeam || 'TBD', emoji: '🏟️' };
+    const at = teamMap[sampleMatch.awayTeam] || { name: sampleMatch.awayTeam || 'TBD', emoji: '🏟️' };
+
+    let homeWins = 0, awayWins = 0, draws = 0;
+    const doneBouts = ms.filter(m => m.status === 'completed');
+    doneBouts.forEach(m => {
+      const hs = parseInt(m.homeScore)||0, as_=parseInt(m.awayScore)||0;
+      if (hs > as_) homeWins++;
+      else if (as_ > hs) awayWins++;
+      else draws++;
+    });
+
+    const isCompleted = doneBouts.length === ms.length && ms.length > 0;
+    const matchdayWinner = isCompleted ? (homeWins > awayWins ? ht.name : awayWins > homeWins ? at.name : 'Draw') : null;
+    const matchdayWinnerEmoji = isCompleted ? (homeWins > awayWins ? ht.emoji : awayWins > homeWins ? at.emoji : '🤝') : null;
+
+    const boutRows = ms.map(m => {
+      const done = m.status === 'completed';
+      const hs = parseInt(m.homeScore)||0, as_=parseInt(m.awayScore)||0;
+      const winH = done && hs > as_, winA = done && as_ > hs;
+      const scoreDisplay = done ? `${hs} – ${as_}` : 'vs';
+      const statusClass = done ? (winH ? 'win-home' : winA ? 'win-away' : 'draw') : 'pending';
+      return `<tr class="bout-row ${statusClass}">
+        <td class="bout-num">${m.boutNumber ? 'Bout ' + m.boutNumber : '—'}</td>
+        <td class="player-home ${winH?'winner':''}">${m.player1 || '—'}</td>
+        <td class="score-cell ${done?'score-done':'score-pending'}">${scoreDisplay}</td>
+        <td class="player-away ${winA?'winner':''}">${m.player2 || '—'}</td>
+        <td class="status-cell">${done ? (winH?'🟢':'🔴') : '⏳'}</td>
+      </tr>`;
+    }).join('');
+
+    const summaryHtml = isCompleted ? `
+      <div class="matchday-summary ${homeWins > awayWins ? 'home-win' : awayWins > homeWins ? 'away-win' : 'draw-result'}">
+        <span class="trophy">🏆</span>
+        <strong>${matchdayWinnerEmoji} ${matchdayWinner}</strong>
+        <span class="score-summary">wins matchday</span>
+        <span class="bout-count">${homeWins} – ${awayWins}${draws>0?' ('+draws+' draw)':''}</span>
+      </div>` : doneBouts.length > 0 ? `
+      <div class="matchday-summary in-progress">
+        <span>⏳ In Progress</span>
+        <span class="bout-count">${doneBouts.length}/${ms.length} bouts done</span>
+      </div>` : '';
+
+    return `<div class="matchday-card">
+      <div class="matchday-header">
+        <div class="matchday-label">${day}</div>
+        <div class="matchup-teams">
+          <span class="team-a">${ht.emoji} ${ht.name}</span>
+          <span class="vs-badge">VS</span>
+          <span class="team-b">${at.emoji} ${at.name}</span>
+        </div>
+        <div class="matchday-status ${isCompleted ? 'done' : doneBouts.length > 0 ? 'partial' : 'upcoming'}">
+          ${isCompleted ? '✅ Completed' : doneBouts.length > 0 ? `⏳ ${doneBouts.length}/${ms.length}` : '📅 Upcoming'}
+        </div>
+      </div>
+      <table class="bouts-table">
+        <thead>
+          <tr>
+            <th>Bout</th>
+            <th>🏠 Home Player</th>
+            <th>Score</th>
+            <th>✈️ Away Player</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>${boutRows}</tbody>
+      </table>
+      ${summaryHtml}
+    </div>`;
+  }).join('');
+
+  const htmlContent = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TYP Championship — Fixture Sheet</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: #f0ebff;
+    color: #1a1040;
+    min-height: 100vh;
+    padding: 0;
+  }
+
+  /* HERO HEADER */
+  .page-header {
+    background: linear-gradient(135deg, #7132CA 0%, #301CA0 60%, #1a0e6a 100%);
+    color: white;
+    padding: 48px 32px 40px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .page-header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 80% 100% at 20% -20%, rgba(255,255,255,0.12) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 80% at 80% 120%, rgba(163,116,232,0.2) 0%, transparent 60%);
+  }
+  .page-header > * { position: relative; z-index: 1; }
+  .header-badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.3);
+    color: rgba(255,255,255,0.9);
+    padding: 5px 16px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    margin-bottom: 16px;
+  }
+  .header-title {
+    font-size: clamp(28px, 6vw, 52px);
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    margin-bottom: 8px;
+    text-shadow: 0 2px 20px rgba(0,0,0,0.3);
+  }
+  .header-subtitle {
+    font-size: 14px;
+    opacity: 0.75;
+    letter-spacing: 0.05em;
+    margin-bottom: 28px;
+  }
+  .header-stats {
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    max-width: 480px;
+    margin: 0 auto;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 14px;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+  }
+  .hstat {
+    flex: 1;
+    padding: 16px 12px;
+    border-right: 1px solid rgba(255,255,255,0.15);
+    text-align: center;
+  }
+  .hstat:last-child { border-right: none; }
+  .hstat-num { font-size: 26px; font-weight: 800; line-height: 1; }
+  .hstat-label { font-size: 10px; opacity: 0.7; margin-top: 4px; letter-spacing: 0.08em; font-weight: 600; }
+
+  /* CONTENT */
+  .content { max-width: 900px; margin: 0 auto; padding: 32px 20px 60px; }
+
+  /* MATCHDAY CARD */
+  .matchday-card {
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 24px rgba(113,50,202,0.10), 0 1px 4px rgba(0,0,0,0.06);
+    border: 1px solid rgba(113,50,202,0.12);
+    transition: transform 0.2s;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  .matchday-header {
+    background: linear-gradient(135deg, #7132CA 0%, #4a1f9a 100%);
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .matchday-label {
+    font-size: 11px;
+    font-weight: 800;
+    color: rgba(255,255,255,0.7);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    min-width: 60px;
+  }
+  .matchup-teams {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 15px;
+    font-weight: 700;
+    color: white;
+  }
+  .team-a, .team-b { color: rgba(255,255,255,0.95); }
+  .vs-badge {
+    font-size: 10px;
+    font-weight: 900;
+    color: rgba(255,255,255,0.5);
+    letter-spacing: 0.1em;
+    padding: 3px 8px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 6px;
+  }
+  .matchday-status {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 5px 12px;
+    border-radius: 20px;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+  }
+  .matchday-status.done { background: rgba(22,163,74,0.25); color: #4ade80; border: 1px solid rgba(74,222,128,0.3); }
+  .matchday-status.partial { background: rgba(202,138,4,0.2); color: #fbbf24; border: 1px solid rgba(251,191,36,0.3); }
+  .matchday-status.upcoming { background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.7); border: 1px solid rgba(255,255,255,0.2); }
+
+  /* BOUTS TABLE */
+  .bouts-table { width: 100%; border-collapse: collapse; }
+  .bouts-table thead tr { background: #f8f5ff; }
+  .bouts-table th {
+    padding: 10px 14px;
+    font-size: 10px;
+    font-weight: 700;
+    color: #7132CA;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    border-bottom: 2px solid #ede8fa;
+    text-align: center;
+  }
+  .bouts-table th:nth-child(2) { text-align: left; }
+  .bouts-table th:nth-child(4) { text-align: right; }
+  .bout-row td {
+    padding: 11px 14px;
+    font-size: 13px;
+    border-bottom: 1px solid #f0ebff;
+    vertical-align: middle;
+  }
+  .bout-row:last-child td { border-bottom: none; }
+  .bout-row:hover { background: #faf8ff; }
+  .bout-num { font-size: 11px; font-weight: 700; color: #9b8fc4; text-align: center; font-family: monospace; white-space: nowrap; }
+  .player-home { text-align: left; font-weight: 500; color: #4a3880; }
+  .player-away { text-align: right; font-weight: 500; color: #4a3880; }
+  .player-home.winner, .player-away.winner { color: #7132CA; font-weight: 700; }
+  .score-cell { text-align: center; font-weight: 700; font-size: 15px; font-family: monospace; min-width: 80px; }
+  .score-done { color: #1a1040; }
+  .score-pending { color: #c4b5e0; font-size: 12px; letter-spacing: 0.05em; }
+  .status-cell { text-align: center; font-size: 16px; }
+
+  .bout-row.win-home { background: rgba(113,50,202,0.03); }
+  .bout-row.win-away { background: rgba(113,50,202,0.03); }
+  .bout-row.pending td { color: #b0a0d0; }
+
+  /* MATCHDAY SUMMARY */
+  .matchday-summary {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 20px;
+    font-size: 13px;
+    font-weight: 600;
+    border-top: 2px solid #ede8fa;
+    flex-wrap: wrap;
+  }
+  .matchday-summary.home-win, .matchday-summary.away-win { background: linear-gradient(90deg, rgba(22,163,74,0.08), transparent); color: #15803d; }
+  .matchday-summary.draw-result { background: rgba(202,138,4,0.06); color: #a16207; }
+  .matchday-summary.in-progress { background: rgba(202,138,4,0.06); color: #a16207; }
+  .trophy { font-size: 18px; }
+  .score-summary { color: #9b8fc4; font-weight: 400; }
+  .bout-count { margin-left: auto; font-size: 12px; color: #9b8fc4; font-weight: 600; background: #f0ebff; padding: 3px 10px; border-radius: 20px; }
+
+  /* FOOTER */
+  .page-footer {
+    text-align: center;
+    padding: 24px;
+    color: #9b8fc4;
+    font-size: 12px;
+    border-top: 1px solid #ede8fa;
+    margin-top: 16px;
+  }
+
+  /* PRINT */
+  @media print {
+    body { background: white; }
+    .page-header { background: #7132CA !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .matchday-header { background: #7132CA !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .matchday-card { box-shadow: none; border: 1px solid #ddd6f7; }
+    .no-print { display: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="header-badge">🏟️ TYP CHAMPIONSHIP • OFFICIAL FIXTURE</div>
+  <div class="header-title">TYP LEAGUE 2026</div>
+  <div class="header-subtitle">Round Robin Tournament • Fixture Sheet • Generated ${today}</div>
+  <div class="header-stats">
+    <div class="hstat">
+      <div class="hstat-num">${totalMatches}</div>
+      <div class="hstat-label">Total Bouts</div>
+    </div>
+    <div class="hstat">
+      <div class="hstat-num">${completedMatches}</div>
+      <div class="hstat-label">Completed</div>
+    </div>
+    <div class="hstat">
+      <div class="hstat-num">${pendingMatches}</div>
+      <div class="hstat-label">Upcoming</div>
+    </div>
+    <div class="hstat">
+      <div class="hstat-num">${trnTeamsCache.length}</div>
+      <div class="hstat-label">Teams</div>
+    </div>
+  </div>
+</div>
+
+<div class="content">
+  ${matchdayHtml}
+</div>
+
+<div class="page-footer">
+  TYP Championship ${new Date().getFullYear()} · Generated on ${today} · Official Fixture Document
+</div>
+
+</body>
+</html>`;
+
+  // Create blob and download
+  const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `TYP-Championship-Fixture-${new Date().toISOString().slice(0,10)}.html`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+};
+
+// ══════════════════════════════════════════
+// 📸 CANVAS RESULT CARD — cobegbd style
+// ══════════════════════════════════════════
+window.downloadMatchdayResultCard = async function() {
+  const dayVal = document.getElementById('trnMatchdaySelect').value;
+  if (!dayVal) { alert('⚠️ আগে একটা matchday select করুন।'); return; }
+
+  // Merge cache data with any unsaved DOM inputs currently on screen
+  const baseMatches = trnMatchesCache.filter(m => m.matchday === dayVal);
+  if (!baseMatches.length) { alert('⚠️ এই matchday load হয়নি। আগে Load করুন।'); return; }
+
+  const matches = baseMatches.map(m => {
+    // Try reading live DOM values (user may not have saved yet)
+    const homeInp = document.querySelector(`.trn-score-home[data-id="${m.id}"]`);
+    const awayInp = document.querySelector(`.trn-score-away[data-id="${m.id}"]`);
+    const p1Sel   = document.querySelector(`.trn-player1-select[data-id="${m.id}"]`);
+    const p2Sel   = document.querySelector(`.trn-player2-select[data-id="${m.id}"]`);
+    const hs = homeInp && homeInp.value !== '' ? parseInt(homeInp.value) : (m.homeScore ?? null);
+    const as_ = awayInp && awayInp.value !== '' ? parseInt(awayInp.value) : (m.awayScore ?? null);
+    // Resolve player names from select or cache
+    const getPlayerName = (sel, fallback) => {
+      if (sel && sel.value) {
+        const opt = sel.options[sel.selectedIndex];
+        return opt ? opt.text : fallback;
+      }
+      return fallback;
+    };
+    return {
+      ...m,
+      homeScore: hs,
+      awayScore: as_,
+      player1: getPlayerName(p1Sel, m.player1),
+      player2: getPlayerName(p2Sel, m.player2),
+    };
+  }).filter(m => m.homeScore !== null && m.awayScore !== null);
+
+  if (!matches.length) { alert('⚠️ কোনো bout-এ score enter করা হয়নি।'); return; }
+
+  const teamMap = {};
+  trnTeamsCache.forEach(t => { teamMap[t.id] = t; });
+  const sampleM = matches[0];
+  const homeTeam = teamMap[sampleM.homeTeam] || { name: 'HOME', emoji: '🏟️' };
+  const awayTeam = teamMap[sampleM.awayTeam] || { name: 'AWAY', emoji: '🏟️' };
+
+  // Tally matchday winner
+  let homeWins = 0, awayWins = 0, draws = 0;
+  matches.forEach(m => {
+    const hs = parseInt(m.homeScore)||0, as_ = parseInt(m.awayScore)||0;
+    if (hs > as_) homeWins++;
+    else if (as_ > hs) awayWins++;
+    else draws++;
+  });
+  const homeTotal = matches.reduce((s,m)=>s+(parseInt(m.homeScore)||0),0);
+  const awayTotal = matches.reduce((s,m)=>s+(parseInt(m.awayScore)||0),0);
+
+  // Find MVP: player with highest individual score (homeScore for home players, awayScore for away)
+  // Build player goal tally
+  const playerGoals = {};
+  matches.forEach(m => {
+    const hs = parseInt(m.homeScore)||0, as_ = parseInt(m.awayScore)||0;
+    const p1 = m.player1 || '—';
+    const p2 = m.player2 || '—';
+    playerGoals[p1] = (playerGoals[p1]||0) + hs;
+    playerGoals[p2] = (playerGoals[p2]||0) + as_;
+  });
+  const mvpName = Object.entries(playerGoals).sort((a,b)=>b[1]-a[1])[0]?.[0] || '';
+
+  // Parse matchday label for display
+  const dayLabel = dayVal.replace('—', '•');
+
+  // ── CANVAS SETUP ──
+  const CARD_W = 900;
+  const ROW_H = 52;
+  const HEADER_H = 180;
+  const SCORE_ROW_H = 80;
+  const FOOTER_H = 46;
+  const CARD_H = HEADER_H + SCORE_ROW_H + matches.length * ROW_H + FOOTER_H;
+
+  const canvas = document.createElement('canvas');
+  canvas.width = CARD_W;
+  canvas.height = CARD_H;
+  const ctx = canvas.getContext('2d');
+
+  // ── BACKGROUND ──
+  const bgGrad = ctx.createLinearGradient(0, 0, CARD_W, CARD_H);
+  bgGrad.addColorStop(0,   '#0b0820');
+  bgGrad.addColorStop(0.5, '#12093a');
+  bgGrad.addColorStop(1,   '#0e0b28');
+  ctx.fillStyle = bgGrad;
+  ctx.fillRect(0, 0, CARD_W, CARD_H);
+
+  // subtle grid lines
+  ctx.strokeStyle = 'rgba(113,50,202,0.06)';
+  ctx.lineWidth = 1;
+  for (let x = 0; x < CARD_W; x += 60) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,CARD_H); ctx.stroke(); }
+  for (let y = 0; y < CARD_H; y += 60) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(CARD_W,y); ctx.stroke(); }
+
+  // ── HEADER BG ──
+  const hGrad = ctx.createLinearGradient(0,0,CARD_W,0);
+  hGrad.addColorStop(0,   'rgba(113,50,202,0.35)');
+  hGrad.addColorStop(0.5, 'rgba(48,28,160,0.25)');
+  hGrad.addColorStop(1,   'rgba(113,50,202,0.35)');
+  ctx.fillStyle = hGrad;
+  ctx.fillRect(0, 0, CARD_W, HEADER_H);
+
+  // header border bottom
+  const hbGrad = ctx.createLinearGradient(0,0,CARD_W,0);
+  hbGrad.addColorStop(0,   'transparent');
+  hbGrad.addColorStop(0.2, '#7132CA');
+  hbGrad.addColorStop(0.8, '#7132CA');
+  hbGrad.addColorStop(1,   'transparent');
+  ctx.strokeStyle = hbGrad;
+  ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(0,HEADER_H); ctx.lineTo(CARD_W,HEADER_H); ctx.stroke();
+
+  // ── TITLE ──
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#d4b8ff';
+  ctx.font = '700 11px Inter, Arial';
+  ctx.letterSpacing = '0.2em';
+  ctx.fillText('INTER COLLEGE TOURNAMENT', CARD_W/2, 36);
+  ctx.letterSpacing = '0';
+
+  ctx.fillStyle = 'rgba(164,120,255,0.5)';
+  ctx.font = '500 10px Inter, Arial';
+  ctx.fillText(dayLabel + '  •  ' + new Date().toLocaleDateString('en-BD',{day:'2-digit',month:'short',year:'numeric'}).toUpperCase(), CARD_W/2, 56);
+
+  // divider line under title
+  ctx.strokeStyle = 'rgba(113,50,202,0.4)';
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(CARD_W/2-160,66); ctx.lineTo(CARD_W/2+160,66); ctx.stroke();
+
+  // ── TEAM LOGOS (emoji as placeholder) ──
+  const logoSize = 64;
+  const logoY = 82;
+  // home logo circle
+  const drawLogoCircle = (cx, cy, emoji, logoUrl) => {
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(cx, cy, logoSize/2, 0, Math.PI*2);
+    ctx.fillStyle = 'rgba(113,50,202,0.18)';
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(113,50,202,0.6)';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    ctx.restore();
+    ctx.font = `${logoSize*0.45}px serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(emoji, cx, cy+3);
+    ctx.textBaseline = 'alphabetic';
+  };
+
+  drawLogoCircle(220, logoY + logoSize/2, homeTeam.emoji || '🏟️');
+  drawLogoCircle(CARD_W - 220, logoY + logoSize/2, awayTeam.emoji || '🏟️');
+
+  // ── TEAM NAMES ──
+  ctx.textAlign = 'left';
+  ctx.fillStyle = '#ede8ff';
+  ctx.font = '700 15px Inter, Arial';
+  const homeNameLines = wrapTextCanvas(ctx, (homeTeam.name||'HOME').toUpperCase(), 130);
+  homeNameLines.forEach((ln, i) => ctx.fillText(ln, 290, logoY + 16 + i*18));
+
+  ctx.textAlign = 'right';
+  const awayNameLines = wrapTextCanvas(ctx, (awayTeam.name||'AWAY').toUpperCase(), 130);
+  awayNameLines.forEach((ln, i) => ctx.fillText(ln, CARD_W-290, logoY + 16 + i*18));
+
+  // ── SCORE BADGE ──
+  const sbW = 110, sbH = 48;
+  const sbX = CARD_W/2 - sbW/2;
+  const sbY = logoY + 8;
+  roundRectCanvas(ctx, sbX, sbY, sbW, sbH, 10);
+  const sbGrad = ctx.createLinearGradient(sbX,sbY,sbX+sbW,sbY);
+  sbGrad.addColorStop(0,'#4B1FA0'); sbGrad.addColorStop(1,'#7132CA');
+  ctx.fillStyle = sbGrad; ctx.fill();
+  ctx.strokeStyle = 'rgba(164,120,255,0.5)'; ctx.lineWidth = 1.5; ctx.stroke();
+
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#ffffff';
+  ctx.font = '800 28px Inter, Arial';
+  ctx.fillText(`${homeWins}   ${awayWins}`, CARD_W/2, sbY + 34);
+  // small divider
+  ctx.fillStyle = 'rgba(255,255,255,0.3)';
+  ctx.fillRect(CARD_W/2-1, sbY+8, 2, sbH-16);
+
+  // ── COLUMN HEADERS ──
+  const colY = HEADER_H + SCORE_ROW_H;
+  ctx.fillStyle = 'rgba(255,255,255,0.04)';
+  ctx.fillRect(0, HEADER_H + SCORE_ROW_H - ROW_H, CARD_W, ROW_H);
+  ctx.strokeStyle = 'rgba(113,50,202,0.3)';
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(0,HEADER_H+SCORE_ROW_H-ROW_H); ctx.lineTo(CARD_W,HEADER_H+SCORE_ROW_H-ROW_H); ctx.stroke();
+
+  ctx.font = '700 10px Inter, Arial';
+  ctx.fillStyle = '#a374e8';
+  const colHY = HEADER_H + SCORE_ROW_H - ROW_H/2 + 4;
+  ctx.textAlign = 'left';  ctx.fillText('HOME PLAYER', 56, colHY);
+  ctx.textAlign = 'center'; ctx.fillText('SCORE', CARD_W/2, colHY);
+  ctx.textAlign = 'right';  ctx.fillText('AWAY PLAYER', CARD_W - 56, colHY);
+
+  // score row team total bg
+  ctx.fillStyle = 'rgba(255,255,255,0.02)';
+  ctx.fillRect(0, HEADER_H, CARD_W, SCORE_ROW_H - ROW_H);
+
+  // ── BOUT ROWS ──
+  matches.forEach((m, idx) => {
+    const ry = HEADER_H + SCORE_ROW_H + idx * ROW_H;
+    const hs = parseInt(m.homeScore)||0;
+    const as_ = parseInt(m.awayScore)||0;
+    const isMVP = m.player1 === mvpName || m.player2 === mvpName;
+
+    // row bg
+    if (isMVP) {
+      const mvpGrad = ctx.createLinearGradient(0, ry, CARD_W, ry);
+      mvpGrad.addColorStop(0,   'rgba(212,175,55,0.18)');
+      mvpGrad.addColorStop(0.5, 'rgba(255,215,0,0.10)');
+      mvpGrad.addColorStop(1,   'rgba(212,175,55,0.18)');
+      ctx.fillStyle = mvpGrad;
+    } else if (idx % 2 === 0) {
+      ctx.fillStyle = 'rgba(255,255,255,0.025)';
+    } else {
+      ctx.fillStyle = 'transparent';
+    }
+    ctx.fillRect(0, ry, CARD_W, ROW_H);
+
+    // row border bottom
+    ctx.strokeStyle = 'rgba(113,50,202,0.12)';
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(0,ry+ROW_H); ctx.lineTo(CARD_W,ry+ROW_H); ctx.stroke();
+
+    // avatar circle placeholder
+    const avR = 18;
+    const avCY = ry + ROW_H/2;
+    // home avatar
+    ctx.beginPath(); ctx.arc(30, avCY, avR, 0, Math.PI*2);
+    ctx.fillStyle = 'rgba(113,50,202,0.22)'; ctx.fill();
+    ctx.strokeStyle = isMVP && m.player1===mvpName ? '#d4af37' : 'rgba(113,50,202,0.3)';
+    ctx.lineWidth = 1.5; ctx.stroke();
+    ctx.font = '10px serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillStyle='rgba(200,180,255,0.7)'; ctx.fillText('👤', 30, avCY);
+    ctx.textBaseline='alphabetic';
+
+    // away avatar
+    ctx.beginPath(); ctx.arc(CARD_W-30, avCY, avR, 0, Math.PI*2);
+    ctx.fillStyle = 'rgba(113,50,202,0.22)'; ctx.fill();
+    ctx.strokeStyle = isMVP && m.player2===mvpName ? '#d4af37' : 'rgba(113,50,202,0.3)';
+    ctx.lineWidth = 1.5; ctx.stroke();
+    ctx.font = '10px serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillStyle='rgba(200,180,255,0.7)'; ctx.fillText('👤', CARD_W-30, avCY);
+    ctx.textBaseline='alphabetic';
+
+    const textY = ry + ROW_H/2 + 5;
+
+    // home player name
+    ctx.textAlign = 'left';
+    if (isMVP && m.player1 === mvpName) {
+      ctx.fillStyle = '#FFD700';
+      ctx.font = '700 13px Inter, Arial';
+    } else {
+      ctx.fillStyle = hs > as_ ? '#ede8ff' : 'rgba(200,180,255,0.6)';
+      ctx.font = hs > as_ ? '700 13px Inter, Arial' : '400 13px Inter, Arial';
+    }
+    ctx.fillText((m.player1||'—').toUpperCase(), 56, textY);
+
+    // away player name
+    ctx.textAlign = 'right';
+    if (isMVP && m.player2 === mvpName) {
+      ctx.fillStyle = '#FFD700';
+      ctx.font = '700 13px Inter, Arial';
+    } else {
+      ctx.fillStyle = as_ > hs ? '#ede8ff' : 'rgba(200,180,255,0.6)';
+      ctx.font = as_ > hs ? '700 13px Inter, Arial' : '400 13px Inter, Arial';
+    }
+    ctx.fillText((m.player2||'—').toUpperCase(), CARD_W-56, textY);
+
+    // score
+    ctx.textAlign = 'center';
+    ctx.font = '700 16px Inter, Arial';
+    // home score
+    ctx.fillStyle = hs > as_ ? '#ffffff' : 'rgba(200,180,255,0.55)';
+    ctx.fillText(String(hs), CARD_W/2 - 20, textY);
+    // separator
+    ctx.fillStyle = 'rgba(164,120,255,0.4)';
+    ctx.fillText('|', CARD_W/2, textY);
+    // away score
+    ctx.fillStyle = as_ > hs ? '#ffffff' : 'rgba(200,180,255,0.55)';
+    ctx.fillText(String(as_), CARD_W/2 + 20, textY);
+
+    // MVP star badge
+    if (isMVP) {
+      const mvpX = isMVP && m.player1===mvpName ? CARD_W/2 - 65 : CARD_W/2 + 65;
+      ctx.font = '700 9px Inter, Arial';
+      ctx.fillStyle = '#FFD700';
+      ctx.textAlign = 'center';
+      ctx.fillText('★ MVP', mvpX, textY - 12);
+    }
+  });
+
+  // ── FOOTER ──
+  const footerY = CARD_H - FOOTER_H;
+  ctx.strokeStyle = 'rgba(113,50,202,0.3)';
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(0,footerY); ctx.lineTo(CARD_W,footerY); ctx.stroke();
+
+  ctx.fillStyle = 'rgba(113,50,202,0.08)';
+  ctx.fillRect(0, footerY, CARD_W, FOOTER_H);
+
+  ctx.textAlign = 'center';
+  ctx.fillStyle = 'rgba(164,120,255,0.6)';
+  ctx.font = '600 10px Inter, Arial';
+  ctx.fillText('SPONSORED BY COBEG BD  •  WWW.COBEGBD.COM', CARD_W/2, footerY + 28);
+
+  // ── DOWNLOAD ──
+  const link = document.createElement('a');
+  const safeDay = dayVal.replace(/[^a-zA-Z0-9\-_]/g,'_').slice(0,40);
+  link.download = `TYP-Result-${safeDay}.png`;
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+};
+
+// helper: wrap text for canvas
+function wrapTextCanvas(ctx, text, maxW) {
+  const words = text.split(' ');
+  const lines = [];
+  let cur = '';
+  for (const w of words) {
+    const test = cur ? cur + ' ' + w : w;
+    if (ctx.measureText(test).width > maxW && cur) { lines.push(cur); cur = w; }
+    else cur = test;
+  }
+  if (cur) lines.push(cur);
+  return lines;
+}
+
+// helper: roundRect for canvas (polyfill)
+function roundRectCanvas(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x+r, y);
+  ctx.lineTo(x+w-r, y); ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+  ctx.lineTo(x+w,y+h-r); ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+  ctx.lineTo(x+r,y+h);   ctx.quadraticCurveTo(x,y+h,x,y+h-r);
+  ctx.lineTo(x,y+r);     ctx.quadraticCurveTo(x,y,x+r,y);
+  ctx.closePath();
+}
+
 window.closePublicProfile = function() {
   document.getElementById('publicProfileModal').classList.remove('show');
   document.getElementById('ppWPBar').style.width = '0%';
@@ -6155,46 +7283,20 @@ window.setBottomNav = function(name) {
 };
 
 window.bnavProfile = function() {
-  if (currentUser) {
-    // Show mini menu
-    const existing = document.getElementById('bnavProfileMenu');
-    if (existing) { existing.remove(); return; }
-    const menu = document.createElement('div');
-    menu.id = 'bnavProfileMenu';
-    menu.style.cssText = 'position:fixed;bottom:70px;right:10px;background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:8px;z-index:9999;min-width:160px;box-shadow:0 -4px 20px rgba(0,0,0,0.5)';
-    menu.innerHTML = `
-      <div onclick="showPage('profile');setBottomNav('profile');document.getElementById('bnavProfileMenu').remove()" style="padding:10px 14px;cursor:pointer;border-radius:8px;color:var(--text);font-size:14px;display:flex;align-items:center;gap:8px" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background=''">👤 My Profile</div>
-      <div onclick="showPage('tournament');setBottomNav('');document.getElementById('bnavProfileMenu').remove()" style="padding:10px 14px;cursor:pointer;border-radius:8px;color:var(--text);font-size:14px;display:flex;align-items:center;gap:8px" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background=''" >🏟️ Tournament</div>
-      <div onclick="showPage('rules');setBottomNav('');document.getElementById('bnavProfileMenu').remove()" style="padding:10px 14px;cursor:pointer;border-radius:8px;color:var(--text);font-size:14px;display:flex;align-items:center;gap:8px" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background=''">📋 Rules</div>
-      ${currentUser && ['mf3171352@gmail.com','arafatkobami@gmail.com','libae804@gmail.com'].includes(currentUser.email) ? `<div onclick="showPage('admin');setBottomNav('');document.getElementById('bnavProfileMenu').remove()" style="padding:10px 14px;cursor:pointer;border-radius:8px;color:var(--primary);font-size:14px;display:flex;align-items:center;gap:8px" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background=''">🛡️ Admin Panel</div>` : ''}
-      <div style="height:1px;background:var(--border);margin:4px 0"></div>
-      <div onclick="logout();document.getElementById('bnavProfileMenu')?.remove()" style="padding:10px 14px;cursor:pointer;border-radius:8px;color:var(--red);font-size:14px;display:flex;align-items:center;gap:8px" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background=''">🚪 Logout</div>
-    `;
-    document.body.appendChild(menu);
-    setTimeout(() => { document.addEventListener('click', function handler(e) { if (!menu.contains(e.target) && e.target.id !== 'bnav-profile') { menu.remove(); document.removeEventListener('click', handler); } }); }, 100);
-  } else {
-    const existing = document.getElementById('bnavProfileMenu');
-    if (existing) { existing.remove(); return; }
-    const menu = document.createElement('div');
-    menu.id = 'bnavProfileMenu';
-    menu.style.cssText = 'position:fixed;bottom:70px;right:10px;background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:8px;z-index:9999;min-width:160px;box-shadow:0 -4px 20px rgba(0,0,0,0.5)';
-    menu.innerHTML = `
-      <div onclick="showPage('tournament');setBottomNav('');document.getElementById('bnavProfileMenu').remove()" style="padding:10px 14px;cursor:pointer;border-radius:8px;color:var(--text);font-size:14px;display:flex;align-items:center;gap:8px" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background=''">🏟️ Tournament</div>
-      <div onclick="showPage('rules');setBottomNav('');document.getElementById('bnavProfileMenu').remove()" style="padding:10px 14px;cursor:pointer;border-radius:8px;color:var(--text);font-size:14px;display:flex;align-items:center;gap:8px" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background=''">📋 Rules</div>
-      <div style="height:1px;background:var(--border);margin:4px 0"></div>
-      <div onclick="showPage('login');document.getElementById('bnavProfileMenu')?.remove()" style="padding:10px 14px;cursor:pointer;border-radius:8px;color:var(--primary);font-size:14px;display:flex;align-items:center;gap:8px" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background=''">🔐 Login</div>
-    `;
-    document.body.appendChild(menu);
-    setTimeout(() => { document.addEventListener('click', function handler(e) { if (!menu.contains(e.target) && e.target.id !== 'bnav-profile') { menu.remove(); document.removeEventListener('click', handler); } }); }, 100);
-  }
+  const existing = document.getElementById('bnavProfileMenu');
+  if (existing) { existing.remove(); return; }
+  const menu = document.createElement('div');
+  menu.id = 'bnavProfileMenu';
+  menu.style.cssText = 'position:fixed;bottom:70px;right:10px;background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:8px;z-index:9999;min-width:160px;box-shadow:0 -4px 20px rgba(0,0,0,0.5)';
+  menu.innerHTML = `
+    <div onclick="showPage('tournament');setBottomNav('');document.getElementById('bnavProfileMenu').remove()" style="padding:10px 14px;cursor:pointer;border-radius:8px;color:var(--text);font-size:14px;display:flex;align-items:center;gap:8px" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background=''" >🏟️ Tournament</div>
+    <div onclick="showPage('rules');setBottomNav('');document.getElementById('bnavProfileMenu').remove()" style="padding:10px 14px;cursor:pointer;border-radius:8px;color:var(--text);font-size:14px;display:flex;align-items:center;gap:8px" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background=''">📋 Rules</div>
+    <div style="height:1px;background:var(--border);margin:4px 0"></div>
+    <div onclick="showPage('admin');setBottomNav('');document.getElementById('bnavProfileMenu').remove()" style="padding:10px 14px;cursor:pointer;border-radius:8px;color:var(--primary);font-size:14px;display:flex;align-items:center;gap:8px" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background=''">🛡️ Admin Panel</div>
+  `;
+  document.body.appendChild(menu);
+  setTimeout(() => { document.addEventListener('click', function handler(e) { if (!menu.contains(e.target) && e.target.id !== 'bnav-profile') { menu.remove(); document.removeEventListener('click', handler); } }); }, 100);
 };
-
-// avatar update bottom nav profile icon
-function updateBnavAvatar() {
-  if (currentUserData && currentUserData.avatarUrl) {
-    document.getElementById('bnavProfileIcon').innerHTML = `<img src="${currentUserData.avatarUrl}" style="width:24px;height:24px;border-radius:50%;object-fit:cover;border:1.5px solid var(--border)">`;
-  }
-}
 
 // ── PAGE NAVIGATION ──
 function showPage(name) {
@@ -6209,28 +7311,21 @@ function showPage(name) {
     window.scrollTo({ top: 0, behavior: 'instant' });
   }
   // bottom nav sync
-  const bnavPages = ['home','ranking','matches','friendly','profile'];
+  const bnavPages = ['home','ranking','matches','friendly'];
   if (bnavPages.includes(name)) setBottomNav(name);
   if (name === 'home') loadHomePageData();
-  if (name === 'profile' && typeof loadProfileData === 'function') loadProfileData();
-  if (name === 'ranking') loadRanking();
+  if (name === 'ranking') { loadRankingSeasonsList(); loadMainRanking(); }
   if (name === 'matches') loadMatches();
   if (name === 'friendly') {
     loadFriendlyLeaderboard();
     loadFriendlyResults();
-    if (currentUser) {
-      document.getElementById('challengeLoginGate').style.display = 'none';
-      document.getElementById('challengeForm').style.display = 'block';
-      document.getElementById('myRequestsLoginGate').style.display = 'none';
-      document.getElementById('myRequestsList').style.display = 'block';
-      loadMyRequests();
-    }
   }
   if (name === 'admin') {
-    document.getElementById('adminLoginSection').style.display = 'block';
-    document.getElementById('adminDashSection').style.display = 'none';
+    document.getElementById('adminLoginSection').style.display = window._isAdminSession ? 'none' : 'block';
+    document.getElementById('adminDashSection').style.display = window._isAdminSession ? 'block' : 'none';
     document.getElementById('adminPassInput').value = '';
     document.getElementById('adminLoginError').classList.remove('show');
+    if (window._isAdminSession) { loadAllPlayers(); loadAdminMatches(); loadResultRequests(); }
   }
   if (name === 'tournament') {
     if (typeof switchTrnTab === 'function') switchTrnTab('standings');
