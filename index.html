@@ -3087,12 +3087,16 @@ const RANKING_DB = 'https://typ-championship-default-rtdb.firebaseio.com';
 // Shared sort: Points (W=3,D=1) first, then score (goals*2 + mvp*3)
 function sortRankingData(arr) {
   arr.sort((a, b) => {
+    // Primary: Score (win*5 + draw*1 + mvp*10 + goals*3)
+    const sa = (a.wins||0)*5 + (a.draws||0)*1 + (a.mvp||0)*10 + (a.goalsFor||0)*3;
+    const sb = (b.wins||0)*5 + (b.draws||0)*1 + (b.mvp||0)*10 + (b.goalsFor||0)*3;
+    if (sb !== sa) return sb - sa;
+    // Secondary: Points (W=3, D=1)
     const pa = (a.wins||0)*3 + (a.draws||0)*1;
     const pb = (b.wins||0)*3 + (b.draws||0)*1;
     if (pb !== pa) return pb - pa;
-    const sa = (a.goalsFor||0)*2 + (a.mvp||0)*3;
-    const sb = (b.goalsFor||0)*2 + (b.mvp||0)*3;
-    return sb - sa;
+    // Tertiary: Goals
+    return (b.goalsFor||0) - (a.goalsFor||0);
   });
   return arr;
 }
@@ -3273,8 +3277,8 @@ function renderRanking(data) {
     const medal = medals[i] || '';
     const bg = rank <= 3 ? `background:linear-gradient(90deg,rgba(245,166,35,${0.08-i*0.02}),transparent)` : '';
     const pts = (p.wins||0)*3 + (p.draws||0);
-    const m = p.matches || 0;
-    const wp = m > 0 ? ((p.wins||0)/m*100).toFixed(1) : '0.0';
+    const m = Math.max(p.matches||0, (p.wins||0)+(p.draws||0)+(p.losses||0));
+    const wp = m > 0 ? Math.min(100, ((p.wins||0)/m*100)).toFixed(1) : '0.0';
     const gd = (p.goalsFor||0) - (p.goalsAgainst||0);
     const avatar = p.avatarUrl
       ? `<img src="${p.avatarUrl}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;border:2px solid var(--border);vertical-align:middle;margin-right:8px">`
@@ -3298,7 +3302,7 @@ function renderRanking(data) {
       <td style="padding:12px 16px;text-align:center;color:var(--cyan)">${wp}%</td>
       <td style="padding:12px 16px;text-align:center;color:var(--yellow);font-weight:700">${p.goalsFor||0}</td>
       <td style="padding:12px 16px;text-align:center;color:var(--gold);font-weight:700">${p.mvp||0}</td>
-      <td style="padding:12px 16px;text-align:center;font-family:'Inter',sans-serif;font-size:18px;font-weight:700;color:var(--cyan)">${(p.goalsFor||0)*2 + (p.mvp||0)*3}</td>
+      <td style="padding:12px 16px;text-align:center;font-family:'Inter',sans-serif;font-size:18px;font-weight:700;color:var(--cyan)">${(p.wins||0)*5 + (p.draws||0)*1 + (p.mvp||0)*10 + (p.goalsFor||0)*3}</td>
     </tr>`;
   }).join('');
 
@@ -4967,7 +4971,7 @@ async function loadHomeTopPlayers() {
 
     const medals = ['🥇','🥈','🥉','','',''];
     container.innerHTML = sorted.map((p, i) => {
-      const score = (p.goalsFor||0)*2 + (p.mvp||0)*3;
+      const score = (p.wins||0)*5 + (p.draws||0)*1 + (p.mvp||0)*10 + (p.goalsFor||0)*3;
       const isTop3 = i < 3;
       return `<div onclick="openPublicProfile('${p.uid}')" style="background:var(--card);border:1px solid ${isTop3?'rgba(245,166,35,0.3)':'var(--border)'};border-radius:14px;padding:18px 14px;text-align:center;cursor:pointer;transition:all 0.2s;position:relative;overflow:hidden" onmouseover="this.style.borderColor='var(--cyan)';this.style.transform='translateY(-3px)'" onmouseout="this.style.borderColor='${isTop3?'rgba(245,166,35,0.3)':'var(--border)'}';this.style.transform=''">
         ${isTop3 ? `<div style="position:absolute;top:8px;right:10px;font-size:18px">${medals[i]}</div>` : ''}
