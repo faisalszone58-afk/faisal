@@ -161,40 +161,8 @@ body::before {
   overflow: hidden;
 }
 
-#page-home .hero::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  background:
-    /* center circle */
-    radial-gradient(circle 80px at 50% 60%, transparent 78px, rgba(124,111,224,0.15) 79px, rgba(124,111,224,0.15) 82px, transparent 83px),
-    /* center dot */
-    radial-gradient(circle 5px at 50% 60%, rgba(201,168,76,0.4) 4px, transparent 5px),
-    /* penalty arc top */
-    radial-gradient(circle 50px at 50% 0%, transparent 49px, rgba(124,111,224,0.1) 50px, rgba(124,111,224,0.1) 52px, transparent 53px),
-    /* penalty arc bottom */
-    radial-gradient(circle 50px at 50% 100%, transparent 49px, rgba(124,111,224,0.1) 50px, rgba(124,111,224,0.1) 52px, transparent 53px);
-  opacity: 0.9;
-}
-
-#page-home .hero::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  /* field lines */
-  background-image:
-    /* center horizontal line */
-    linear-gradient(to right, transparent 0%, rgba(124,111,224,0.18) 1px, rgba(124,111,224,0.18) 1px, transparent 2px),
-    /* outer border top/bottom */
-    linear-gradient(to bottom, rgba(124,111,224,0.12) 1px, transparent 1px, transparent calc(100% - 1px), rgba(124,111,224,0.12) calc(100% - 1px));
-  background-size: 50% 100%, 100% 100%;
-  background-position: center, 0 0;
-  background-repeat: no-repeat;
-}
+#page-home .hero::before { display: none; }
+#page-home .hero::after  { display: none; }
 
 /* Football hex/pentagon pattern for section background */
 #page-home {
@@ -962,35 +930,9 @@ select.form-input option { background: var(--card); color: var(--text); }
 <!-- ═══════════════ HOME PAGE ═══════════════ -->
 <div class="page active" id="page-home">
 
-  <!-- Football floating balls background -->
-  <div class="football-bg" aria-hidden="true">
-    <div class="grass-stripe"></div>
-    <span class="football-float" style="top:8%;left:5%">⚽</span>
-    <span class="football-float" style="top:55%;left:88%;font-size:48px">⚽</span>
-    <span class="football-float" style="top:75%;left:12%;font-size:40px">⚽</span>
-    <span class="football-float" style="top:30%;left:78%;font-size:72px">⚽</span>
-    <span class="football-float" style="top:90%;left:55%;font-size:36px">⚽</span>
-  </div>
+  
 
   <div class="hero">
-    <!-- Corner flags -->
-    <div class="corner-flag" style="top:18px;left:18px"></div>
-    <div class="corner-flag" style="top:18px;right:18px"></div>
-
-    <!-- Field SVG overlay -->
-    <svg style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:0.5" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
-      <!-- Center line (vertical) -->
-      <line x1="50%" y1="0" x2="50%" y2="100%" stroke="rgba(124,111,224,0.15)" stroke-width="1.5" stroke-dasharray="6,4"/>
-      <!-- Center circle -->
-      <ellipse cx="50%" cy="65%" rx="90" ry="60" fill="none" stroke="rgba(124,111,224,0.18)" stroke-width="1.5"/>
-      <!-- Center dot -->
-      <circle cx="50%" cy="65%" r="4" fill="rgba(201,168,76,0.35)"/>
-      <!-- Top penalty box -->
-      <rect x="calc(50% - 80px)" y="0" width="160" height="40" fill="none" stroke="rgba(124,111,224,0.12)" stroke-width="1"/>
-      <!-- Bottom border line -->
-      <line x1="5%" y1="99%" x2="95%" y2="99%" stroke="rgba(124,111,224,0.1)" stroke-width="1"/>
-    </svg>
-
     <div class="hero-badge">🏆 Season 2026 • Active</div>
     <h1><span class="gold">TYP</span> <span class="cyan">CHAMPIONSHIP</span></h1>
     <p>Bangladesh-এর সেরা eFootball community। খেলো, জেতো, legend হও।</p>
@@ -1054,7 +996,6 @@ select.form-input option { background: var(--card); color: var(--text); }
 
   <!-- LIVE TOURNAMENT MATCHDAY -->
   <div class="section" style="padding-top:0;position:relative;overflow:hidden" id="liveTrnSection">
-    <span class="football-section-pattern" style="top:-10px;right:10px;font-size:140px;opacity:0.045">🏟️</span>
     <div class="section-title">🏆 Tournament Live</div>
     <div class="section-sub">// চলমান Matchday এর scores</div>
     <div id="homeLiveMatchday">
@@ -1064,7 +1005,6 @@ select.form-input option { background: var(--card); color: var(--text); }
 
   <!-- RECENT MATCH RESULTS -->
   <div class="section" style="padding-top:0;position:relative;overflow:hidden">
-    <span class="football-section-pattern" style="top:-20px">⚽</span>
     <div class="section-title">⚽ Recent Results</div>
     <div class="section-sub">// সর্বশেষ match results</div>
     <div id="homeRecentMatches">
@@ -1074,7 +1014,6 @@ select.form-input option { background: var(--card); color: var(--text); }
 
   <!-- RULES BUTTON -->
   <div class="section" style="padding-top:0;padding-bottom:80px;position:relative;overflow:hidden">
-    <span class="football-section-pattern" style="bottom:-30px;right:-20px;font-size:120px;opacity:0.05">🏆</span>
     <button onclick="showPage('rules')" style="width:100%;padding:16px;background:linear-gradient(135deg,var(--primary),var(--primary-dark));border:none;border-radius:12px;color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;display:flex;align-items:center;justify-content:center;gap:10px;letter-spacing:0.02em;position:relative;z-index:1">
       📋 Rules &amp; Regulations দেখো
     </button>
@@ -2824,17 +2763,15 @@ window._isAdminSession = false;
 // ── RANKING ──
 const RANKING_DB = 'https://typ-championship-default-rtdb.firebaseio.com';
 
-// Shared sort: Points (W=3,D=1) first, then score (goals*2 + mvp*3)
+// Shared sort: Score (Win=9, MVP=5, Draw=3, Goal=1)
 function sortRankingData(arr) {
   arr.sort((a, b) => {
-    // Primary: Score (win*5 + draw*1 + mvp*10 + goals*3)
-    const sa = (a.wins||0)*5 + (a.draws||0)*1 + (a.mvp||0)*10 + (a.goalsFor||0)*3;
-    const sb = (b.wins||0)*5 + (b.draws||0)*1 + (b.mvp||0)*10 + (b.goalsFor||0)*3;
+    // Primary: Score (win*9 + mvp*5 + draw*3 + goals*1)
+    const sa = (a.wins||0)*9 + (a.mvp||0)*5 + (a.draws||0)*3 + (a.goalsFor||0)*1;
+    const sb = (b.wins||0)*9 + (b.mvp||0)*5 + (b.draws||0)*3 + (b.goalsFor||0)*1;
     if (sb !== sa) return sb - sa;
-    // Secondary: Points (W=3, D=1)
-    const pa = (a.wins||0)*3 + (a.draws||0)*1;
-    const pb = (b.wins||0)*3 + (b.draws||0)*1;
-    if (pb !== pa) return pb - pa;
+    // Secondary: Wins
+    if ((b.wins||0) !== (a.wins||0)) return (b.wins||0) - (a.wins||0);
     // Tertiary: Goals
     return (b.goalsFor||0) - (a.goalsFor||0);
   });
@@ -3067,11 +3004,10 @@ function renderRanking(data) {
       <td style="padding:12px 16px;text-align:center;color:var(--green)">${p.wins||0}</td>
       <td style="padding:12px 16px;text-align:center">${p.draws||0}</td>
       <td style="padding:12px 16px;text-align:center;color:var(--red)">${p.losses||0}</td>
-      <td style="padding:12px 16px;text-align:center;color:${gd>=0?'var(--green)':'var(--red)'}">${gd>0?'+':''}${gd}</td>
       <td style="padding:12px 16px;text-align:center;color:var(--cyan)">${wp}%</td>
       <td style="padding:12px 16px;text-align:center;color:var(--yellow);font-weight:700">${p.goalsFor||0}</td>
       <td style="padding:12px 16px;text-align:center;color:var(--gold);font-weight:700">${p.mvp||0}</td>
-      <td style="padding:12px 16px;text-align:center;font-family:'Inter',sans-serif;font-size:18px;font-weight:700;color:var(--cyan)">${(p.wins||0)*5 + (p.draws||0)*1 + (p.mvp||0)*10 + (p.goalsFor||0)*3}</td>
+      <td style="padding:12px 16px;text-align:center;font-family:'Inter',sans-serif;font-size:18px;font-weight:700;color:var(--cyan)">${(p.wins||0)*9 + (p.mvp||0)*5 + (p.draws||0)*3 + (p.goalsFor||0)*1}</td>
     </tr>`;
   }).join('');
 
@@ -3089,7 +3025,6 @@ function renderRanking(data) {
             <th style="padding:12px 16px;text-align:center;font-size:11px;color:var(--text3);font-family:'Inter',sans-serif">W</th>
             <th style="padding:12px 16px;text-align:center;font-size:11px;color:var(--yellow);font-family:'Inter',sans-serif">D</th>
             <th style="padding:12px 16px;text-align:center;font-size:11px;color:var(--red);font-family:'Inter',sans-serif">L</th>
-            <th style="padding:12px 16px;text-align:center;font-size:11px;color:var(--text3);font-family:'Inter',sans-serif">GD</th>
             <th style="padding:12px 16px;text-align:center;font-size:11px;color:var(--text3);font-family:'Inter',sans-serif">WIN%</th>
             <th style="padding:12px 16px;text-align:center;font-size:11px;color:var(--yellow);font-family:'Inter',sans-serif">⚽ GOALS</th>
             <th style="padding:12px 16px;text-align:center;font-size:11px;color:var(--gold);font-family:'Inter',sans-serif">🏅 MVP</th>
@@ -3109,7 +3044,7 @@ function renderRankingCards(data) {
     const _wlc = w + l;
     const wp = _wlc > 0 ? Math.round((w/_wlc)*100) : 0;
     const goals = p.goalsFor||0, mvp = p.mvp||0;
-    const score = (w||0)*5 + (d||0)*1 + (mvp||0)*10 + (goals||0)*3;
+    const score = (w||0)*9 + (mvp||0)*5 + (d||0)*3 + (goals||0)*1;
     const gd = goals - (p.goalsAgainst||0);
     const rating = Math.min(99, Math.max(40, Math.round(50 + w*3 - l*2 + d*0.5 + wp*0.3)));
     const ratingColor = rating>=85?'#f5c842':rating>=70?'#7ed321':rating>=55?'#7132ca':'#aaa';
@@ -4643,7 +4578,7 @@ window.homeSearchPlayer = function(q) {
       const avatar = p.avatarUrl
         ? `<img src="${p.avatarUrl}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;border:2px solid var(--primary)">`
         : `<div style="width:40px;height:40px;border-radius:50%;background:var(--bg3);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:20px">🎮</div>`;
-      const score = (p.wins||0)*5+(p.draws||0)+(p.mvp||0)*10+(p.goalsFor||0)*3;
+      const score = (p.wins||0)*9+(p.mvp||0)*5+(p.draws||0)*3+(p.goalsFor||0)*1;
       return `<div onclick="openPublicProfile('${p.uid}')" style="display:flex;align-items:center;gap:12px;padding:12px 16px;cursor:pointer;border-bottom:1px solid var(--border);transition:background 0.15s" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background=''">
         ${avatar}
         <div style="flex:1;min-width:0">
@@ -4807,14 +4742,14 @@ async function loadHomeTopPlayers() {
     const users = await getAllUsers();
     if (!users.length) { container.innerHTML = '<div style="color:var(--text3);text-align:center;padding:20px">কোনো player নেই।</div>'; return; }
     const sorted = [...users].sort((a,b) => {
-      const sa = (a.goalsFor||0)*2 + (a.mvp||0)*3;
-      const sb = (b.goalsFor||0)*2 + (b.mvp||0)*3;
+      const sa = (a.wins||0)*9 + (a.mvp||0)*5 + (a.draws||0)*3 + (a.goalsFor||0)*1;
+      const sb = (b.wins||0)*9 + (b.mvp||0)*5 + (b.draws||0)*3 + (b.goalsFor||0)*1;
       return sb - sa;
     }).slice(0, 6);
 
     const medals = ['🥇','🥈','🥉','','',''];
     container.innerHTML = sorted.map((p, i) => {
-      const score = (p.wins||0)*5 + (p.draws||0)*1 + (p.mvp||0)*10 + (p.goalsFor||0)*3;
+      const score = (p.wins||0)*9 + (p.mvp||0)*5 + (p.draws||0)*3 + (p.goalsFor||0)*1;
       const isTop3 = i < 3;
       return `<div onclick="openPublicProfile('${p.uid}')" style="background:var(--card);border:1px solid ${isTop3?'rgba(245,166,35,0.3)':'var(--border)'};border-radius:14px;padding:18px 14px;text-align:center;cursor:pointer;transition:all 0.2s;position:relative;overflow:hidden" onmouseover="this.style.borderColor='var(--cyan)';this.style.transform='translateY(-3px)'" onmouseout="this.style.borderColor='${isTop3?'rgba(245,166,35,0.3)':'var(--border)'}';this.style.transform=''">
         ${isTop3 ? `<div style="position:absolute;top:8px;right:10px;font-size:18px">${medals[i]}</div>` : ''}
@@ -4948,7 +4883,7 @@ window.openPublicProfile = async function(uid) {
 
   const m = p.matches||0, w = p.wins||0, d = p.draws||0, l = p.losses||0;
   const goals = p.goalsFor||0, mvp = p.mvp||0;
-  const score = w*5 + d*1 + mvp*10 + goals*3;
+  const score = w*9 + mvp*5 + d*3 + goals*1;
   const wl = w + l;
   const wp = wl > 0 ? ((w/wl)*100).toFixed(1) : '0.0';
 
@@ -6330,11 +6265,19 @@ window.saveTrnMatchResults = async function() {
   statusEl.textContent = '⏳ Saving...';
   const homeInputs = document.querySelectorAll('.trn-score-home');
   let saved = 0;
+  let profilesUpdated = 0;
 
   // Load all users for profile update
   const allUsers = await getAllUsers();
   const userMap = {};
   allUsers.forEach(u => { userMap[u.uid] = u; });
+
+  // Track stat deltas per player (in case multiple matches in one save)
+  const statDelta = {}; // uid -> { matches, wins, draws, losses, goalsFor, goalsAgainst }
+
+  const ensureDelta = (uid) => {
+    if (!statDelta[uid]) statDelta[uid] = { matches:0, wins:0, draws:0, losses:0, goalsFor:0, goalsAgainst:0 };
+  };
 
   for (const inp of homeInputs) {
     const id = inp.dataset.id;
@@ -6368,15 +6311,63 @@ window.saveTrnMatchResults = async function() {
       })
     });
 
-    // Tournament bouts do NOT affect main player W/D/L stats — only team matchday points count
+    // ── AUTO UPDATE MAIN PLAYER PROFILE STATS ──
+    // Only update if not already saved before (avoid double counting)
+    if (!alreadySaved && p1uid && p2uid && userMap[p1uid] && userMap[p2uid]) {
+      ensureDelta(p1uid);
+      ensureDelta(p2uid);
+
+      // matches played
+      statDelta[p1uid].matches += 1;
+      statDelta[p2uid].matches += 1;
+
+      // goals
+      statDelta[p1uid].goalsFor     += homeScore;
+      statDelta[p1uid].goalsAgainst += awayScore;
+      statDelta[p2uid].goalsFor     += awayScore;
+      statDelta[p2uid].goalsAgainst += homeScore;
+
+      // win / draw / loss
+      if (homeScore > awayScore) {
+        statDelta[p1uid].wins   += 1;
+        statDelta[p2uid].losses += 1;
+      } else if (awayScore > homeScore) {
+        statDelta[p2uid].wins   += 1;
+        statDelta[p1uid].losses += 1;
+      } else {
+        statDelta[p1uid].draws += 1;
+        statDelta[p2uid].draws += 1;
+      }
+    }
+
     saved++;
+  }
+
+  // ── FLUSH STAT DELTAS TO FIREBASE ──
+  const DB = 'https://typ-championship-default-rtdb.firebaseio.com';
+  for (const [uid, delta] of Object.entries(statDelta)) {
+    const base = userMap[uid];
+    if (!base) continue;
+    const updated = {
+      matches:      (base.matches      || 0) + delta.matches,
+      wins:         (base.wins         || 0) + delta.wins,
+      draws:        (base.draws        || 0) + delta.draws,
+      losses:       (base.losses       || 0) + delta.losses,
+      goalsFor:     (base.goalsFor     || 0) + delta.goalsFor,
+      goalsAgainst: (base.goalsAgainst || 0) + delta.goalsAgainst,
+    };
+    await fetch(`${DB}/users/${uid}.json`, {
+      method: 'PATCH',
+      body: JSON.stringify(updated)
+    });
+    profilesUpdated++;
   }
 
   window._allUsersCache = [];
   await fetchTrnData();
   loadTrnMatchdays();
-  statusEl.textContent = `✅ ${saved} bout saved!`;
-  setTimeout(() => statusEl.textContent = '', 4000);
+  statusEl.textContent = `✅ ${saved} bout saved! 👤 ${profilesUpdated} player profile updated.`;
+  setTimeout(() => statusEl.textContent = '', 5000);
 };
 
 // ── Knockout Admin ──
