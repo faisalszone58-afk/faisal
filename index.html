@@ -777,6 +777,31 @@ select.form-input option { background: var(--card); color: var(--text); }
 .trn-admin-section-title { font-size:13px; font-weight:700; color:var(--text); margin-bottom:14px; letter-spacing:0.04em; }
 .trn-team-card { background:var(--bg2); border:1px solid var(--border); border-radius:10px; padding:14px 16px; display:flex; align-items:center; gap:12px; margin-bottom:8px; }
 
+/* ── TEAMS PAGE SQUAD ── */
+.team-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:16px; margin-bottom:14px; }
+.team-card-header { display:flex; align-items:center; gap:12px; margin-bottom:12px; padding-bottom:10px; border-bottom:1px solid var(--border); }
+.team-badge { font-size:28px; line-height:1; }
+.team-name { font-size:15px; font-weight:700; color:var(--text); letter-spacing:0.02em; }
+.team-manager { font-size:12px; color:var(--gold); margin-top:2px; }
+.team-players-list { display:flex; flex-direction:column; gap:6px; }
+.team-player-row { display:flex; align-items:center; gap:10px; padding:6px 0; border-bottom:1px solid var(--border); }
+.team-player-row:last-child { border-bottom:none; }
+.team-player-num { width:26px; height:26px; border-radius:6px; background:rgba(124,111,224,0.2); color:var(--cyan); font-size:11px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-family:'Inter',monospace; }
+.team-player-avatar { width:36px; height:36px; border-radius:50%; overflow:hidden; flex-shrink:0; background:var(--bg3); display:flex; align-items:center; justify-content:center; font-size:16px; border:1.5px solid var(--border); }
+.team-player-avatar img { width:100%; height:100%; object-fit:cover; display:block; }
+
+/* ── FIXTURE MATCHES ── */
+.matchday-group { margin-bottom:16px; }
+.matchday-group-label { font-size:11px; font-weight:700; color:var(--text3); letter-spacing:1.5px; text-transform:uppercase; font-family:'Inter',monospace; padding:6px 0 8px; border-bottom:1px solid var(--border); margin-bottom:8px; }
+.match1v1-row { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:14px 12px 10px; margin-bottom:8px; display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
+.match1v1-player { flex:1; min-width:0; display:flex; align-items:center; gap:6px; font-size:13px; font-weight:600; color:var(--text2); overflow:hidden; }
+.match1v1-player.right { justify-content:flex-end; text-align:right; }
+.match1v1-player span { flex-shrink:0; font-size:18px; }
+.match1v1-player .pname { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.match1v1-score { min-width:48px; text-align:center; font-size:15px; font-weight:800; color:var(--text); font-family:'Inter',monospace; background:var(--bg3); border-radius:8px; padding:4px 8px; flex-shrink:0; }
+.match1v1-score.pending { color:var(--text3); font-size:12px; font-weight:500; }
+.match1v1-badge { width:100%; text-align:center; font-size:10px; font-family:'Inter',monospace; letter-spacing:0.5px; margin-top:4px; }
+
 /* ── MISC ── */
 .qual-badge { display:inline-block; padding:2px 8px; border-radius:5px; font-size:10px; font-weight:700; letter-spacing:0.05em; text-transform:uppercase; }
 .section-divider { height:1px; background:var(--border); margin:0; }
@@ -1672,7 +1697,7 @@ if (document.readyState === 'loading') {
     </div>
 
     <div style="margin-top:16px;font-size:12px;color:var(--text3);font-family:'Inter',sans-serif">
-      * Group A ও B এর Top 2 করে মোট 4 team → Semi-Final। প্রতিটা matchday: 8টা 1v1 bout।
+      * Group A ও B এর Top 2 করে মোট 4 team → Semi-Final। প্রতিটা matchday: 4 match (GRP-A × 2 + GRP-B × 2) × 8 bout। Double round-robin — প্রতি team ৬ ম্যাচ খেলবে।
     </div>
   </div>
 
@@ -2517,6 +2542,7 @@ if (document.readyState === 'loading') {
     <div class="trn-admin-section-title">👥 Manage Teams</div>
     <div id="trnAdminTeamsList" style="margin-bottom:14px"></div>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-outline" onclick="loadTrnAdminTeams()" style="padding:9px 20px;font-size:13px">🔄 Load Teams</button>
       <button class="btn btn-outline" onclick="openCreateTeamModal()" style="padding:9px 20px;font-size:13px">➕ Create New Team</button>
       <button class="btn" onclick="confirmRegenerateFixtures()" style="padding:9px 20px;font-size:13px;background:rgba(52,211,153,0.1);border:1px solid var(--green);color:var(--green)">🔄 Regenerate Fixtures</button>
     </div>
@@ -2524,7 +2550,7 @@ if (document.readyState === 'loading') {
 
   <div class="trn-admin-section">
     <div class="trn-admin-section-title">⚽ Enter Match Results</div>
-    <p style="font-size:13px;color:var(--text3);margin-bottom:14px">Select a matchday to enter 8 x 1v1 bout results. প্রতিটা matchday = 2 team × 8 bout।</p>
+    <p style="font-size:13px;color:var(--text3);margin-bottom:14px">Select a matchday to enter bout results. প্রতিটা matchday = 4 matches × 8 bout (double round-robin)।</p>
     <div style="margin-bottom:12px;display:flex;gap:10px;flex-wrap:wrap">
       <select class="form-input" id="trnMatchdaySelect" style="flex:1;min-width:200px" onchange="loadMatchdayForEntry()">
         <option value="">-- Select Matchday --</option>
@@ -3574,20 +3600,13 @@ const IMGBB_KEY = 'e981fe62829ed3f63d0a6cc4d6bd6e67';
 async function uploadToImgBB(file) {
   const formData = new FormData();
   formData.append('image', file);
-  let res;
-  try {
-    res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, {
-      method: 'POST',
-      body: formData
-    });
-  } catch(netErr) {
-    throw new Error('Network error: ' + netErr.message);
-  }
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  let data;
-  try { data = await res.json(); } catch(e) { throw new Error('Invalid response from ImgBB'); }
+  const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, {
+    method: 'POST',
+    body: formData
+  });
+  const data = await res.json();
   if (data.success) return data.data.url;
-  throw new Error(data.error?.message || 'ImgBB upload failed');
+  throw new Error('ImgBB upload failed');
 }
 
 // ── AVATAR PREVIEW (Admin Edit Player) ──
@@ -6109,10 +6128,14 @@ window.filterFixtures = function(type, btn) {
     return;
   }
 
-  // Group by matchday
+  // Normalize matchday key: GRP-A Day 1 / GRP-B Day 1 / Matchday 1 → all become "Matchday 1"
   const grouped = {};
   fixtures.forEach(m => {
-    const key = m.matchday || 'Matchday ?';
+    const raw = m.matchday || 'Matchday ?';
+    // Strip team names after dash
+    let key = raw.replace(/\s*—.*$/, '').trim();
+    // Convert old format "GRP-A Day 1" or "GRP-B Day 1" → "Matchday 1"
+    key = key.replace(/^GRP-[AB]\s+Day\s+(\d+)$/i, 'Matchday $1');
     if (!grouped[key]) grouped[key] = [];
     grouped[key].push(m);
   });
@@ -6120,56 +6143,66 @@ window.filterFixtures = function(type, btn) {
   const teamMap = {};
   trnTeamsCache.forEach(t => { teamMap[t.id] = t; });
 
+  // Group by matchday label, then deduplicate by team pair → show only Team vs Team
   container.innerHTML = Object.entries(grouped).map(([day, ms]) => {
-    const rows = ms.map(m => {
-      const ht = teamMap[m.homeTeam] || {};
-      const at = teamMap[m.awayTeam] || {};
-      const done = m.status === 'completed';
-      const hs = parseInt(m.homeScore) || 0, as_ = parseInt(m.awayScore) || 0;
-      const winH = done && hs > as_, winA = done && as_ > hs;
-      return `<div class="match1v1-row">
-        <div class="match1v1-player" style="color:${winH?'var(--cyan)':'var(--text2)'}">
-          <span style="margin-right:6px">${ht.emoji||'🏟️'}</span>${ht.name||m.homeTeam||'—'}
-        </div>
-        <div class="match1v1-score ${done?'':'pending'}">${done ? `${hs}–${as_}` : 'vs'}</div>
-        <div class="match1v1-player right" style="color:${winA?'var(--cyan)':'var(--text2)'}">
-          ${at.name||m.awayTeam||'—'}<span style="margin-left:6px">${at.emoji||'🏟️'}</span>
-        </div>
-        ${m.player1 ? `<div style="font-size:11px;color:var(--text3);width:100%;text-align:center;font-family:'Inter',sans-serif">${m.boutNumber?'Bout '+m.boutNumber+' · ':''} ${m.player1} vs ${m.player2}</div>` : ''}
-      </div>`;
-    }).join('');
+    // Extract unique team matches from bouts
+    const matchMap = {};
+    ms.forEach(m => {
+      const key = `${m.homeTeam}_${m.awayTeam}`;
+      if (!matchMap[key]) {
+        matchMap[key] = { homeTeam: m.homeTeam, awayTeam: m.awayTeam, bouts: [] };
+      }
+      matchMap[key].bouts.push(m);
+    });
 
-    // Bout summary card
-    const doneBouts = ms.filter(m => m.status === 'completed');
-    let summaryHtml = '';
-    if (doneBouts.length > 0) {
-      const sampleMatch = ms[0];
-      const ht = teamMap[sampleMatch.homeTeam] || {};
-      const at = teamMap[sampleMatch.awayTeam] || {};
+    const rows = Object.values(matchMap).map(match => {
+      const ht = teamMap[match.homeTeam] || {};
+      const at = teamMap[match.awayTeam] || {};
+      const bouts = match.bouts;
+      const doneBouts = bouts.filter(b => b.status === 'completed');
+      const totalBouts = bouts.length;
       let homeWins = 0, awayWins = 0, draws = 0;
-      doneBouts.forEach(m => {
-        const hs = parseInt(m.homeScore)||0, as_=parseInt(m.awayScore)||0;
+      doneBouts.forEach(b => {
+        const hs = parseInt(b.homeScore)||0, as_ = parseInt(b.awayScore)||0;
         if (hs > as_) homeWins++;
         else if (as_ > hs) awayWins++;
         else draws++;
       });
-      const winnerLabel = homeWins > awayWins
-        ? `🏆 ${ht.emoji||''} ${ht.name} wins matchday`
-        : awayWins > homeWins
-        ? `🏆 ${at.emoji||''} ${at.name} wins matchday`
-        : '🤝 Matchday draw';
-      summaryHtml = `<div class="team-score-total" style="margin-top:6px;border-radius:8px">
-        <span>${ht.emoji||'🏟️'} <strong style="color:${homeWins>awayWins?'var(--cyan)':'var(--text2)'}">${homeWins}</strong>
-        bouts — <strong style="color:${awayWins>homeWins?'var(--cyan)':'var(--text2)'}">${awayWins}</strong>
-        bouts ${at.emoji||'🏟️'}${draws>0?' · '+draws+' draw':''}</span>
-        <span style="font-size:11px;color:${homeWins===awayWins?'var(--yellow)':'var(--green)'}">${doneBouts.length}/${ms.length} done · ${winnerLabel}</span>
-      </div>`;
-    }
+      const allDone = doneBouts.length === totalBouts && totalBouts > 0;
+      const winH = allDone && homeWins > awayWins;
+      const winA = allDone && awayWins > homeWins;
 
+      const scoreDisplay = doneBouts.length > 0
+        ? `${homeWins}–${awayWins}`
+        : 'vs';
+      const scoreClass = doneBouts.length > 0 ? '' : 'pending';
+
+      const badgeColor = allDone ? 'var(--green)' : doneBouts.length > 0 ? 'var(--yellow)' : 'var(--text3)';
+      const badgeIcon = allDone ? '✅' : doneBouts.length > 0 ? '⏳' : '🎮';
+      const badgeText = allDone
+        ? `${badgeIcon} Completed`
+        : doneBouts.length > 0
+        ? `${badgeIcon} ${doneBouts.length}/${totalBouts} bouts done`
+        : `${badgeIcon} ${totalBouts} bouts · Upcoming`;
+
+      return `<div class="match1v1-row">
+        <div class="match1v1-player" style="color:${winH?'var(--cyan)':'var(--text2)'}">
+          <span>${ht.emoji||'🏟️'}</span>
+          <span class="pname">${ht.name||match.homeTeam||'—'}</span>
+        </div>
+        <div class="match1v1-score ${scoreClass}">${scoreDisplay}</div>
+        <div class="match1v1-player right" style="color:${winA?'var(--cyan)':'var(--text2)'}">
+          <span class="pname">${at.name||match.awayTeam||'—'}</span>
+          <span>${at.emoji||'🏟️'}</span>
+        </div>
+        <div class="match1v1-badge" style="color:${badgeColor}">${badgeText}</div>
+      </div>`;
+    }).join('');
+
+    const shortLabel = day.replace(/\s*—\s*(GRP-[AB]\s+)?Match.*$/, '');
     return `<div class="matchday-group">
-      <div class="matchday-label">${day}</div>
+      <div class="matchday-group-label">${shortLabel}</div>
       ${rows}
-      ${summaryHtml}
     </div>`;
   }).join('');
 };
@@ -6265,14 +6298,22 @@ window.saveTrnSettings = async function() {
 
 // ── Admin: Load Teams ──
 window.loadTrnAdminTeams = async function() {
-  await fetchTrnData();
+  const container = document.getElementById('trnAdminTeamsList');
+  if (container) container.innerHTML = '<div style="color:var(--text3);font-size:13px"><span class="spinner"></span> Loading...</div>';
+  try {
+    await fetchTrnData();
+  } catch(e) {
+    console.error('fetchTrnData failed:', e);
+  }
   renderAdminTeamsList();
   // Prefill settings form
-  if (trnSettingsCache.seasonName) document.getElementById('trnSeasonName').value = trnSettingsCache.seasonName;
-  if (trnSettingsCache.status) document.getElementById('trnStatus').value = trnSettingsCache.status;
+  try {
+    if (trnSettingsCache.seasonName) document.getElementById('trnSeasonName').value = trnSettingsCache.seasonName;
+    if (trnSettingsCache.status) document.getElementById('trnStatus').value = trnSettingsCache.status;
+  } catch(e) { console.error('settings prefill failed:', e); }
   // Load matchdays
-  loadTrnMatchdays();
-  loadKnockoutAdmin();
+  try { loadTrnMatchdays(); } catch(e) { console.error('loadTrnMatchdays failed:', e); }
+  try { loadKnockoutAdmin(); } catch(e) { console.error('loadKnockoutAdmin failed:', e); }
 };
 
 function renderAdminTeamsList() {
@@ -6282,20 +6323,29 @@ function renderAdminTeamsList() {
     container.innerHTML = '<div style="color:var(--text3);font-size:13px;margin-bottom:8px">কোনো team নেই।</div>';
     return;
   }
-  container.innerHTML = trnTeamsCache.map(t => `
+  try {
+    container.innerHTML = trnTeamsCache.map(t => {
+      const safeName = t.name || '(নাম নেই)';
+      const safeNameAttr = safeName.replace(/'/g,'');
+      return `
     <div style="display:flex;align-items:center;gap:12px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin-bottom:10px">
       <div style="width:36px;height:36px;border-radius:50%;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">${t.emoji||'🏟️'}</div>
       <div style="width:44px;height:44px;border-radius:10px;border:1px solid var(--border);background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:24px;overflow:hidden;flex-shrink:0">
         ${t.logo ? `<img src="${t.logo}" style="width:100%;height:100%;object-fit:cover;border-radius:9px">` : (t.emoji||'🏟️')}
       </div>
       <div style="flex:1">
-        <div style="font-weight:700;font-size:14px;color:var(--text)">${t.name}</div>
-        <div style="font-size:12px;color:var(--text3)">👑 ${t.manager||'—'} • ${(t.players||[]).filter(p=>p.isStarter).length}/8 starters · ${(t.players||[]).filter(p=>!p.isStarter).length}/4 subs</div>
+        <div style="font-weight:700;font-size:14px;color:var(--text)">${safeName}</div>
+        <div style="font-size:12px;color:var(--text3)">👑 ${t.manager||'—'} • ${(t.players||[]).filter(p=>p&&p.isStarter).length}/8 starters · ${(t.players||[]).filter(p=>p&&!p.isStarter).length}/4 subs</div>
       </div>
       <button class="btn-admin-edit" onclick="openEditTeamModal('${t.id}')">✏️ Edit</button>
-      <button class="btn-admin-del" onclick="deleteTeam('${t.id}','${t.name.replace(/'/g,'')}')">🗑️</button>
+      <button class="btn-admin-del" onclick="deleteTeam('${t.id}','${safeNameAttr}')">🗑️</button>
     </div>
-  `).join('');
+  `;
+    }).join('');
+  } catch(e) {
+    console.error('renderAdminTeamsList error:', e);
+    container.innerHTML = `<div style="color:var(--red);font-size:13px">❌ Team list load করতে error হয়েছে: ${e.message}</div>`;
+  }
 }
 
 // ── Create / Edit Team Modal ──
@@ -6397,17 +6447,9 @@ function updatePlayerPickCount() {
   if (el) el.textContent = `${_playerPickSelected.length} selected (${Math.min(_playerPickSelected.length,8)} starters + ${Math.max(0,_playerPickSelected.length-8)} subs)`;
 }
 
-window.previewTeamLogo = async function(input) {
+window.previewTeamLogo = function(input) {
   const file = input.files[0];
   if (!file) return;
-
-  if (file.size > 2 * 1024 * 1024) {
-    alert('❌ File size 2MB এর বেশি হবে না।');
-    input.value = '';
-    return;
-  }
-
-  // Show local preview immediately
   const reader = new FileReader();
   reader.onload = e => {
     const prev = document.getElementById('teamLogoPreview');
@@ -6415,28 +6457,6 @@ window.previewTeamLogo = async function(input) {
     prev.style.border = '2px solid var(--primary)';
   };
   reader.readAsDataURL(file);
-
-  // Upload to ImgBB right away (like avatar does)
-  const errEl = document.getElementById('createTeamError');
-  errEl.textContent = '⏳ Logo upload হচ্ছে...';
-  errEl.style.color = 'var(--cyan)';
-  document.getElementById('teamLogoUrl').value = '';
-  window._teamLogoUploading = true;
-
-  try {
-    const url = await uploadToImgBB(file);
-    document.getElementById('teamLogoUrl').value = url;
-    errEl.textContent = '✅ Logo ready!';
-    errEl.style.color = 'var(--green)';
-    setTimeout(() => { if (errEl.textContent === '✅ Logo ready!') errEl.textContent = ''; }, 2000);
-  } catch(e) {
-    errEl.textContent = '❌ Logo upload failed. Try again.';
-    errEl.style.color = 'var(--red)';
-    document.getElementById('teamLogoPreview').innerHTML = '🏟️';
-    document.getElementById('teamLogoPreview').style.border = '2px dashed var(--border)';
-    input.value = '';
-  }
-  window._teamLogoUploading = false;
 }
 
 window.saveTeam = async function() {
@@ -6457,12 +6477,19 @@ window.saveTeam = async function() {
   const teamId = document.getElementById('editTeamId').value;
   errEl.textContent = '';
 
-  // Logo already uploaded during preview — just read the stored URL
-  if (window._teamLogoUploading) {
-    errEl.textContent = '⏳ Logo এখনো upload হচ্ছে, একটু অপেক্ষা করুন...';
-    return;
-  }
+  // Upload logo if new file selected
   let logoUrl = document.getElementById('teamLogoUrl').value || '';
+  const logoFile = document.getElementById('teamLogoInput').files[0];
+  if (logoFile) {
+    errEl.textContent = '⏳ Logo upload হচ্ছে...';
+    try {
+      logoUrl = await uploadToImgBB(logoFile);
+    } catch(e) {
+      errEl.textContent = '❌ Logo upload failed. Try again.';
+      return;
+    }
+    errEl.textContent = '';
+  }
 
   const payload = { name, manager, emoji, group, players, updatedAt: new Date().toISOString() };
   if (logoUrl) payload.logo = logoUrl;
@@ -6508,8 +6535,8 @@ window.deleteTeam = async function(id, name) {
 };
 
 // ── Auto-generate Round Robin Fixtures ──
-// Group A/B round robin: 4 teams each group, 3 matchdays per group
-// Each matchday = 2 teams × 8 x 1v1 bouts
+// Group A/B double round robin: 4 teams each group, 6 matchdays per group
+// Each matchday = 4 matches (2 GRP-A + 2 GRP-B) × 8 x 1v1 bouts
 async function generateFixtures() {
   const teams = trnTeamsCache;
   if (teams.length !== 8) { alert('ঠিক 8টা team লাগবে fixture generate করতে।'); return; }
@@ -6522,74 +6549,67 @@ async function generateFixtures() {
     return;
   }
 
-  // Round-robin pairs for 4 teams using circle method → 3 rounds, 2 pairs each
-  function getRoundRobinPairs(grpTeams) {
+  // Double round-robin: each team plays every other team TWICE (home & away)
+  // 4 teams → 6 rounds, 2 matches per round per group → 12 matches per group
+  function getDoubleRoundRobinRounds(grpTeams) {
     const ids = grpTeams.map(t => t.id);
+    // Single round-robin using circle method (3 rounds)
     const fixed = ids[0];
-    const rotating = ids.slice(1); // 3 rotating
-    const rounds = [];
+    const rotating = ids.slice(1);
+    const singleRounds = [];
     for (let r = 0; r < 3; r++) {
       const pairs = [];
       pairs.push([fixed, rotating[r % 3]]);
       pairs.push([rotating[(r + 1) % 3], rotating[(r + 2) % 3]]);
-      rounds.push(pairs);
+      singleRounds.push(pairs);
     }
-    return rounds;
+    // Double: repeat with home/away swapped
+    const doubleRounds = [...singleRounds];
+    singleRounds.forEach(round => {
+      doubleRounds.push(round.map(([a, b]) => [b, a])); // swap home/away
+    });
+    return doubleRounds; // 6 rounds total
   }
 
-  const roundsA = getRoundRobinPairs(groupA);
-  const roundsB = getRoundRobinPairs(groupB);
+  const roundsA = getDoubleRoundRobinRounds(groupA);
+  const roundsB = getDoubleRoundRobinRounds(groupB);
 
   const allFixtures = [];
-  let globalDay = 1;
 
-  // Group A — Days 1-3
-  roundsA.forEach((pairs, rIdx) => {
-    const dayLabel = `GRP-A Day ${rIdx + 1}`;
-    pairs.forEach((pair, matchIdx) => {
+  // Helper to push bouts for a match
+  function pushBouts(t1, t2, matchdayNum, matchIdx, group) {
+    const t1S = (t1.players||[]).filter(p=>p.isStarter).slice(0,8);
+    const t2S = (t2.players||[]).filter(p=>p.isStarter).slice(0,8);
+    const bouts = Math.min(t1S.length, t2S.length, 8);
+    const matchdayLabel = `Matchday ${matchdayNum} — GRP-${group} Match ${matchIdx+1}: ${t1.name} vs ${t2.name}`;
+    for (let k = 0; k < bouts; k++) {
+      allFixtures.push({
+        homeTeam: t1.id, awayTeam: t2.id,
+        player1: t1S[k]?.name||`P${k+1}`, player2: t2S[k]?.name||`P${k+1}`,
+        player1uid: t1S[k]?.uid||'', player2uid: t2S[k]?.uid||'',
+        matchday: matchdayLabel,
+        boutNumber: k+1, day: matchdayNum, matchNumber: matchIdx+1,
+        group, status: 'pending', createdAt: new Date().toISOString()
+      });
+    }
+  }
+
+  // Generate all 6 matchdays (Group A & B together each day)
+  for (let rIdx = 0; rIdx < 6; rIdx++) {
+    const matchdayNum = rIdx + 1;
+    // Group A
+    (roundsA[rIdx] || []).forEach((pair, matchIdx) => {
       const t1 = teams.find(t => t.id === pair[0]);
       const t2 = teams.find(t => t.id === pair[1]);
-      if (!t1 || !t2) return;
-      const t1S = (t1.players||[]).filter(p=>p.isStarter).slice(0,8);
-      const t2S = (t2.players||[]).filter(p=>p.isStarter).slice(0,8);
-      const bouts = Math.min(t1S.length, t2S.length, 8);
-      const matchdayLabel = `${dayLabel} — Match ${matchIdx+1}: ${t1.name} vs ${t2.name}`;
-      for (let k = 0; k < bouts; k++) {
-        allFixtures.push({
-          homeTeam: t1.id, awayTeam: t2.id,
-          player1: t1S[k]?.name||`P${k+1}`, player2: t2S[k]?.name||`P${k+1}`,
-          player1uid: t1S[k]?.uid||'', player2uid: t2S[k]?.uid||'',
-          matchday: matchdayLabel,
-          boutNumber: k+1, day: rIdx+1, matchNumber: matchIdx+1,
-          group: 'A', status: 'pending', createdAt: new Date().toISOString()
-        });
-      }
+      if (t1 && t2) pushBouts(t1, t2, matchdayNum, matchIdx, 'A');
     });
-  });
-
-  // Group B — Days 4-6
-  roundsB.forEach((pairs, rIdx) => {
-    const dayLabel = `GRP-B Day ${rIdx + 1}`;
-    pairs.forEach((pair, matchIdx) => {
+    // Group B
+    (roundsB[rIdx] || []).forEach((pair, matchIdx) => {
       const t1 = teams.find(t => t.id === pair[0]);
       const t2 = teams.find(t => t.id === pair[1]);
-      if (!t1 || !t2) return;
-      const t1S = (t1.players||[]).filter(p=>p.isStarter).slice(0,8);
-      const t2S = (t2.players||[]).filter(p=>p.isStarter).slice(0,8);
-      const bouts = Math.min(t1S.length, t2S.length, 8);
-      const matchdayLabel = `${dayLabel} — Match ${matchIdx+1}: ${t1.name} vs ${t2.name}`;
-      for (let k = 0; k < bouts; k++) {
-        allFixtures.push({
-          homeTeam: t1.id, awayTeam: t2.id,
-          player1: t1S[k]?.name||`P${k+1}`, player2: t2S[k]?.name||`P${k+1}`,
-          player1uid: t1S[k]?.uid||'', player2uid: t2S[k]?.uid||'',
-          matchday: matchdayLabel,
-          boutNumber: k+1, day: rIdx+4, matchNumber: matchIdx+1,
-          group: 'B', status: 'pending', createdAt: new Date().toISOString()
-        });
-      }
+      if (t1 && t2) pushBouts(t1, t2, matchdayNum, matchIdx, 'B');
     });
-  });
+  }
 
   const batchObj = {};
   allFixtures.forEach((f, i) => { batchObj[`fixture_${Date.now()}_${i}`] = f; });
@@ -6597,7 +6617,7 @@ async function generateFixtures() {
   if (!putRes.ok) { alert('❌ Fixture save failed: ' + await putRes.text()); return; }
   await new Promise(r => setTimeout(r, 500));
   await fetchTrnData();
-  alert(`✅ Fixtures generated!\nGroup A: 3 days × 2 matches\nGroup B: 3 days × 2 matches\nTotal: ${allFixtures.length} bouts`);
+  alert(`✅ Fixtures generated!\nGroup A & B: 6 matchdays × 4 matches per day\nDouble round-robin (home & away)\nTotal: ${allFixtures.length} bouts`);
 }
 
 window.confirmRegenerateFixtures = async function() {
@@ -6618,12 +6638,25 @@ window.loadTrnMatchdays = async function() {
   await fetchTrnData();
   const sel = document.getElementById('trnMatchdaySelect');
   if (!sel) return;
-  const days = [...new Set(trnMatchesCache.map(m => m.matchday))].sort();
+  // Normalize matchday labels: GRP-A Day 1 → Matchday 1
+  const normalizeDay = raw => raw.replace(/\s*—.*$/, '').trim().replace(/^GRP-[AB]\s+Day\s+(\d+)$/i, 'Matchday $1');
+  // Group by normalized key
+  const dayMap = {};
+  trnMatchesCache.forEach(m => {
+    const key = normalizeDay(m.matchday || 'Matchday ?');
+    if (!dayMap[key]) dayMap[key] = { total: 0, done: 0 };
+    dayMap[key].total++;
+    if (m.status === 'completed') dayMap[key].done++;
+  });
+  const days = Object.keys(dayMap).sort((a, b) => {
+    const na = parseInt(a.match(/\d+/)?.[0] || 0);
+    const nb = parseInt(b.match(/\d+/)?.[0] || 0);
+    return na - nb;
+  });
   sel.innerHTML = '<option value="">-- Select Matchday --</option>' +
     days.map(d => {
-      const done = trnMatchesCache.filter(m => m.matchday === d && m.status === 'completed').length;
-      const total = trnMatchesCache.filter(m => m.matchday === d).length;
-      return `<option value="${d}">${d} (${done}/${total} done)</option>`;
+      const { done, total } = dayMap[d];
+      return `<option value="${d}">${d} (${done}/${total} bouts done)</option>`;
     }).join('');
 };
 
@@ -6633,61 +6666,90 @@ window.loadMatchdayForEntry = function() {
   const btnWrap = document.getElementById('trnSaveMatchBtnWrap');
   if (!day) { area.innerHTML = ''; btnWrap.style.display = 'none'; return; }
 
-  const matches = trnMatchesCache.filter(m => m.matchday === day);
+  // Support both old (GRP-A Day 1) and new (Matchday 1) label formats
+  const normDay = raw => (raw||'').replace(/\s*—.*$/, '').trim().replace(/^GRP-[AB]\s+Day\s+(\d+)$/i, 'Matchday $1');
+  const matches = trnMatchesCache.filter(m => normDay(m.matchday) === day);
   const teamMap = {};
   trnTeamsCache.forEach(t => { teamMap[t.id] = t; });
 
   // Build player options for each team
   const allUsers = window._trnAllUsers || [];
 
-  area.innerHTML = matches.map(m => {
-    const ht = teamMap[m.homeTeam] || {};
-    const at = teamMap[m.awayTeam] || {};
-    const done = m.status === 'completed';
+  // Group bouts by team match (homeTeam_awayTeam)
+  const matchGroups = {};
+  const matchOrder = [];
+  matches.forEach(m => {
+    const key = `${m.homeTeam}_${m.awayTeam}`;
+    if (!matchGroups[key]) { matchGroups[key] = []; matchOrder.push(key); }
+    matchGroups[key].push(m);
+  });
 
-    // Home team player options
-    const htPlayers = (ht.players || []);
-    const atPlayers = (at.players || []);
+  area.innerHTML = matchOrder.map(key => {
+    const groupMatches = matchGroups[key].sort((a,b) => (a.boutNumber||0)-(b.boutNumber||0));
+    const ht = teamMap[groupMatches[0].homeTeam] || {};
+    const at = teamMap[groupMatches[0].awayTeam] || {};
+    const doneCount = groupMatches.filter(m => m.status === 'completed').length;
+    const grp = groupMatches[0].group || '';
 
-    const homeOpts = htPlayers.map(p =>
-      `<option value="${p.uid}" ${p.uid === m.player1uid ? 'selected' : ''}>${p.name}</option>`
-    ).join('');
-    const awayOpts = atPlayers.map(p =>
-      `<option value="${p.uid}" ${p.uid === m.player2uid ? 'selected' : ''}>${p.name}</option>`
-    ).join('');
+    const boutRows = groupMatches.map(m => {
+      const done = m.status === 'completed';
+      const htPlayers = (ht.players || []);
+      const atPlayers = (at.players || []);
+      const homeOpts = htPlayers.map(p =>
+        `<option value="${p.uid}" ${p.uid === m.player1uid ? 'selected' : ''}>${p.name}</option>`
+      ).join('');
+      const awayOpts = atPlayers.map(p =>
+        `<option value="${p.uid}" ${p.uid === m.player2uid ? 'selected' : ''}>${p.name}</option>`
+      ).join('');
 
-    return `<div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:10px">
-      <input type="hidden" class="trn-match-id" value="${m.id}">
-      ${m.boutNumber ? `<div style="font-size:10px;color:var(--text3);font-family:'Inter',sans-serif;margin-bottom:8px;letter-spacing:1px">BOUT ${m.boutNumber} — ${ht.emoji||'🏟️'} ${ht.name||'?'} vs ${at.emoji||'🏟️'} ${at.name||'?'}</div>` : ''}
-      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-        <!-- Home Player -->
-        <div style="flex:1;min-width:120px">
-          <div style="font-size:10px;color:var(--cyan);margin-bottom:4px;font-family:'Inter',sans-serif">🏠 HOME PLAYER</div>
-          <select class="form-input trn-player1-select" data-id="${m.id}" style="font-size:12px;padding:7px 10px">
-            <option value="">-- Select --</option>
-            ${homeOpts}
-          </select>
+      return `<div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:6px">
+        <input type="hidden" class="trn-match-id" value="${m.id}">
+        <div style="font-size:10px;color:var(--text3);font-family:'Inter',monospace;margin-bottom:8px;letter-spacing:1px">
+          BOUT ${m.boutNumber || '?'} ${done ? '<span style="color:var(--green)">✅</span>' : ''}
         </div>
-        <!-- Score -->
-        <div style="display:flex;align-items:center;gap:6px;padding-top:16px">
-          <input type="number" min="0" max="99" value="${done ? m.homeScore : ''}" placeholder="0"
-            class="form-input trn-score-home" data-id="${m.id}"
-            style="width:56px;text-align:center;padding:8px 4px;font-size:18px;font-weight:700">
-          <span style="color:var(--text3);font-weight:700;font-size:16px">—</span>
-          <input type="number" min="0" max="99" value="${done ? m.awayScore : ''}" placeholder="0"
-            class="form-input trn-score-away" data-id="${m.id}"
-            style="width:56px;text-align:center;padding:8px 4px;font-size:18px;font-weight:700">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <div style="flex:1;min-width:100px">
+            <div style="font-size:10px;color:var(--cyan);margin-bottom:4px">🏠 HOME</div>
+            <select class="form-input trn-player1-select" data-id="${m.id}" style="font-size:12px;padding:7px 10px">
+              <option value="">-- Select --</option>
+              ${homeOpts}
+            </select>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;padding-top:16px">
+            <input type="number" min="0" max="99" value="${done ? m.homeScore : ''}" placeholder="0"
+              class="form-input trn-score-home" data-id="${m.id}"
+              style="width:52px;text-align:center;padding:8px 4px;font-size:16px;font-weight:700">
+            <span style="color:var(--text3);font-weight:700">—</span>
+            <input type="number" min="0" max="99" value="${done ? m.awayScore : ''}" placeholder="0"
+              class="form-input trn-score-away" data-id="${m.id}"
+              style="width:52px;text-align:center;padding:8px 4px;font-size:16px;font-weight:700">
+          </div>
+          <div style="flex:1;min-width:100px">
+            <div style="font-size:10px;color:var(--gold);margin-bottom:4px;text-align:right">AWAY 🏟️</div>
+            <select class="form-input trn-player2-select" data-id="${m.id}" style="font-size:12px;padding:7px 10px">
+              <option value="">-- Select --</option>
+              ${awayOpts}
+            </select>
+          </div>
         </div>
-        <!-- Away Player -->
-        <div style="flex:1;min-width:120px">
-          <div style="font-size:10px;color:var(--gold);margin-bottom:4px;font-family:'Inter',sans-serif;text-align:right">AWAY PLAYER 🏟️</div>
-          <select class="form-input trn-player2-select" data-id="${m.id}" style="font-size:12px;padding:7px 10px">
-            <option value="">-- Select --</option>
-            ${awayOpts}
-          </select>
+      </div>`;
+    }).join('');
+
+    return `<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:16px;overflow:hidden">
+      <div style="background:linear-gradient(135deg,var(--primary),var(--primary-dark));padding:12px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <div style="font-size:10px;color:rgba(255,255,255,0.6);font-weight:700;letter-spacing:2px;font-family:'Inter',monospace">GRP-${grp}</div>
+        <div style="flex:1;display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;color:#fff">
+          <span>${ht.emoji||'🏟️'}</span>
+          <span>${ht.name||'—'}</span>
+          <span style="font-size:11px;color:rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);padding:2px 8px;border-radius:6px">VS</span>
+          <span>${at.name||'—'}</span>
+          <span>${at.emoji||'🏟️'}</span>
+        </div>
+        <div style="font-size:11px;color:${doneCount===groupMatches.length?'#34d399':doneCount>0?'#fbbf24':'rgba(255,255,255,0.5)'};font-weight:600">
+          ${doneCount}/${groupMatches.length} bouts
         </div>
       </div>
-      ${done ? '<div style="font-size:11px;color:var(--green);margin-top:8px;text-align:center">✅ SAVED — Re-enter to update</div>' : ''}
+      <div style="padding:12px">${boutRows}</div>
     </div>`;
   }).join('');
 
@@ -6910,7 +6972,7 @@ window.autoSetSemis = async function() {
 // ══════════════════════════════════════════
 // 📥 DOWNLOAD FIXTURE AS BEAUTIFUL HTML
 // ══════════════════════════════════════════
-window.downloadFixturePDF = function() {
+window.downloadFixturePDF = async function() {
   const teamMap = {};
   trnTeamsCache.forEach(t => { teamMap[t.id] = t; });
   const fixtures = trnAllFixtures && trnAllFixtures.length ? trnAllFixtures : trnMatchesCache;
@@ -6920,360 +6982,103 @@ window.downloadFixturePDF = function() {
     return;
   }
 
-  // Group by matchday
+  // Normalize matchday key: GRP-A Day 1 / GRP-B Day 1 / Matchday 1 → all become "Matchday 1"
   const grouped = {};
   fixtures.forEach(m => {
-    const key = m.matchday || 'Matchday ?';
+    const raw = m.matchday || 'Matchday ?';
+    let key = raw.replace(/\s*—.*$/, '').trim();
+    key = key.replace(/^GRP-[AB]\s+Day\s+(\d+)$/i, 'Matchday $1');
     if (!grouped[key]) grouped[key] = [];
     grouped[key].push(m);
   });
 
-  const totalMatches = fixtures.length;
-  const completedMatches = fixtures.filter(m => m.status === 'completed').length;
-  const pendingMatches = totalMatches - completedMatches;
-  const today = new Date().toLocaleDateString('en-BD', { year: 'numeric', month: 'long', day: 'numeric' });
-
-  // Build matchday HTML
-  const matchdayHtml = Object.entries(grouped).map(([day, ms]) => {
-    // Figure out home and away teams for this matchday group
-    const sampleMatch = ms[0];
-    const ht = teamMap[sampleMatch.homeTeam] || { name: sampleMatch.homeTeam || 'TBD', emoji: '🏟️' };
-    const at = teamMap[sampleMatch.awayTeam] || { name: sampleMatch.awayTeam || 'TBD', emoji: '🏟️' };
-
-    let homeWins = 0, awayWins = 0, draws = 0;
-    const doneBouts = ms.filter(m => m.status === 'completed');
-    doneBouts.forEach(m => {
-      const hs = parseInt(m.homeScore)||0, as_=parseInt(m.awayScore)||0;
-      if (hs > as_) homeWins++;
-      else if (as_ > hs) awayWins++;
-      else draws++;
+  // Build unique team matches per day
+  const days = {};
+  Object.entries(grouped).forEach(([day, ms]) => {
+    const shortLabel = day;
+    if (!days[shortLabel]) days[shortLabel] = {};
+    ms.forEach(m => {
+      const key = `${m.homeTeam}_${m.awayTeam}`;
+      if (!days[shortLabel][key]) days[shortLabel][key] = { homeTeam: m.homeTeam, awayTeam: m.awayTeam, bouts: [] };
+      days[shortLabel][key].bouts.push(m);
     });
+  });
 
-    const isCompleted = doneBouts.length === ms.length && ms.length > 0;
-    const matchdayWinner = isCompleted ? (homeWins > awayWins ? ht.name : awayWins > homeWins ? at.name : 'Draw') : null;
-    const matchdayWinnerEmoji = isCompleted ? (homeWins > awayWins ? ht.emoji : awayWins > homeWins ? at.emoji : '🤝') : null;
+  const today = new Date().toLocaleDateString('en-BD', { year: 'numeric', month: 'long', day: 'numeric' });
+  const totalTeamMatches = Object.values(days).reduce((s, d) => s + Object.keys(d).length, 0);
 
-    const boutRows = ms.map(m => {
-      const done = m.status === 'completed';
-      const hs = parseInt(m.homeScore)||0, as_=parseInt(m.awayScore)||0;
-      const winH = done && hs > as_, winA = done && as_ > hs;
-      const scoreDisplay = done ? `${hs} – ${as_}` : 'vs';
-      const statusClass = done ? (winH ? 'win-home' : winA ? 'win-away' : 'draw') : 'pending';
-      return `<tr class="bout-row ${statusClass}">
-        <td class="bout-num">${m.boutNumber ? 'Bout ' + m.boutNumber : '—'}</td>
-        <td class="player-home ${winH?'winner':''}">${m.player1 || '—'}</td>
-        <td class="score-cell ${done?'score-done':'score-pending'}">${scoreDisplay}</td>
-        <td class="player-away ${winA?'winner':''}">${m.player2 || '—'}</td>
-        <td class="status-cell">${done ? (winH?'🟢':'🔴') : '⏳'}</td>
-      </tr>`;
-    }).join('');
-
-    const summaryHtml = isCompleted ? `
-      <div class="matchday-summary ${homeWins > awayWins ? 'home-win' : awayWins > homeWins ? 'away-win' : 'draw-result'}">
-        <span class="trophy">🏆</span>
-        <strong>${matchdayWinnerEmoji} ${matchdayWinner}</strong>
-        <span class="score-summary">wins matchday</span>
-        <span class="bout-count">${homeWins} – ${awayWins}${draws>0?' ('+draws+' draw)':''}</span>
-      </div>` : doneBouts.length > 0 ? `
-      <div class="matchday-summary in-progress">
-        <span>⏳ In Progress</span>
-        <span class="bout-count">${doneBouts.length}/${ms.length} bouts done</span>
-      </div>` : '';
-
-    return `<div class="matchday-card">
-      <div class="matchday-header">
-        <div class="matchday-label">${day}</div>
-        <div class="matchup-teams">
-          <span class="team-a">${ht.emoji} ${ht.name}</span>
-          <span class="vs-badge">VS</span>
-          <span class="team-b">${at.emoji} ${at.name}</span>
+  // Build canvas-friendly HTML in a hidden div
+  const wrap = document.createElement('div');
+  wrap.style.cssText = 'position:fixed;left:-9999px;top:0;width:520px;background:#0e0c1a;font-family:Inter,sans-serif;padding:0;z-index:-1';
+  wrap.innerHTML = `
+    <div style="background:linear-gradient(135deg,#7c6fe0,#4a3fb0);padding:28px 24px 20px;text-align:center">
+      <div style="font-size:11px;color:rgba(255,255,255,0.6);letter-spacing:3px;font-weight:700;margin-bottom:6px">TYP CHAMPIONSHIP</div>
+      <div style="font-size:26px;font-weight:900;color:#fff;letter-spacing:-0.5px;margin-bottom:4px">OFFICIAL FIXTURE</div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.55);margin-bottom:18px">Round Robin • Season 2026 • ${today}</div>
+      <div style="display:flex;justify-content:center;gap:0;background:rgba(255,255,255,0.1);border-radius:10px;overflow:hidden;max-width:300px;margin:0 auto">
+        <div style="flex:1;padding:10px 6px;border-right:1px solid rgba(255,255,255,0.1);text-align:center">
+          <div style="font-size:20px;font-weight:800;color:#fff">${trnTeamsCache.length}</div>
+          <div style="font-size:9px;color:rgba(255,255,255,0.55);letter-spacing:1px;margin-top:2px">TEAMS</div>
         </div>
-        <div class="matchday-status ${isCompleted ? 'done' : doneBouts.length > 0 ? 'partial' : 'upcoming'}">
-          ${isCompleted ? '✅ Completed' : doneBouts.length > 0 ? `⏳ ${doneBouts.length}/${ms.length}` : '📅 Upcoming'}
+        <div style="flex:1;padding:10px 6px;border-right:1px solid rgba(255,255,255,0.1);text-align:center">
+          <div style="font-size:20px;font-weight:800;color:#fff">${totalTeamMatches}</div>
+          <div style="font-size:9px;color:rgba(255,255,255,0.55);letter-spacing:1px;margin-top:2px">MATCHES</div>
+        </div>
+        <div style="flex:1;padding:10px 6px;text-align:center">
+          <div style="font-size:20px;font-weight:800;color:#fff">2</div>
+          <div style="font-size:9px;color:rgba(255,255,255,0.55);letter-spacing:1px;margin-top:2px">GROUPS</div>
         </div>
       </div>
-      <table class="bouts-table">
-        <thead>
-          <tr>
-            <th>Bout</th>
-            <th>🏠 Home Player</th>
-            <th>Score</th>
-            <th>✈️ Away Player</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>${boutRows}</tbody>
-      </table>
-      ${summaryHtml}
-    </div>`;
-  }).join('');
-
-  const htmlContent = `<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TYP Championship — Fixture Sheet</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-<style>
-  * { margin:0; padding:0; box-sizing:border-box; }
-  body {
-    font-family: 'Inter', -apple-system, sans-serif;
-    background: #f0ebff;
-    color: #1a1040;
-    min-height: 100vh;
-    padding: 0;
-  }
-
-  /* HERO HEADER */
-  .page-header {
-    background: linear-gradient(135deg, #7132CA 0%, #301CA0 60%, #1a0e6a 100%);
-    color: white;
-    padding: 48px 32px 40px;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-  }
-  .page-header::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(ellipse 80% 100% at 20% -20%, rgba(255,255,255,0.12) 0%, transparent 60%),
-                radial-gradient(ellipse 60% 80% at 80% 120%, rgba(163,116,232,0.2) 0%, transparent 60%);
-  }
-  .page-header > * { position: relative; z-index: 1; }
-  .header-badge {
-    display: inline-block;
-    background: rgba(255,255,255,0.15);
-    border: 1px solid rgba(255,255,255,0.3);
-    color: rgba(255,255,255,0.9);
-    padding: 5px 16px;
-    border-radius: 20px;
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.15em;
-    margin-bottom: 16px;
-  }
-  .header-title {
-    font-size: clamp(28px, 6vw, 52px);
-    font-weight: 900;
-    letter-spacing: -0.02em;
-    line-height: 1.1;
-    margin-bottom: 8px;
-    text-shadow: 0 2px 20px rgba(0,0,0,0.3);
-  }
-  .header-subtitle {
-    font-size: 14px;
-    opacity: 0.75;
-    letter-spacing: 0.05em;
-    margin-bottom: 28px;
-  }
-  .header-stats {
-    display: flex;
-    justify-content: center;
-    gap: 0;
-    max-width: 480px;
-    margin: 0 auto;
-    background: rgba(255,255,255,0.1);
-    border: 1px solid rgba(255,255,255,0.2);
-    border-radius: 14px;
-    overflow: hidden;
-    backdrop-filter: blur(10px);
-  }
-  .hstat {
-    flex: 1;
-    padding: 16px 12px;
-    border-right: 1px solid rgba(255,255,255,0.15);
-    text-align: center;
-  }
-  .hstat:last-child { border-right: none; }
-  .hstat-num { font-size: 26px; font-weight: 800; line-height: 1; }
-  .hstat-label { font-size: 10px; opacity: 0.7; margin-top: 4px; letter-spacing: 0.08em; font-weight: 600; }
-
-  /* CONTENT */
-  .content { max-width: 900px; margin: 0 auto; padding: 32px 20px 60px; }
-
-  /* MATCHDAY CARD */
-  .matchday-card {
-    background: white;
-    border-radius: 16px;
-    overflow: hidden;
-    margin-bottom: 24px;
-    box-shadow: 0 4px 24px rgba(113,50,202,0.10), 0 1px 4px rgba(0,0,0,0.06);
-    border: 1px solid rgba(113,50,202,0.12);
-    transition: transform 0.2s;
-    break-inside: avoid;
-    page-break-inside: avoid;
-  }
-  .matchday-header {
-    background: linear-gradient(135deg, #7132CA 0%, #4a1f9a 100%);
-    padding: 16px 20px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex-wrap: wrap;
-  }
-  .matchday-label {
-    font-size: 11px;
-    font-weight: 800;
-    color: rgba(255,255,255,0.7);
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    min-width: 60px;
-  }
-  .matchup-teams {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 15px;
-    font-weight: 700;
-    color: white;
-  }
-  .team-a, .team-b { color: rgba(255,255,255,0.95); }
-  .vs-badge {
-    font-size: 10px;
-    font-weight: 900;
-    color: rgba(255,255,255,0.5);
-    letter-spacing: 0.1em;
-    padding: 3px 8px;
-    background: rgba(255,255,255,0.1);
-    border-radius: 6px;
-  }
-  .matchday-status {
-    font-size: 11px;
-    font-weight: 700;
-    padding: 5px 12px;
-    border-radius: 20px;
-    letter-spacing: 0.05em;
-    white-space: nowrap;
-  }
-  .matchday-status.done { background: rgba(22,163,74,0.25); color: #4ade80; border: 1px solid rgba(74,222,128,0.3); }
-  .matchday-status.partial { background: rgba(202,138,4,0.2); color: #fbbf24; border: 1px solid rgba(251,191,36,0.3); }
-  .matchday-status.upcoming { background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.7); border: 1px solid rgba(255,255,255,0.2); }
-
-  /* BOUTS TABLE */
-  .bouts-table { width: 100%; border-collapse: collapse; }
-  .bouts-table thead tr { background: #f8f5ff; }
-  .bouts-table th {
-    padding: 10px 14px;
-    font-size: 10px;
-    font-weight: 700;
-    color: #7132CA;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    border-bottom: 2px solid #ede8fa;
-    text-align: center;
-  }
-  .bouts-table th:nth-child(2) { text-align: left; }
-  .bouts-table th:nth-child(4) { text-align: right; }
-  .bout-row td {
-    padding: 11px 14px;
-    font-size: 13px;
-    border-bottom: 1px solid #f0ebff;
-    vertical-align: middle;
-  }
-  .bout-row:last-child td { border-bottom: none; }
-  .bout-row:hover { background: #faf8ff; }
-  .bout-num { font-size: 11px; font-weight: 700; color: #9b8fc4; text-align: center; font-family: monospace; white-space: nowrap; }
-  .player-home { text-align: left; font-weight: 500; color: #4a3880; }
-  .player-away { text-align: right; font-weight: 500; color: #4a3880; }
-  .player-home.winner, .player-away.winner { color: #7132CA; font-weight: 700; }
-  .score-cell { text-align: center; font-weight: 700; font-size: 15px; font-family: monospace; min-width: 80px; }
-  .score-done { color: #1a1040; }
-  .score-pending { color: #c4b5e0; font-size: 12px; letter-spacing: 0.05em; }
-  .status-cell { text-align: center; font-size: 16px; }
-
-  .bout-row.win-home { background: rgba(113,50,202,0.03); }
-  .bout-row.win-away { background: rgba(113,50,202,0.03); }
-  .bout-row.pending td { color: #b0a0d0; }
-
-  /* MATCHDAY SUMMARY */
-  .matchday-summary {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 12px 20px;
-    font-size: 13px;
-    font-weight: 600;
-    border-top: 2px solid #ede8fa;
-    flex-wrap: wrap;
-  }
-  .matchday-summary.home-win, .matchday-summary.away-win { background: linear-gradient(90deg, rgba(22,163,74,0.08), transparent); color: #15803d; }
-  .matchday-summary.draw-result { background: rgba(202,138,4,0.06); color: #a16207; }
-  .matchday-summary.in-progress { background: rgba(202,138,4,0.06); color: #a16207; }
-  .trophy { font-size: 18px; }
-  .score-summary { color: #9b8fc4; font-weight: 400; }
-  .bout-count { margin-left: auto; font-size: 12px; color: #9b8fc4; font-weight: 600; background: #f0ebff; padding: 3px 10px; border-radius: 20px; }
-
-  /* FOOTER */
-  .page-footer {
-    text-align: center;
-    padding: 24px;
-    color: #9b8fc4;
-    font-size: 12px;
-    border-top: 1px solid #ede8fa;
-    margin-top: 16px;
-  }
-
-  /* PRINT */
-  @media print {
-    body { background: white; }
-    .page-header { background: #7132CA !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-    .matchday-header { background: #7132CA !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-    .matchday-card { box-shadow: none; border: 1px solid #ddd6f7; }
-    .no-print { display: none !important; }
-  }
-</style>
-</head>
-<body>
-
-<div class="page-header">
-  <img src="${window.TYP_LOGO_DATA}" style="height:100px;width:auto;display:block;margin:0 auto 14px;filter:brightness(0) invert(1)">
-  <div class="header-badge">🏟️ CHAMPIONSHIP • OFFICIAL FIXTURE</div>
-  <div class="header-title">LEAGUE 2026</div>
-  <div class="header-subtitle">Round Robin Tournament • Fixture Sheet • Generated ${today}</div>
-  <div class="header-stats">
-    <div class="hstat">
-      <div class="hstat-num">${totalMatches}</div>
-      <div class="hstat-label">Total Bouts</div>
     </div>
-    <div class="hstat">
-      <div class="hstat-num">${completedMatches}</div>
-      <div class="hstat-label">Completed</div>
+    <div style="padding:16px 16px 20px">
+      ${Object.entries(days).map(([dayLabel, matchMap]) => `
+        <div style="margin-bottom:14px">
+          <div style="font-size:9px;font-weight:800;color:#7c6fe0;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid rgba(255,255,255,0.07)">${dayLabel}</div>
+          ${Object.values(matchMap).map(match => {
+            const ht = teamMap[match.homeTeam] || { name: match.homeTeam, emoji: '🏟️' };
+            const at = teamMap[match.awayTeam] || { name: match.awayTeam, emoji: '🏟️' };
+            const doneBouts = match.bouts.filter(b => b.status === 'completed');
+            let hw = 0, aw = 0;
+            doneBouts.forEach(b => { const hs=parseInt(b.homeScore)||0,as_=parseInt(b.awayScore)||0; if(hs>as_)hw++; else if(as_>hs)aw++; });
+            const allDone = doneBouts.length === match.bouts.length && match.bouts.length > 0;
+            const scoreText = doneBouts.length > 0 ? `${hw} – ${aw}` : 'vs';
+            const statusColor = allDone ? '#34d399' : doneBouts.length > 0 ? '#fbbf24' : 'rgba(255,255,255,0.3)';
+            const statusText = allDone ? '✅' : doneBouts.length > 0 ? `⏳${doneBouts.length}/${match.bouts.length}` : '🎮';
+            return `<div style="background:#16132e;border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:12px 14px;margin-bottom:7px;display:flex;align-items:center;gap:8px">
+              <div style="flex:1;min-width:0;font-size:13px;font-weight:700;color:${allDone&&hw>aw?'#7c6fe0':'rgba(255,255,255,0.85)'};overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${ht.emoji} ${ht.name}</div>
+              <div style="font-size:13px;font-weight:800;color:#f0eeff;font-family:monospace;background:#0e0c1a;padding:4px 10px;border-radius:7px;flex-shrink:0">${scoreText}</div>
+              <div style="flex:1;min-width:0;font-size:13px;font-weight:700;color:${allDone&&aw>hw?'#7c6fe0':'rgba(255,255,255,0.85)'};overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:right">${at.name} ${at.emoji}</div>
+              <div style="font-size:11px;color:${statusColor};flex-shrink:0;margin-left:4px">${statusText}</div>
+            </div>`;
+          }).join('')}
+        </div>
+      `).join('')}
     </div>
-    <div class="hstat">
-      <div class="hstat-num">${pendingMatches}</div>
-      <div class="hstat-label">Upcoming</div>
-    </div>
-    <div class="hstat">
-      <div class="hstat-num">${trnTeamsCache.length}</div>
-      <div class="hstat-label">Teams</div>
-    </div>
-  </div>
-</div>
+    <div style="text-align:center;padding:12px;font-size:10px;color:rgba(255,255,255,0.25);border-top:1px solid rgba(255,255,255,0.06)">TYP Championship 2026 · Official Fixture</div>
+  `;
+  document.body.appendChild(wrap);
 
-<div class="content">
-  ${matchdayHtml}
-</div>
+  // Load html2canvas if not already loaded
+  if (!window.html2canvas) {
+    await new Promise((res, rej) => {
+      const s = document.createElement('script');
+      s.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+      s.onload = res; s.onerror = rej;
+      document.head.appendChild(s);
+    });
+  }
 
-<div class="page-footer">
-  TYP Championship ${new Date().getFullYear()} · Generated on ${today} · Official Fixture Document
-</div>
-
-</body>
-</html>`;
-
-  // Create blob and download
-  const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `TYP-Championship-Fixture-${new Date().toISOString().slice(0,10)}.html`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
+  try {
+    const canvas = await html2canvas(wrap, { scale: 2, useCORS: true, backgroundColor: '#0e0c1a', logging: false });
+    document.body.removeChild(wrap);
+    const link = document.createElement('a');
+    link.download = `TYP-Fixture-${new Date().toISOString().slice(0,10)}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  } catch(e) {
+    document.body.removeChild(wrap);
+    alert('❌ Image তৈরি করতে পারিনি: ' + e.message);
+  }
 };
 
 // ══════════════════════════════════════════
@@ -7284,7 +7089,8 @@ window.downloadMatchdayResultCard = async function() {
   if (!dayVal) { alert('⚠️ আগে একটা matchday select করুন।'); return; }
 
   // Merge cache data with any unsaved DOM inputs currently on screen
-  const baseMatches = trnMatchesCache.filter(m => m.matchday === dayVal);
+  const normDayVal = raw => (raw||'').replace(/\s*—.*$/, '').trim().replace(/^GRP-[AB]\s+Day\s+(\d+)$/i, 'Matchday $1');
+  const baseMatches = trnMatchesCache.filter(m => normDayVal(m.matchday) === dayVal);
   if (!baseMatches.length) { alert('⚠️ এই matchday load হয়নি। আগে Load করুন।'); return; }
 
   const matches = baseMatches.map(m => {
