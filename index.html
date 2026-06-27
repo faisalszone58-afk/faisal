@@ -3574,13 +3574,20 @@ const IMGBB_KEY = 'e981fe62829ed3f63d0a6cc4d6bd6e67';
 async function uploadToImgBB(file) {
   const formData = new FormData();
   formData.append('image', file);
-  const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, {
-    method: 'POST',
-    body: formData
-  });
-  const data = await res.json();
+  let res;
+  try {
+    res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, {
+      method: 'POST',
+      body: formData
+    });
+  } catch(netErr) {
+    throw new Error('Network error: ' + netErr.message);
+  }
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  let data;
+  try { data = await res.json(); } catch(e) { throw new Error('Invalid response from ImgBB'); }
   if (data.success) return data.data.url;
-  throw new Error('ImgBB upload failed');
+  throw new Error(data.error?.message || 'ImgBB upload failed');
 }
 
 // ── AVATAR PREVIEW (Admin Edit Player) ──
@@ -6390,9 +6397,17 @@ function updatePlayerPickCount() {
   if (el) el.textContent = `${_playerPickSelected.length} selected (${Math.min(_playerPickSelected.length,8)} starters + ${Math.max(0,_playerPickSelected.length-8)} subs)`;
 }
 
-window.previewTeamLogo = function(input) {
+window.previewTeamLogo = async function(input) {
   const file = input.files[0];
   if (!file) return;
+
+  if (file.size > 2 * 1024 * 1024) {
+    alert('❌ File size 2MB এর বেশি হবে না।');
+    input.value = '';
+    return;
+  }
+
+  // Show local preview immediately
   const reader = new FileReader();
   reader.onload = e => {
     const prev = document.getElementById('teamLogoPreview');
@@ -6400,6 +6415,28 @@ window.previewTeamLogo = function(input) {
     prev.style.border = '2px solid var(--primary)';
   };
   reader.readAsDataURL(file);
+
+  // Upload to ImgBB right away (like avatar does)
+  const errEl = document.getElementById('createTeamError');
+  errEl.textContent = '⏳ Logo upload হচ্ছে...';
+  errEl.style.color = 'var(--cyan)';
+  document.getElementById('teamLogoUrl').value = '';
+  window._teamLogoUploading = true;
+
+  try {
+    const url = await uploadToImgBB(file);
+    document.getElementById('teamLogoUrl').value = url;
+    errEl.textContent = '✅ Logo ready!';
+    errEl.style.color = 'var(--green)';
+    setTimeout(() => { if (errEl.textContent === '✅ Logo ready!') errEl.textContent = ''; }, 2000);
+  } catch(e) {
+    errEl.textContent = '❌ Logo upload failed. Try again.';
+    errEl.style.color = 'var(--red)';
+    document.getElementById('teamLogoPreview').innerHTML = '🏟️';
+    document.getElementById('teamLogoPreview').style.border = '2px dashed var(--border)';
+    input.value = '';
+  }
+  window._teamLogoUploading = false;
 }
 
 window.saveTeam = async function() {
@@ -6420,19 +6457,12 @@ window.saveTeam = async function() {
   const teamId = document.getElementById('editTeamId').value;
   errEl.textContent = '';
 
-  // Upload logo if new file selected
-  let logoUrl = document.getElementById('teamLogoUrl').value || '';
-  const logoFile = document.getElementById('teamLogoInput').files[0];
-  if (logoFile) {
-    errEl.textContent = '⏳ Logo upload হচ্ছে...';
-    try {
-      logoUrl = await uploadToImgBB(logoFile);
-    } catch(e) {
-      errEl.textContent = '❌ Logo upload failed. Try again.';
-      return;
-    }
-    errEl.textContent = '';
+  // Logo already uploaded during preview — just read the stored URL
+  if (window._teamLogoUploading) {
+    errEl.textContent = '⏳ Logo এখনো upload হচ্ছে, একটু অপেক্ষা করুন...';
+    return;
   }
+  let logoUrl = document.getElementById('teamLogoUrl').value || '';
 
   const payload = { name, manager, emoji, group, players, updatedAt: new Date().toISOString() };
   if (logoUrl) payload.logo = logoUrl;
