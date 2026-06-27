@@ -815,6 +815,19 @@ select.form-input option { background: var(--card); color: var(--text); }
 #introScreen { transition: opacity 0.6s ease, transform 0.6s ease; }
 #introScreen.hide { opacity: 0; transform: scale(1.05); pointer-events: none; }
 </style>
+<script>
+window.TYP_LOGO_DATA = "data:image/png;base64,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";
+</script>
+<script>
+function _typFillLogos() {
+  document.querySelectorAll('[data-typ-logo]').forEach(el => { el.src = window.TYP_LOGO_DATA; });
+}
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', _typFillLogos);
+} else {
+  _typFillLogos();
+}
+</script>
 
 <script>
 (function() {
@@ -885,7 +898,7 @@ select.form-input option { background: var(--card); color: var(--text); }
 <div class="loading-screen" id="loadingScreen">
   <canvas id="loadingCanvas" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none"></canvas>
   <div class="loading-logo" id="loadingLogo">
-    <span class="ll" style="animation-delay:0s">T</span><span class="ll" style="animation-delay:0.1s">Y</span><span class="ll" style="animation-delay:0.2s">P</span>
+    <img src="" data-typ-logo style="height:160px;width:auto;display:block;margin:0 auto">
     <span class="ll" style="animation-delay:0.35s;opacity:0.4;font-family:'Inter',sans-serif;font-size:18px;font-weight:300;letter-spacing:0.1em"> ⚡ </span>
     <span class="ll" style="animation-delay:0.5s;font-size:16px;font-family:'Inter',sans-serif;font-weight:600;letter-spacing:0.15em">CHAMPIONSHIP</span>
   </div>
@@ -914,7 +927,7 @@ select.form-input option { background: var(--card); color: var(--text); }
 
 <!-- NAV -->
 <nav id="mainNav" class="hidden">
-  <div class="nav-logo" onclick="showPage('home')"><div class="logo-dot"></div> TYP CHAMPIONSHIP</div>
+  <div class="nav-logo" onclick="showPage('home')"><img src="" data-typ-logo style="height:46px;width:auto;vertical-align:middle;margin-right:6px"><div class="logo-dot"></div> CHAMPIONSHIP</div>
   <div class="nav-links" id="navLinks">
     <button class="nav-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle theme" style="font-size:16px;padding:7px 10px;">🌙</button>
     <button class="nav-btn" onclick="showPage('home')">🏠 Home</button>
@@ -934,7 +947,8 @@ select.form-input option { background: var(--card); color: var(--text); }
 
   <div class="hero">
     <div class="hero-badge">🏆 Season 2026 • Active</div>
-    <h1><span class="gold">TYP</span> <span class="cyan">CHAMPIONSHIP</span></h1>
+    <img src="" data-typ-logo style="height:170px;width:auto;display:block;margin:0 auto 14px">
+    <h1><span class="cyan">CHAMPIONSHIP</span></h1>
     <p>Bangladesh-এর সেরা eFootball community। খেলো, জেতো, legend হও।</p>
     <div class="hero-btns" id="heroBtns">
       <button class="btn btn-outline" onclick="showPage('ranking')">🏆 Leaderboard</button>
@@ -1606,7 +1620,8 @@ select.form-input option { background: var(--card); color: var(--text); }
 <!-- ═══════════════ TOURNAMENT PAGE ═══════════════ -->
 <div class="page" id="page-tournament">
   <div class="trn-header">
-    <div class="trn-title">🏟️ TYP LEAGUE</div>
+    <img src="" data-typ-logo style="height:110px;width:auto;display:block;margin:0 auto 10px">
+    <div class="trn-title">🏟️ LEAGUE</div>
     <div class="trn-subtitle" id="trnSeasonLabel">// Season 2026 • Round Robin → Knockout</div>
   </div>
 
@@ -1772,15 +1787,22 @@ select.form-input option { background: var(--card); color: var(--text); }
           <div style="display:flex;gap:14px;padding-bottom:16px;position:relative">
             <div style="width:12px;height:12px;border-radius:50%;background:var(--primary);flex-shrink:0;margin-top:5px;box-shadow:0 0 8px rgba(113,50,202,0.5);position:relative;z-index:1"></div>
             <div style="flex:1">
-              <div style="font-family:'Inter',sans-serif;font-weight:700;font-size:13px;color:var(--primary);letter-spacing:0.05em">FIRST DAY — রাত ১০:৪৫</div>
-              <div style="font-size:13px;color:var(--text2);line-height:1.7;margin-top:3px">ফার্স্ট ডে উপস্থিতি ডেডলাইন। Response Time: <span class="rh">১০:৩০ – ১০:৪০</span>। SUB/SWAP ডেডলাইন: রাত <span class="rh">১০:২৯</span>।</div>
+              <div style="font-family:'Inter',sans-serif;font-weight:700;font-size:13px;color:var(--primary);letter-spacing:0.05em">1ST DEADLINE — রাত ১১:০০</div>
+              <div style="font-size:13px;color:var(--text2);line-height:1.7;margin-top:3px">উপস্থিতি ডেডলাইন। Priority Time: <span class="rh">রাত ১০:৪৫</span>। Sub/Swap ডেডলাইন: <span class="rh">রাত ১০:৪৪:৫৯</span>।</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:14px;padding-bottom:16px;position:relative">
+            <div style="width:12px;height:12px;border-radius:50%;background:var(--primary);flex-shrink:0;margin-top:5px;box-shadow:0 0 8px rgba(113,50,202,0.5);position:relative;z-index:1"></div>
+            <div style="flex:1">
+              <div style="font-family:'Inter',sans-serif;font-weight:700;font-size:13px;color:var(--primary);letter-spacing:0.05em">2ND DEADLINE — রাত ১২:০০</div>
+              <div style="font-size:13px;color:var(--text2);line-height:1.7;margin-top:3px">উপস্থিতি ডেডলাইন। Priority Time: <span class="rh">রাত ১১:৪৫</span>। Sub/Swap ডেডলাইন: <span class="rh">রাত ১১:৪৪:৫৯</span>।</div>
             </div>
           </div>
           <div style="display:flex;gap:14px;padding-bottom:4px">
             <div style="width:12px;height:12px;border-radius:50%;background:var(--primary);flex-shrink:0;margin-top:5px;box-shadow:0 0 8px rgba(113,50,202,0.5)"></div>
             <div style="flex:1">
-              <div style="font-family:'Inter',sans-serif;font-weight:700;font-size:13px;color:var(--primary);letter-spacing:0.05em">SECOND DAY — রাত ০১:০৫</div>
-              <div style="font-size:13px;color:var(--text2);line-height:1.7;margin-top:3px">সেকেন্ড ডে উপস্থিতি ডেডলাইন। Response Time: <span class="rh">১২:৪৫ – ০১:০০</span>। Sub/Swap ডেডলাইন: রাত <span class="rh">১২:৪৪</span>।</div>
+              <div style="font-family:'Inter',sans-serif;font-weight:700;font-size:13px;color:var(--primary);letter-spacing:0.05em">3RD DEADLINE — রাত ০১:০০</div>
+              <div style="font-size:13px;color:var(--text2);line-height:1.7;margin-top:3px">উপস্থিতি ডেডলাইন। Priority Time: <span class="rh">রাত ১২:৪৫</span>। Sub/Swap ডেডলাইন: <span class="rh">রাত ১২:৪৪:৫৯</span>।</div>
             </div>
           </div>
         </div>
@@ -1959,9 +1981,36 @@ select.form-input option { background: var(--card); color: var(--text); }
       </div>
     </div>
 
+    <!-- 15 -->
+    <div class="rules-section" id="rs15">
+      <div class="rules-header" onclick="toggleRule(this)">
+        <span style="font-size:1.2rem">📡</span>
+        <span class="rules-title">Match Disconnection Rule</span>
+        <span class="rules-toggle">▼</span>
+      </div>
+      <div class="rules-body">
+        <div class="rule-row">📤 কোনো খেলোয়াড় যদি নেটওয়ার্ক সমস্যা বা অন্য কোনো কারণে ম্যাচ সম্পূর্ণ না খেলে বের হয়ে যায়, তাহলে তাকে অবশ্যই <span class="rh">ভিডিও প্রমাণ (Video Proof)</span> দিতে হবে।</div>
+        <div class="rule-row" style="padding-bottom:4px"><strong style="color:var(--primary)">📋 ভিডিওতে অবশ্যই নিচের বিষয়গুলো স্পষ্টভাবে দেখা যেতে হবে:</strong></div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px;margin:4px 0 14px 0">
+          <div class="setting-pill-r"><span>🎮</span> Smart Assist Status</div>
+          <div class="setting-pill-r"><span>🪪</span> User ID</div>
+          <div class="setting-pill-r"><span>📱</span> Device Name</div>
+          <div class="setting-pill-r"><span>🚪</span> বের হওয়ার কারণ</div>
+        </div>
+        <div class="rule-row">📳 <strong>Black Screen, Disconnect</strong> বা অন্য কোনো টেকনিক্যাল সমস্যা হলে সেটিও ভিডিওতে <span class="rh">স্পষ্টভাবে</span> দেখাতে হবে।</div>
+        <div class="rule-row"><span class="rl rl-red">⚠️</span> নির্ধারিত সময়ের মধ্যে যথাযথ ভিডিও প্রমাণ দিতে ব্যর্থ হলে — প্রতিপক্ষ (Opponent) <span class="rh">১ গোল লিড</span> নিয়ে বাকি <span class="rh">Remaining Time</span> থেকে ম্যাচ সম্পন্ন করবে।</div>
+        <div class="rule-row" style="background:rgba(52,211,153,0.06);border-left:3px solid var(--green);border-radius:6px;padding:10px 14px">
+          <strong style="color:var(--green)">📝 নোট:</strong> ডিসকানেক্টের পর গেমে যাকে <span class="rh">Winner</span> দেখানো হবে, তাকে ভিডিও প্রমাণ দিতে হবে না। শুধুমাত্র <span class="rh">Winner Screen-এর Screenshot (SS)</span> দিলেই যথেষ্ট।
+        </div>
+      </div>
+    </div>
+
     <!-- Footer -->
-    <div style="text-align:center;padding:30px 20px;border-top:1px solid var(--border);margin-top:10px;font-family:'Rubik Glitch',cursive;font-size:1.2rem;letter-spacing:0.2em;color:var(--text3)">
-      TYP <span style="color:var(--primary)">CHAMPIONSHIP</span> — PRESENT
+    <div style="text-align:center;padding:30px 20px;border-top:1px solid var(--border);margin-top:10px">
+      <img src="" data-typ-logo style="height:80px;width:auto;display:block;margin:0 auto 10px">
+      <div style="font-family:'Rubik Glitch',cursive;font-size:1.2rem;letter-spacing:0.2em;color:var(--text3)">
+        <span style="color:var(--primary)">CHAMPIONSHIP</span> — PRESENT
+      </div>
     </div>
 
   </div>
@@ -1972,6 +2021,7 @@ select.form-input option { background: var(--card); color: var(--text); }
   <!-- Admin Login -->
   <div id="adminLoginSection">
     <div class="admin-login-box">
+      <img src="" data-typ-logo style="height:90px;width:auto;display:block;margin:0 auto 12px">
       <div class="admin-login-title">🛡️ ADMIN ACCESS</div>
       <div class="alert alert-error" id="adminLoginError"></div>
       <div class="form-group">
@@ -2002,6 +2052,7 @@ select.form-input option { background: var(--card); color: var(--text); }
         <div class="admin-tab" onclick="switchAdminTab('resultmgmt')">📤 Result Requests <span id="pendingResultCount" style="background:var(--red);color:#fff;border-radius:10px;padding:1px 6px;font-size:11px;margin-left:4px">0</span></div>
         <div class="admin-tab" onclick="switchAdminTab('tournament')">🏟️ Tournament</div>
         <div class="admin-tab" onclick="switchAdminTab('notice')">📢 Notice</div>
+        <div class="admin-tab" onclick="switchAdminTab('boutdraw')">🎲 Bout Draw</div>
       </div>
 
       <!-- PLAYERS TAB -->
@@ -2380,6 +2431,65 @@ select.form-input option { background: var(--card); color: var(--text); }
   </div>
 </div>
 
+<!-- BOUT DRAW SECTION -->
+<div class="admin-section" id="adminTab-boutdraw">
+  <div style="max-width:600px">
+    <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px">🎲 Bout Draw</div>
+    <div style="font-size:13px;color:var(--text3);margin-bottom:18px">তিনটি Deadline-এর জন্য Bout Draw করুন এবং PNG হিসেবে ডাউনলোড করুন।</div>
+
+    <!-- Deadline Tabs -->
+    <div style="display:flex;gap:5px;margin-bottom:16px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:5px">
+      <button id="bdtab-1" onclick="bdSetDeadline(1,this)" style="flex:1;padding:8px 4px;border-radius:7px;border:none;background:var(--primary);color:#fff;font-family:'Inter',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all .18s;position:relative">
+        Deadline 1<span style="display:block;font-size:10px;font-weight:400;margin-top:2px;opacity:.8">3v3</span>
+      </button>
+      <button id="bdtab-2" onclick="bdSetDeadline(2,this)" style="flex:1;padding:8px 4px;border-radius:7px;border:none;background:transparent;color:var(--text3);font-family:'Inter',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all .18s;position:relative">
+        Deadline 2<span style="display:block;font-size:10px;font-weight:400;margin-top:2px;opacity:.7">2v2</span>
+      </button>
+      <button id="bdtab-3" onclick="bdSetDeadline(3,this)" style="flex:1;padding:8px 4px;border-radius:7px;border:none;background:transparent;color:var(--text3);font-family:'Inter',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all .18s;position:relative">
+        Deadline 3<span style="display:block;font-size:10px;font-weight:400;margin-top:2px;opacity:.7">3v3</span>
+      </button>
+    </div>
+
+    <!-- Team Inputs -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+      <div>
+        <input class="form-input" id="bd-tname-a" placeholder="Team A নাম" value="Team A" style="margin-bottom:6px;font-weight:600">
+        <input class="form-input" id="bd-tshort-a" placeholder="Tag (FCB)" maxlength="6" style="margin-bottom:8px;font-size:12px;letter-spacing:.1em;text-transform:uppercase">
+        <div id="bd-boxes-a" style="display:flex;flex-direction:column;gap:5px"></div>
+      </div>
+      <div>
+        <input class="form-input" id="bd-tname-b" placeholder="Team B নাম" value="Team B" style="margin-bottom:6px;font-weight:600">
+        <input class="form-input" id="bd-tshort-b" placeholder="Tag (RMA)" maxlength="6" style="margin-bottom:8px;font-size:12px;letter-spacing:.1em;text-transform:uppercase">
+        <div id="bd-boxes-b" style="display:flex;flex-direction:column;gap:5px"></div>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
+      <button class="btn btn-gold" onclick="bdDoDraw()" style="padding:10px 22px">🎲 Draw!</button>
+      <button class="btn btn-outline" onclick="bdRedraw()" style="padding:10px 18px">↻ Redraw</button>
+      <button class="btn btn-outline" onclick="bdClearCurrent()" style="padding:10px 18px;color:var(--red);border-color:var(--red)">✕ Clear</button>
+    </div>
+
+    <!-- Result Area -->
+    <div id="bd-result-area" style="display:none">
+      <div id="bd-dl-label" style="text-align:center;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--text3);margin-bottom:10px;padding:5px 12px;background:var(--card2);border:1px solid var(--border);border-radius:6px;font-weight:500"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;padding:0 2px">
+        <span id="bd-r-ta" style="font-size:17px;font-weight:800;letter-spacing:.06em;color:var(--primary)"></span>
+        <span style="font-size:10px;color:var(--text3);letter-spacing:.12em">VS</span>
+        <span id="bd-r-tb" style="font-size:17px;font-weight:800;letter-spacing:.06em;color:var(--primary)"></span>
+      </div>
+      <div id="bd-bouts" style="display:flex;flex-direction:column;gap:6px"></div>
+    </div>
+
+    <!-- Download Button -->
+    <div style="margin-top:16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+      <button class="btn btn-gold" id="bd-dl-btn" onclick="bdDownloadAll()" disabled style="padding:10px 24px;opacity:.5">⬇ Download All (PNG)</button>
+      <div id="bd-dl-status" style="font-size:12px;color:var(--text3)"></div>
+    </div>
+  </div>
+</div>
+
 <!-- ADMIN TOURNAMENT SECTION -->
 <div class="admin-section" id="adminTab-tournament">
   <div class="trn-admin-section">
@@ -2475,7 +2585,7 @@ select.form-input option { background: var(--card); color: var(--text); }
       </div>
     </div>
     <div class="form-group">
-      <label class="form-label">Select Players (8 starters + 3 subs = 11 max)</label>
+      <label class="form-label">Select Players (8 starters + 4 subs = 12 max)</label>
       <input type="text" class="form-input" id="playerPickSearch" placeholder="🔍 Search player..." oninput="filterPlayerPick()" style="margin-bottom:8px">
       <div class="player-pick-list" id="playerPickList"></div>
       <div style="margin-top:8px;font-size:12px;color:var(--cyan)" id="playerPickCount">0 selected</div>
@@ -3527,7 +3637,236 @@ window.switchAdminTab = function(tab) {
   if (tab === 'friendlymgmt') loadFriendlyRequests();
   if (tab === 'resultmgmt') loadResultRequests();
   if (tab === 'seasonstats') ssmInit();
+  if (tab === 'boutdraw') bdInit();
 };
+
+// ══════════════════════════════════════════
+// 🎲 BOUT DRAW
+// ══════════════════════════════════════════
+const BD_CONFIG = {
+  1:{count:3,label:'Deadline 1',boutLabel:'3v3 Bout Draw'},
+  2:{count:2,label:'Deadline 2',boutLabel:'2v2 Bout Draw'},
+  3:{count:3,label:'Deadline 3',boutLabel:'3v3 Bout Draw'},
+};
+let bdCurrentDL = 1;
+const bdSaved = {1:null,2:null,3:null};
+let bdCurrentDraw = {a:[],b:[]};
+let bdInited = false;
+
+function bdInit() {
+  if (bdInited) return;
+  bdInited = true;
+  bdBuildBoxes('a'); bdBuildBoxes('b');
+}
+
+function bdBuildBoxes(side) {
+  const col = document.getElementById('bd-boxes-' + side);
+  const n = BD_CONFIG[bdCurrentDL].count;
+  col.innerHTML = '';
+  for (let i = 1; i <= n; i++) {
+    const d = document.createElement('div');
+    d.style.cssText = 'background:var(--card);border:1px solid var(--border);border-radius:7px;display:flex;align-items:center;gap:6px;padding:7px 10px';
+    d.innerHTML = `<span style="font-size:10px;color:var(--text3);min-width:14px;text-align:right;font-weight:500">${i}</span><input type="text" placeholder="Player ${i}" id="bd-p-${side}-${i}" autocomplete="off" style="background:transparent;border:none;color:var(--text);font-family:'Inter',sans-serif;font-size:13px;outline:none;width:100%">`;
+    col.appendChild(d);
+  }
+}
+
+function bdGetPlayers(side) {
+  const n = BD_CONFIG[bdCurrentDL].count, arr = [];
+  for (let i = 1; i <= n; i++) {
+    const el = document.getElementById('bd-p-' + side + '-' + i);
+    if (el) { const v = el.value.trim(); if (v) arr.push(v); }
+  }
+  return arr;
+}
+
+function bdShuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length-1; i > 0; i--) { const j = Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+  return a;
+}
+
+window.bdSetDeadline = function(dl, btn) {
+  if (bdCurrentDraw.a.length) bdSaved[bdCurrentDL] = {a:[...bdCurrentDraw.a],b:[...bdCurrentDraw.b]};
+  bdCurrentDL = dl;
+  document.querySelectorAll('[id^="bdtab-"]').forEach(t => {
+    t.style.background = 'transparent'; t.style.color = 'var(--text3)';
+  });
+  btn.style.background = 'var(--primary)'; btn.style.color = '#fff';
+  bdBuildBoxes('a'); bdBuildBoxes('b');
+  if (bdSaved[dl]) {
+    bdCurrentDraw = {a:[...bdSaved[dl].a],b:[...bdSaved[dl].b]};
+    bdRenderBouts(bdCurrentDraw.a, bdCurrentDraw.b);
+  } else {
+    bdCurrentDraw = {a:[],b:[]};
+    document.getElementById('bd-result-area').style.display = 'none';
+  }
+  bdUpdateStatus();
+};
+
+window.bdDoDraw = function() {
+  const cfg = BD_CONFIG[bdCurrentDL];
+  const pa = bdGetPlayers('a'), pb = bdGetPlayers('b');
+  if (pa.length < cfg.count || pb.length < cfg.count) {
+    alert(`${cfg.label}-এ দুই team-এ ${cfg.count} জন করে player দাও!`); return;
+  }
+  bdCurrentDraw.a = bdShuffle(pa).slice(0, cfg.count);
+  bdCurrentDraw.b = bdShuffle(pb).slice(0, cfg.count);
+  bdSaved[bdCurrentDL] = {a:[...bdCurrentDraw.a],b:[...bdCurrentDraw.b]};
+  bdRenderBouts(bdCurrentDraw.a, bdCurrentDraw.b);
+  bdUpdateStatus();
+};
+
+window.bdRedraw = function() {
+  if (bdCurrentDraw.a.length) {
+    bdCurrentDraw.a = bdShuffle([...bdCurrentDraw.a]);
+    bdCurrentDraw.b = bdShuffle([...bdCurrentDraw.b]);
+    bdSaved[bdCurrentDL] = {a:[...bdCurrentDraw.a],b:[...bdCurrentDraw.b]};
+    bdRenderBouts(bdCurrentDraw.a, bdCurrentDraw.b);
+  } else bdDoDraw();
+};
+
+window.bdClearCurrent = function() {
+  const cfg = BD_CONFIG[bdCurrentDL];
+  for (let i = 1; i <= cfg.count; i++) {
+    const ea = document.getElementById('bd-p-a-'+i);
+    const eb = document.getElementById('bd-p-b-'+i);
+    if (ea) ea.value=''; if (eb) eb.value='';
+  }
+  bdSaved[bdCurrentDL] = null; bdCurrentDraw = {a:[],b:[]};
+  document.getElementById('bd-result-area').style.display = 'none';
+  bdUpdateStatus();
+};
+
+function bdGetTag(side) { return (document.getElementById('bd-tshort-'+side).value||'').trim().toUpperCase(); }
+
+function bdRenderBouts(pa, pb) {
+  const cfg = BD_CONFIG[bdCurrentDL];
+  const ta = document.getElementById('bd-tname-a').value||'Team A';
+  const tb = document.getElementById('bd-tname-b').value||'Team B';
+  const tagA = bdGetTag('a'), tagB = bdGetTag('b');
+  document.getElementById('bd-r-ta').textContent = ta;
+  document.getElementById('bd-r-tb').textContent = tb;
+  document.getElementById('bd-dl-label').textContent = `${cfg.label} — ${cfg.boutLabel}`;
+  document.getElementById('bd-result-area').style.display = 'block';
+  const boutsEl = document.getElementById('bd-bouts');
+  boutsEl.innerHTML = '';
+  for (let i = 0; i < pa.length; i++) {
+    const d = document.createElement('div');
+    d.style.cssText = 'display:grid;grid-template-columns:1fr 60px 1fr;align-items:center;background:var(--card);border:1px solid var(--border);border-radius:9px;padding:10px';
+    d.innerHTML = `
+      <div style="font-size:13px;font-weight:600;text-align:right;color:var(--text);word-break:break-word">${tagA?`<span style="font-size:9px;font-weight:700;background:var(--card2);color:var(--text3);border:1px solid var(--border);border-radius:3px;padding:1px 4px;margin-right:4px">${tagA}</span>`:''}${pa[i]}</div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:2px">
+        <span style="font-size:9px;color:var(--text3);letter-spacing:.08em">Bout ${i+1}</span>
+        <span style="font-size:13px;font-weight:800;letter-spacing:.1em;color:var(--primary);background:var(--card2);border:1px solid var(--border);border-radius:5px;padding:2px 7px">VS</span>
+      </div>
+      <div style="font-size:13px;font-weight:600;text-align:left;color:var(--text);word-break:break-word">${tagB?`<span style="font-size:9px;font-weight:700;background:var(--card2);color:var(--text3);border:1px solid var(--border);border-radius:3px;padding:1px 4px;margin-right:4px">${tagB}</span>`:''}${pb[i]}</div>`;
+    boutsEl.appendChild(d);
+  }
+}
+
+function bdUpdateStatus() {
+  const doneCount = [1,2,3].filter(d=>bdSaved[d]).length;
+  const statusEl = document.getElementById('bd-dl-status');
+  const btn = document.getElementById('bd-dl-btn');
+  const parts = [1,2,3].map(d => bdSaved[d]
+    ? `<span style="color:var(--green);font-weight:600">✓ ${BD_CONFIG[d].label}</span>`
+    : `<span style="color:var(--text3)">${BD_CONFIG[d].label}</span>`
+  );
+  statusEl.innerHTML = doneCount > 0 ? parts.join(' &nbsp;·&nbsp; ') : '';
+  btn.disabled = doneCount < 3;
+  btn.style.opacity = doneCount < 3 ? '0.5' : '1';
+  btn.textContent = doneCount < 3 ? `⬇ Download All (${doneCount}/3 done)` : '⬇ Download All (PNG)';
+}
+
+window.bdDownloadAll = async function() {
+  if (!bdSaved[1]||!bdSaved[2]||!bdSaved[3]) { alert('আগে তিনটা deadline-এরই draw করো!'); return; }
+  const ta = document.getElementById('bd-tname-a').value||'Team A';
+  const tb = document.getElementById('bd-tname-b').value||'Team B';
+  const tagA = bdGetTag('a'), tagB = bdGetTag('b');
+  const typLogoImg = await new Promise(resolve => {
+    if (!window.TYP_LOGO_DATA) { resolve(null); return; }
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = () => resolve(null);
+    img.src = window.TYP_LOGO_DATA;
+  });
+  const SCALE=2,W=560,PAD=28;
+  const ROW_H=44,ROW_GAP=6,SECTION_GAP=22,SEC_LABEL_H=30;
+  const HEADER_H=102,FOOTER_H=38;
+  const totalRows=3+2+3;
+  const totalH=HEADER_H+3*SEC_LABEL_H+totalRows*(ROW_H+ROW_GAP)-ROW_GAP+2*SECTION_GAP+FOOTER_H+24;
+  const canvas=document.createElement('canvas');
+  canvas.width=W*SCALE; canvas.height=totalH*SCALE;
+  const ctx=canvas.getContext('2d');
+  ctx.scale(SCALE,SCALE);
+  ctx.fillStyle='#f5f2ee'; ctx.fillRect(0,0,W,totalH);
+  if (typLogoImg) {
+    const lh=100, lw = typLogoImg.width * (lh/typLogoImg.height);
+    ctx.drawImage(typLogoImg, PAD, PAD-4, lw, lh);
+  } else {
+    ctx.font="bold 48px 'Arial Black',Arial,sans-serif";
+    ctx.fillStyle='#1a1a1a'; ctx.textAlign='left';
+    ctx.fillText('TYP',PAD,PAD+40);
+  }
+  ctx.font="700 13px Arial,sans-serif"; ctx.fillStyle='#2c2c2c'; ctx.textAlign='right';
+  ctx.fillText('TYP Championship',W-PAD,PAD+24);
+  ctx.font="10px Arial,sans-serif"; ctx.fillStyle='#888078'; ctx.textAlign='right';
+  ctx.fillText('BOUT DRAW RESULT',W-PAD,PAD+40);
+  ctx.fillStyle='#d8d0c4'; ctx.fillRect(PAD,HEADER_H-22,W-PAD*2,1);
+  ctx.font="bold 16px 'Arial Black',Arial,sans-serif";
+  ctx.fillStyle='#1a1a1a'; ctx.textAlign='left'; ctx.fillText(ta.toUpperCase(),PAD,HEADER_H-5);
+  ctx.textAlign='right'; ctx.fillText(tb.toUpperCase(),W-PAD,HEADER_H-5);
+  ctx.font="10px Arial,sans-serif"; ctx.fillStyle='#888078'; ctx.textAlign='center';
+  ctx.fillText('VS',W/2,HEADER_H-5);
+  let y=HEADER_H+6;
+  [1,2,3].forEach((dl,secIdx)=>{
+    const cfg=BD_CONFIG[dl], players=bdSaved[dl];
+    if(secIdx>0) y+=SECTION_GAP;
+    ctx.fillStyle='#ede9e3';
+    bdRoundRect(ctx,PAD,y,W-PAD*2,SEC_LABEL_H-4,6); ctx.fill();
+    ctx.strokeStyle='#d8d0c4'; ctx.lineWidth=1;
+    bdRoundRect(ctx,PAD,y,W-PAD*2,SEC_LABEL_H-4,6); ctx.stroke();
+    ctx.font="bold 11px Arial,sans-serif"; ctx.fillStyle='#555'; ctx.textAlign='center';
+    ctx.fillText(`${cfg.label.toUpperCase()}  —  ${cfg.boutLabel.toUpperCase()}`,W/2,y+SEC_LABEL_H-10);
+    y+=SEC_LABEL_H+4;
+    for(let i=0;i<players.a.length;i++){
+      ctx.fillStyle='#ffffff';
+      bdRoundRect(ctx,PAD,y,W-PAD*2,ROW_H,8); ctx.fill();
+      ctx.strokeStyle='#d8d0c4'; ctx.lineWidth=1;
+      bdRoundRect(ctx,PAD,y,W-PAD*2,ROW_H,8); ctx.stroke();
+      const midX=PAD+(W-PAD*2)/2, textY=y+ROW_H/2;
+      ctx.font="10px Arial,sans-serif"; ctx.fillStyle='#bbb3a8'; ctx.textAlign='center';
+      ctx.fillText('BOUT '+(i+1),midX,textY-6);
+      ctx.fillStyle='#f0ece6';
+      bdRoundRect(ctx,midX-18,textY,36,15,4); ctx.fill();
+      ctx.strokeStyle='#d8d0c4'; ctx.lineWidth=1;
+      bdRoundRect(ctx,midX-18,textY,36,15,4); ctx.stroke();
+      ctx.font="bold 12px 'Arial Black',Arial,sans-serif"; ctx.fillStyle='#1a1a1a'; ctx.textAlign='center';
+      ctx.fillText('VS',midX,textY+11);
+      ctx.font="13px Arial,sans-serif"; ctx.fillStyle='#1a1a1a'; ctx.textAlign='right';
+      ctx.fillText((tagA?tagA+' ':'')+players.a[i],midX-28,textY+12);
+      ctx.textAlign='left';
+      ctx.fillText((tagB?tagB+' ':'')+players.b[i],midX+28,textY+12);
+      y+=ROW_H+ROW_GAP;
+    }
+  });
+  ctx.font="10px Arial,sans-serif"; ctx.fillStyle='#bbb3a8'; ctx.textAlign='center';
+  ctx.fillText('TEXT YOUR PES  ·  typ.is-a.dev',W/2,y+20);
+  const link=document.createElement('a');
+  link.download=`TYP_FullDraw_${ta}_vs_${tb}.png`;
+  link.href=canvas.toDataURL('image/png');
+  link.click();
+};
+
+function bdRoundRect(ctx,x,y,w,h,r){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);
+  ctx.quadraticCurveTo(x+w,y,x+w,y+r);ctx.lineTo(x+w,y+h-r);
+  ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);ctx.lineTo(x+r,y+h);
+  ctx.quadraticCurveTo(x,y+h,x,y+h-r);ctx.lineTo(x,y+r);
+  ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();
+}
 
 // ══════════════════════════════════════════
 // SEASON RESET
@@ -4998,7 +5337,23 @@ window.openPublicProfile = async function(uid) {
     }
   }
 
-  // Store for download
+  // Store for download — inject live rank
+  // Use global rankingData if already loaded (most reliable), else sort from users
+  try {
+    let rankSource = (window.rankingData && window.rankingData.length)
+      ? window.rankingData
+      : [...users].sort((a,b)=>{
+          const sa=(a.wins||0)*9+(a.mvp||0)*5+(a.draws||0)*3+(a.goalsFor||0);
+          const sb=(b.wins||0)*9+(b.mvp||0)*5+(b.draws||0)*3+(b.goalsFor||0);
+          if(sb!==sa) return sb-sa;
+          if((b.wins||0)!==(a.wins||0)) return (b.wins||0)-(a.wins||0);
+          return (b.goalsFor||0)-(a.goalsFor||0);
+        });
+    // Only rank players who have played
+    const activePlayers = rankSource.filter(u=>(u.wins||0)+(u.draws||0)+(u.losses||0)+(u.matches||0)>0);
+    const liveRankIdx = activePlayers.findIndex(u => u.uid === p.uid || u.name === p.name);
+    p._liveRank = liveRankIdx !== -1 ? liveRankIdx + 1 : null;
+  } catch(e) { p._liveRank = null; }
   window._ppCurrentPlayer = p;
   window._ppCurrentStats = { m, w, d, l, goals, mvp, score, wp, ga: p.goalsAgainst||0 };
 
@@ -5258,6 +5613,15 @@ window.downloadStatsCard = async function() {
     img.src = p.avatarUrl;
   });
 
+  // ── Load TYP brand logo ──
+  const typLogoImg = await new Promise(resolve => {
+    if (!window.TYP_LOGO_DATA) { resolve(null); return; }
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = () => resolve(null);
+    img.src = window.TYP_LOGO_DATA;
+  });
+
   // ════════════════════════════════════════════
   // LAYER 1: BLACK BASE
   // ════════════════════════════════════════════
@@ -5316,21 +5680,60 @@ window.downloadStatsCard = async function() {
   ctx.fillStyle = vigR; ctx.fillRect(W - 160, 0, 160, H);
 
   // ════════════════════════════════════════════
-  // LAYER 4: TOP-LEFT — TYP LOGO (placeholder)
+  // LAYER 4: TOP-LEFT — TYP LOGO
   // ════════════════════════════════════════════
-  ctx.fillStyle = '#ffffff';
-  ctx.font = 'bold 44px Arial Black, Arial, sans-serif';
-  ctx.textAlign = 'left'; ctx.textBaseline = 'top';
-  ctx.fillText('⚡ TYP', 32, 32);
+  if (typLogoImg) {
+    const lh = 92;
+    const lw = typLogoImg.width * (lh / typLogoImg.height);
+    ctx.save();
+    ctx.filter = 'brightness(0) invert(1) drop-shadow(0 1px 3px rgba(0,0,0,0.6))';
+    ctx.drawImage(typLogoImg, 32, 28, lw, lh);
+    ctx.restore();
+  } else {
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 44px Arial Black, Arial, sans-serif';
+    ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+    ctx.fillText('⚡ TYP', 32, 32);
+  }
 
   // ════════════════════════════════════════════
-  // LAYER 4b: TOP-RIGHT — RANK
+  // LAYER 4b: TOP-RIGHT — RANK BADGE
   // ════════════════════════════════════════════
-  if (p.rank) {
-    ctx.fillStyle = '#f5c842';
-    ctx.font = 'bold 56px Arial Black, Arial, sans-serif';
-    ctx.textAlign = 'right'; ctx.textBaseline = 'top';
-    ctx.fillText(`#${p.rank}`, W - 32, 28);
+  const displayRank = p._liveRank || p.rank;
+  if (displayRank) {
+    const rankText = `#${displayRank}`;
+    const badgePad = 18, badgeH = 72, badgeR = 14;
+    ctx.font = `bold 44px Arial Black, Arial, sans-serif`;
+    const rankTW = ctx.measureText(rankText).width;
+    const badgeW = rankTW + badgePad * 2;
+    const bx = W - 28 - badgeW, by = 24;
+
+    // Badge background
+    const bg = ctx.createLinearGradient(bx, by, bx + badgeW, by + badgeH);
+    bg.addColorStop(0, 'rgba(245,200,66,0.92)');
+    bg.addColorStop(1, 'rgba(180,130,20,0.92)');
+    ctx.shadowColor = 'rgba(0,0,0,0.5)';
+    ctx.shadowBlur = 14;
+    ctx.beginPath();
+    ctx.moveTo(bx + badgeR, by);
+    ctx.lineTo(bx + badgeW - badgeR, by);
+    ctx.quadraticCurveTo(bx + badgeW, by, bx + badgeW, by + badgeR);
+    ctx.lineTo(bx + badgeW, by + badgeH - badgeR);
+    ctx.quadraticCurveTo(bx + badgeW, by + badgeH, bx + badgeW - badgeR, by + badgeH);
+    ctx.lineTo(bx + badgeR, by + badgeH);
+    ctx.quadraticCurveTo(bx, by + badgeH, bx, by + badgeH - badgeR);
+    ctx.lineTo(bx, by + badgeR);
+    ctx.quadraticCurveTo(bx, by, bx + badgeR, by);
+    ctx.closePath();
+    ctx.fillStyle = bg;
+    ctx.fill();
+    ctx.shadowBlur = 0;
+
+    // Rank text
+    ctx.fillStyle = '#1a1000';
+    ctx.font = `bold 44px Arial Black, Arial, sans-serif`;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(rankText, bx + badgeW / 2, by + badgeH / 2 + 2);
   }
 
   // ════════════════════════════════════════════
@@ -5635,7 +6038,7 @@ window.loadTrnTeams = async function() {
     container.innerHTML = trnTeamsCache.map(t => {
       const players = t.players || [];
       const starters = players.filter(p => p.isStarter).slice(0, 8);
-      const subs = players.filter(p => !p.isStarter).slice(0, 3);
+      const subs = players.filter(p => !p.isStarter).slice(0, 4);
 
       const renderRow = (p, i, isSub) => {
         const u = userMap[p.uid] || {};
@@ -5880,7 +6283,7 @@ function renderAdminTeamsList() {
       </div>
       <div style="flex:1">
         <div style="font-weight:700;font-size:14px;color:var(--text)">${t.name}</div>
-        <div style="font-size:12px;color:var(--text3)">👑 ${t.manager||'—'} • ${(t.players||[]).filter(p=>p.isStarter).length}/8 starters · ${(t.players||[]).filter(p=>!p.isStarter).length}/3 subs</div>
+        <div style="font-size:12px;color:var(--text3)">👑 ${t.manager||'—'} • ${(t.players||[]).filter(p=>p.isStarter).length}/8 starters · ${(t.players||[]).filter(p=>!p.isStarter).length}/4 subs</div>
       </div>
       <button class="btn-admin-edit" onclick="openEditTeamModal('${t.id}')">✏️ Edit</button>
       <button class="btn-admin-del" onclick="deleteTeam('${t.id}','${t.name.replace(/'/g,'')}')">🗑️</button>
@@ -5971,7 +6374,7 @@ window.togglePlayerPick = function(uid, el) {
   const idx = _playerPickSelected.indexOf(uid);
   const cb = el.querySelector('input[type=checkbox]');
   if (idx === -1) {
-    if (_playerPickSelected.length >= 11) { alert('Maximum 11 players (8 starters + 3 subs)।'); return; }
+    if (_playerPickSelected.length >= 12) { alert('Maximum 12 players (8 starters + 4 subs)।'); return; }
     _playerPickSelected.push(uid);
     el.classList.add('selected'); if(cb) cb.checked = true;
   } else {
@@ -5986,7 +6389,7 @@ function updatePlayerPickCount() {
   if (el) el.textContent = `${_playerPickSelected.length} selected (${Math.min(_playerPickSelected.length,8)} starters + ${Math.max(0,_playerPickSelected.length-8)} subs)`;
 }
 
-function previewTeamLogo(input) {
+window.previewTeamLogo = function(input) {
   const file = input.files[0];
   if (!file) return;
   const reader = new FileReader();
@@ -6795,8 +7198,9 @@ window.downloadFixturePDF = function() {
 <body>
 
 <div class="page-header">
-  <div class="header-badge">🏟️ TYP CHAMPIONSHIP • OFFICIAL FIXTURE</div>
-  <div class="header-title">TYP LEAGUE 2026</div>
+  <img src="${window.TYP_LOGO_DATA}" style="height:100px;width:auto;display:block;margin:0 auto 14px;filter:brightness(0) invert(1)">
+  <div class="header-badge">🏟️ CHAMPIONSHIP • OFFICIAL FIXTURE</div>
+  <div class="header-title">LEAGUE 2026</div>
   <div class="header-subtitle">Round Robin Tournament • Fixture Sheet • Generated ${today}</div>
   <div class="header-stats">
     <div class="hstat">
@@ -6924,6 +7328,15 @@ window.downloadMatchdayResultCard = async function() {
   canvas.height = CARD_H;
   const ctx = canvas.getContext('2d');
 
+  // ── Load TYP brand logo ──
+  const typLogoImg = await new Promise(resolve => {
+    if (!window.TYP_LOGO_DATA) { resolve(null); return; }
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = () => resolve(null);
+    img.src = window.TYP_LOGO_DATA;
+  });
+
   // ── BACKGROUND ──
   const bgGrad = ctx.createLinearGradient(0, 0, CARD_W, CARD_H);
   bgGrad.addColorStop(0,   '#0b0820');
@@ -6955,6 +7368,17 @@ window.downloadMatchdayResultCard = async function() {
   ctx.strokeStyle = hbGrad;
   ctx.lineWidth = 2;
   ctx.beginPath(); ctx.moveTo(0,HEADER_H); ctx.lineTo(CARD_W,HEADER_H); ctx.stroke();
+
+  // ── TYP LOGO (top-left watermark) ──
+  if (typLogoImg) {
+    const lh = 56;
+    const lw = typLogoImg.width * (lh / typLogoImg.height);
+    ctx.save();
+    ctx.globalAlpha = 0.92;
+    ctx.filter = 'brightness(0) invert(1)';
+    ctx.drawImage(typLogoImg, 18, 10, lw, lh);
+    ctx.restore();
+  }
 
   // ── TITLE ──
   ctx.textAlign = 'center';
