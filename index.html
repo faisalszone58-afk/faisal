@@ -6318,6 +6318,7 @@ window.openEditTeamModal = async function(teamId) {
   document.getElementById('newTeamName').value = t.name || '';
   document.getElementById('newTeamManager').value = t.manager || '';
   document.getElementById('newTeamEmoji').value = t.emoji || '🏟️';
+  document.getElementById('newTeamGroup').value = t.group || 'A';
   document.getElementById('teamLogoUrl').value = t.logo || '';
   const prevEl = document.getElementById('teamLogoPreview');
   if (t.logo) {
@@ -6433,7 +6434,7 @@ window.saveTeam = async function() {
     errEl.textContent = '';
   }
 
-  const payload = { name, manager, emoji, players, updatedAt: new Date().toISOString() };
+  const payload = { name, manager, emoji, group, players, updatedAt: new Date().toISOString() };
   if (logoUrl) payload.logo = logoUrl;
 
   if (teamId) {
