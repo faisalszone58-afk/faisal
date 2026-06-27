@@ -3023,11 +3023,13 @@ window.loadRankingSeasonsList = async function loadRankingSeasonsList(force) {
           fetch(`${RANKING_DB}/seasons/${k}/seasonName.json`),
           fetch(`${RANKING_DB}/seasons/${k}/archivedAt.json`)
         ]);
-        const n = await nRes.json();
-        const a = await aRes.json();
-        if (n && typeof n === 'string') name = n;
-        else if (n && typeof n === 'object' && n.seasonName) name = n.seasonName;
-        if (a) archivedAt = typeof a === 'string' ? a : JSON.stringify(a);
+        let n = null, a = null;
+        try { n = await nRes.json(); } catch(e) {}
+        try { a = await aRes.json(); } catch(e) {}
+        if (n && typeof n === 'string' && n !== 'null' && n !== 'error') name = n;
+        else if (n && typeof n === 'object' && n !== null && n.seasonName) name = n.seasonName;
+        if (a && typeof a === 'string' && a !== 'null') archivedAt = a;
+        else if (a && typeof a === 'object' && a !== null) archivedAt = JSON.stringify(a);
       } catch(e) {}
       return { key: k, name, archivedAt };
     }));
