@@ -2279,8 +2279,10 @@ if (document.readyState === 'loading') {
           <button class="btn btn-gold" style="width:100%;margin-top:8px" onclick="ssmAddPlayerToDraft()">➕ এই Player-কে List-এ যুক্ত করো</button>
         </div>
 
+        <div id="ssmExistingPlayersWrap" style="display:none;margin-top:4px"></div>
+
         <div style="margin-top:24px">
-          <div style="font-size:14px;font-weight:700;color:var(--text2);margin-bottom:12px">📋 যুক্ত হওয়া Players (Save করার আগে দেখে নাও)</div>
+          <div style="font-size:14px;font-weight:700;color:var(--text2);margin-bottom:12px">📋 নতুন Players যুক্ত করো (Save করার আগে দেখে নাও)</div>
           <div id="ssmDraftList"><div style="color:var(--text3);font-size:13px">এখনো কোনো player যুক্ত করা হয়নি।</div></div>
         </div>
 
@@ -2954,6 +2956,10 @@ window.loadMainRanking = async function() {
       } catch(e) { return []; }
     }));
 
+    // archived season e already থাকা uid গুলো collect করো
+    const archivedUids = new Set();
+    archivedPlayersArrays.forEach(arr => arr.forEach(p => { if(p.uid) archivedUids.add(p.uid); }));
+
     const totals = {};
     function addToTotal(p) {
       if (!p.uid) return;
@@ -2962,11 +2968,37 @@ window.loadMainRanking = async function() {
           matches:0, wins:0, draws:0, losses:0, goalsFor:0, goalsAgainst:0, mvp:0 };
       }
       const t = totals[p.uid];
+      // name/avatar সবসময় latest থেকে নাও
+      if (p.name) t.name = p.name;
+      if (p.avatarUrl) t.avatarUrl = p.avatarUrl;
+      if (p.club) t.club = p.club;
+      if (p.district) t.district = p.district;
       t.matches += (p.matches||0); t.wins += (p.wins||0); t.draws += (p.draws||0); t.losses += (p.losses||0);
       t.goalsFor += (p.goalsFor||0); t.goalsAgainst += (p.goalsAgainst||0); t.mvp += (p.mvp||0);
     }
-    liveUsers.forEach(addToTotal);
+
+    // archived seasons আগে add করো
     archivedPlayersArrays.forEach(arr => arr.forEach(addToTotal));
+
+    // current users: যাদের uid archived এ নেই শুধু তাদের add করো
+    // যাদের uid archived এ আছে তাদের current stats ও add করো (নতুন season এর progress)
+    liveUsers.forEach(p => {
+      // current season এ যদি কোনো stats থাকে তাহলে add করো
+      const hasCurrentStats = (p.matches||0) > 0 || (p.wins||0) > 0 || (p.goalsFor||0) > 0 || (p.mvp||0) > 0;
+      if (hasCurrentStats) {
+        addToTotal(p);
+      } else if (!archivedUids.has(p.uid)) {
+        // archived এ নেই এবং current stats ও নেই — profile শুধু show করো
+        addToTotal(p);
+      } else {
+        // archived এ আছে, current stats 0 — শুধু name/avatar update করো
+        if (!totals[p.uid]) return;
+        if (p.name) totals[p.uid].name = p.name;
+        if (p.avatarUrl) totals[p.uid].avatarUrl = p.avatarUrl;
+        if (p.club) totals[p.uid].club = p.club;
+        if (p.district) totals[p.uid].district = p.district;
+      }
+    });
 
     rankingData = Object.values(totals);
     if (!rankingData.length) {
@@ -3284,9 +3316,76 @@ window.ssmInit = async function() {
   ssmRenderDraftList();
 };
 
-window.ssmOnSeasonSelectChange = function() {
+window.ssmOnSeasonSelectChange = async function() {
   const val = document.getElementById('ssmSeasonSelect').value;
   document.getElementById('ssmNewSeasonWrap').style.display = (val === '__new__') ? 'block' : 'none';
+  window._ssmDraft = {};
+  window._ssmSelectedUid = null;
+  document.getElementById('ssmSelectedPlayer').style.display = 'none';
+  document.getElementById('ssmPlayerSearch').value = '';
+  ['ssmMatches','ssmWins','ssmDraws','ssmLosses','ssmGoalsFor','ssmGoalsAgainst','ssmMvp'].forEach(id => document.getElementById(id).value = '0');
+  const existingWrap = document.getElementById('ssmExistingPlayersWrap');
+  if (val && val !== '__new__') {
+    existingWrap.style.display = 'block';
+    existingWrap.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:10px 0">Loading...</div>';
+    try {
+      const res = await fetch(`${RANKING_DB}/seasons/${val}/players.json`);
+      const data = await res.json();
+      if (!data) { existingWrap.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:10px 0">এই season এ কোনো player নেই।</div>'; return; }
+      const players = Object.entries(data).map(([uid, p]) => ({ uid, ...(p||{}) }));
+      ssmRenderExistingPlayers(players, val);
+    } catch(e) { existingWrap.innerHTML = `<div style="color:var(--red);font-size:13px">Error: ${e.message}</div>`; }
+  } else {
+    existingWrap.style.display = 'none';
+    existingWrap.innerHTML = '';
+  }
+  ssmRenderDraftList();
+};
+
+window.ssmRenderExistingPlayers = function(players, seasonKey) {
+  const wrap = document.getElementById('ssmExistingPlayersWrap');
+  if (!players.length) { wrap.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:10px 0">কোনো player নেই।</div>'; return; }
+  const rows = players.map(p => `
+    <tr>
+      <td style="padding:7px 10px;font-size:13px;font-weight:600;color:var(--text)">${p.name||'—'}</td>
+      <td style="padding:4px"><input type="number" id="ssmE_m_${p.uid}" value="${p.matches||0}" min="0" style="width:50px;padding:4px;border:1px solid var(--border);border-radius:6px;background:var(--card2);color:var(--text);font-size:12px;text-align:center"></td>
+      <td style="padding:4px"><input type="number" id="ssmE_w_${p.uid}" value="${p.wins||0}" min="0" style="width:50px;padding:4px;border:1px solid var(--border);border-radius:6px;background:var(--card2);color:var(--text);font-size:12px;text-align:center"></td>
+      <td style="padding:4px"><input type="number" id="ssmE_d_${p.uid}" value="${p.draws||0}" min="0" style="width:50px;padding:4px;border:1px solid var(--border);border-radius:6px;background:var(--card2);color:var(--text);font-size:12px;text-align:center"></td>
+      <td style="padding:4px"><input type="number" id="ssmE_l_${p.uid}" value="${p.losses||0}" min="0" style="width:50px;padding:4px;border:1px solid var(--border);border-radius:6px;background:var(--card2);color:var(--text);font-size:12px;text-align:center"></td>
+      <td style="padding:4px"><input type="number" id="ssmE_gf_${p.uid}" value="${p.goalsFor||0}" min="0" style="width:50px;padding:4px;border:1px solid var(--border);border-radius:6px;background:var(--card2);color:var(--text);font-size:12px;text-align:center"></td>
+      <td style="padding:4px"><input type="number" id="ssmE_ga_${p.uid}" value="${p.goalsAgainst||0}" min="0" style="width:50px;padding:4px;border:1px solid var(--border);border-radius:6px;background:var(--card2);color:var(--text);font-size:12px;text-align:center"></td>
+      <td style="padding:4px"><input type="number" id="ssmE_mvp_${p.uid}" value="${p.mvp||0}" min="0" style="width:50px;padding:4px;border:1px solid var(--border);border-radius:6px;background:var(--card2);color:var(--text);font-size:12px;text-align:center"></td>
+      <td style="padding:4px 6px"><button onclick="ssmSaveOnePlayer('${p.uid}','${seasonKey}')" style="background:var(--cyan);color:#fff;border:none;padding:5px 10px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer">Save</button></td>
+    </tr>`).join('');
+  wrap.innerHTML = `
+    <div style="font-size:14px;font-weight:700;color:var(--gold);margin-bottom:10px;margin-top:20px">✏️ Existing Players — Direct Edit</div>
+    <div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;min-width:600px">
+      <thead><tr style="border-bottom:1px solid var(--border)">
+        <th style="padding:8px 10px;text-align:left;font-size:12px;color:var(--text3)">Player</th>
+        <th style="padding:8px 4px;text-align:center;font-size:12px;color:var(--text3)">M</th>
+        <th style="padding:8px 4px;text-align:center;font-size:12px;color:var(--text3)">W</th>
+        <th style="padding:8px 4px;text-align:center;font-size:12px;color:var(--text3)">D</th>
+        <th style="padding:8px 4px;text-align:center;font-size:12px;color:var(--text3)">L</th>
+        <th style="padding:8px 4px;text-align:center;font-size:12px;color:var(--text3)">GF</th>
+        <th style="padding:8px 4px;text-align:center;font-size:12px;color:var(--text3)">GA</th>
+        <th style="padding:8px 4px;text-align:center;font-size:12px;color:var(--text3)">MVP</th>
+        <th></th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table></div>
+    <div id="ssmEditStatus" style="margin-top:10px;font-size:13px"></div>`;
+};
+
+window.ssmSaveOnePlayer = async function(uid, seasonKey) {
+  const statusEl = document.getElementById('ssmEditStatus');
+  const g = id => parseInt(document.getElementById(id)?.value)||0;
+  const updated = { matches:g('ssmE_m_'+uid), wins:g('ssmE_w_'+uid), draws:g('ssmE_d_'+uid), losses:g('ssmE_l_'+uid), goalsFor:g('ssmE_gf_'+uid), goalsAgainst:g('ssmE_ga_'+uid), mvp:g('ssmE_mvp_'+uid) };
+  statusEl.innerHTML = '<span style="color:var(--yellow)">Saving...</span>';
+  try {
+    await fetch(`${RANKING_DB}/seasons/${seasonKey}/players/${uid}.json`, { method:'PATCH', body:JSON.stringify(updated) });
+    statusEl.innerHTML = '<span style="color:var(--green)">Saved!</span>';
+    setTimeout(() => statusEl.innerHTML = '', 2000);
+  } catch(e) { statusEl.innerHTML = `<span style="color:var(--red)">Error: ${e.message}</span>`; }
 };
 
 window.ssmSearchPlayers = async function(query) {
