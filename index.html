@@ -5831,47 +5831,42 @@ window.selectCmpPlayer = async function(uid2) {
   document.getElementById('cmpResult').style.display = 'block';
   document.getElementById('cmpPlayerList').innerHTML = '';
 
-  // ── Load all-time aggregated stats (same proven logic as profile page) ──
+  // ── Load all-time aggregated stats ──
   async function getAggregatedPlayer(targetUid) {
-    // Primary: use already-loaded rankingData (fast path)
+    // Primary: use already-loaded rankingData (fast path, only if main ranking mode)
     if (window.rankingData && window.rankingData.length && window._rankingMode === 'main') {
       const found = window.rankingData.find(r => r.uid === targetUid);
       if (found && ((found.matches||0)+(found.wins||0)+(found.goalsFor||0)) > 0) return found;
     }
-    // Fallback: fetch per-uid from Firebase (exact same logic as openPublicProfile)
+    // Fallback: direct Firebase fetch per uid
     let m=0, w=0, d=0, l=0, goals=0, goalsAgainst=0, mvp=0;
+    const DB = 'https://typ-championship-default-rtdb.firebaseio.com';
     try {
-      const [seasonsRes, currentRes] = await Promise.all([
-        fetch(`${RANKING_DB}/seasons.json?shallow=true`),
-        fetch(`${RANKING_DB}/users/${targetUid}.json`)
-      ]);
+      const seasonsRes = await fetch(`${DB}/seasons.json?shallow=true`);
       const seasonsObj = await seasonsRes.json();
-      const currentData = await currentRes.json();
-
       const seasonKeys = seasonsObj ? Object.keys(seasonsObj) : [];
-      const archivedStats = await Promise.all(seasonKeys.map(async k => {
-        try {
-          const r = await fetch(`${RANKING_DB}/seasons/${k}/players/${targetUid}.json`);
-          return await r.json();
-        } catch(e) { return null; }
-      }));
 
-      archivedStats.forEach(s => {
+      // fetch archived per-uid + current in parallel
+      const [archivedResults, currentData] = await Promise.all([
+        Promise.all(seasonKeys.map(async k => {
+          try { const r = await fetch(`${DB}/seasons/${k}/players/${targetUid}.json`); return await r.json(); }
+          catch(e) { return null; }
+        })),
+        fetch(`${DB}/users/${targetUid}.json`).then(r => r.json()).catch(() => null)
+      ]);
+
+      archivedResults.forEach(s => {
         if (!s) return;
         m += s.matches||0; w += s.wins||0; d += s.draws||0; l += s.losses||0;
         goals += s.goalsFor||0; goalsAgainst += s.goalsAgainst||0; mvp += s.mvp||0;
       });
-
       if (currentData) {
         m += currentData.matches||0; w += currentData.wins||0; d += currentData.draws||0;
         l += currentData.losses||0; goals += currentData.goalsFor||0;
         goalsAgainst += currentData.goalsAgainst||0; mvp += currentData.mvp||0;
       }
     } catch(e) {
-      // last resort: use raw user object stats
-      const liveUsers = await getAllUsers();
-      const lp = liveUsers.find(u => u.uid === targetUid);
-      if (lp) { m=lp.matches||0; w=lp.wins||0; d=lp.draws||0; l=lp.losses||0; goals=lp.goalsFor||0; goalsAgainst=lp.goalsAgainst||0; mvp=lp.mvp||0; }
+      console.warn('getAggregatedPlayer error', targetUid, e);
     }
     return { uid: targetUid, matches:m, wins:w, draws:d, losses:l, goalsFor:goals, goalsAgainst, mvp };
   }
