@@ -5826,56 +5826,51 @@ window.selectCmpPlayer = async function(uid2) {
   const p2raw = _cmpAllUsers.find(u => u.uid === uid2);
   if (!p1raw || !p2raw) return;
 
-  // ── Load all-time aggregated stats (same logic as main ranking) ──
-  async function getAllTimeStats(targetUids) {
-    const totals = {};
-    targetUids.forEach(uid => { totals[uid] = { matches:0, wins:0, draws:0, losses:0, goalsFor:0, goalsAgainst:0, mvp:0 }; });
-
-    try {
-      const seasonsRes = await fetch(`${RANKING_DB}/seasons.json?shallow=true`);
-      const seasonsKeysObj = await seasonsRes.json();
-      const seasonKeys = seasonsKeysObj ? Object.keys(seasonsKeysObj) : [];
-
-      const archivedArrays = await Promise.all(seasonKeys.map(async k => {
-        try {
-          const r = await fetch(`${RANKING_DB}/seasons/${k}/players.json`);
-          const d = await r.json();
-          return d ? Object.entries(d).map(([uid, val]) => ({ uid, ...(val||{}) })) : [];
-        } catch(e) { return []; }
-      }));
-
-      archivedArrays.forEach(arr => arr.forEach(p => {
-        if (!targetUids.includes(p.uid)) return;
-        const t = totals[p.uid];
-        t.matches += (p.matches||0); t.wins += (p.wins||0); t.draws += (p.draws||0);
-        t.losses += (p.losses||0); t.goalsFor += (p.goalsFor||0); t.goalsAgainst += (p.goalsAgainst||0); t.mvp += (p.mvp||0);
-      }));
-    } catch(e) {}
-
-    // Add current season stats
-    const liveUsers = await getAllUsers();
-    targetUids.forEach(uid => {
-      const lp = liveUsers.find(u => u.uid === uid);
-      if (!lp) return;
-      const hasStats = (lp.matches||0)>0||(lp.wins||0)>0||(lp.goalsFor||0)>0||(lp.mvp||0)>0;
-      if (hasStats) {
-        const t = totals[uid];
-        t.matches += (lp.matches||0); t.wins += (lp.wins||0); t.draws += (lp.draws||0);
-        t.losses += (lp.losses||0); t.goalsFor += (lp.goalsFor||0); t.goalsAgainst += (lp.goalsAgainst||0); t.mvp += (lp.mvp||0);
-      }
-    });
-
-    return totals;
-  }
-
   // Show loading in compare area
   document.getElementById('cmpBars').innerHTML = '<div style="padding:20px;text-align:center;color:var(--text3)"><span class="spinner"></span><p style="margin-top:8px;font-size:13px">All-time stats লোড হচ্ছে...</p></div>';
   document.getElementById('cmpResult').style.display = 'block';
   document.getElementById('cmpPlayerList').innerHTML = '';
 
-  const allTimeStats = await getAllTimeStats([p1raw.uid, p2raw.uid]);
-  const p1 = { ...p1raw, ...allTimeStats[p1raw.uid] };
-  const p2 = { ...p2raw, ...allTimeStats[p2raw.uid] };
+  // ── Load all-time aggregated stats ──
+  // Use global rankingData if already loaded (fast), else fetch fresh from Firebase
+  async function getAggregatedPlayer(targetUid) {
+    // Primary: use already-loaded rankingData
+    if (window.rankingData && window.rankingData.length) {
+      const found = window.rankingData.find(r => r.uid === targetUid);
+      if (found && ((found.matches||0) > 0 || (found.wins||0) > 0)) return found;
+    }
+    // Fallback: build from archived seasons + current season
+    const totals = { uid: targetUid, matches:0, wins:0, draws:0, losses:0, goalsFor:0, goalsAgainst:0, mvp:0 };
+    try {
+      const seasonsRes = await fetch(`${RANKING_DB}/seasons.json?shallow=true`);
+      const seasonsKeysObj = await seasonsRes.json();
+      const seasonKeys = seasonsKeysObj ? Object.keys(seasonsKeysObj) : [];
+      const archivedArrays = await Promise.all(seasonKeys.map(async k => {
+        try {
+          const r = await fetch(`${RANKING_DB}/seasons/${k}/players.json`);
+          const d = await r.json();
+          return d ? Object.entries(d).map(([u, val]) => ({ uid: u, ...(val||{}) })) : [];
+        } catch(e) { return []; }
+      }));
+      archivedArrays.forEach(arr => arr.forEach(p => {
+        if (p.uid !== targetUid) return;
+        totals.matches += (p.matches||0); totals.wins += (p.wins||0); totals.draws += (p.draws||0);
+        totals.losses += (p.losses||0); totals.goalsFor += (p.goalsFor||0); totals.goalsAgainst += (p.goalsAgainst||0); totals.mvp += (p.mvp||0);
+      }));
+    } catch(e) {}
+    // Add current season
+    const liveUsers = await getAllUsers();
+    const lp = liveUsers.find(u => u.uid === targetUid);
+    if (lp && ((lp.matches||0)>0||(lp.wins||0)>0||(lp.goalsFor||0)>0||(lp.mvp||0)>0)) {
+      totals.matches += (lp.matches||0); totals.wins += (lp.wins||0); totals.draws += (lp.draws||0);
+      totals.losses += (lp.losses||0); totals.goalsFor += (lp.goalsFor||0); totals.goalsAgainst += (lp.goalsAgainst||0); totals.mvp += (lp.mvp||0);
+    }
+    return totals;
+  }
+
+  const [p1stats, p2stats] = await Promise.all([getAggregatedPlayer(p1raw.uid), getAggregatedPlayer(p2raw.uid)]);
+  const p1 = { ...p1raw, ...p1stats };
+  const p2 = { ...p2raw, ...p2stats };
 
   // ── Head to Head from friendlyMatches ──
   let h2h_p1=0, h2h_p2=0, h2h_d=0;
