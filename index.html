@@ -5821,6 +5821,42 @@ function renderCmpList(list) {
   ).join('');
 }
 
+// ── Compare: all-time aggregated stats fetcher ──
+window._cmpGetAggregated = async function(targetUid) {
+  // Fast path: use already-loaded main rankingData
+  if (window.rankingData && window.rankingData.length && window._rankingMode === 'main') {
+    const found = window.rankingData.find(r => r.uid === targetUid);
+    if (found && ((found.matches||0)+(found.wins||0)+(found.goalsFor||0)) > 0) return found;
+  }
+  // Fetch from Firebase: archived seasons + current
+  let m=0, w=0, d=0, l=0, goals=0, goalsAgainst=0, mvp=0;
+  const DB = 'https://typ-championship-default-rtdb.firebaseio.com';
+  try {
+    const seasonsRes = await fetch(`${DB}/seasons.json?shallow=true`);
+    const seasonsObj = await seasonsRes.json();
+    const seasonKeys = seasonsObj ? Object.keys(seasonsObj) : [];
+    const [archivedResults, currentData] = await Promise.all([
+      Promise.all(seasonKeys.map(async k => {
+        try { const r = await fetch(`${DB}/seasons/${k}/players/${targetUid}.json`); return await r.json(); }
+        catch(e) { return null; }
+      })),
+      fetch(`${DB}/users/${targetUid}.json`).then(r => r.json()).catch(() => null)
+    ]);
+    archivedResults.forEach(s => {
+      if (!s) return;
+      m += s.matches||0; w += s.wins||0; d += s.draws||0; l += s.losses||0;
+      goals += s.goalsFor||0; goalsAgainst += s.goalsAgainst||0; mvp += s.mvp||0;
+    });
+    // current season stats (reset after archive, so always safe to add)
+    if (currentData) {
+      m += currentData.matches||0; w += currentData.wins||0; d += currentData.draws||0;
+      l += currentData.losses||0; goals += currentData.goalsFor||0;
+      goalsAgainst += currentData.goalsAgainst||0; mvp += currentData.mvp||0;
+    }
+  } catch(e) { console.warn('_cmpGetAggregated error', e); }
+  return { uid: targetUid, matches:m, wins:w, draws:d, losses:l, goalsFor:goals, goalsAgainst, mvp };
+};
+
 window.selectCmpPlayer = async function(uid2) {
   const p1raw = _cmpPlayer1;
   const p2raw = _cmpAllUsers.find(u => u.uid === uid2);
@@ -5831,47 +5867,7 @@ window.selectCmpPlayer = async function(uid2) {
   document.getElementById('cmpResult').style.display = 'block';
   document.getElementById('cmpPlayerList').innerHTML = '';
 
-  // ── Load all-time aggregated stats ──
-  async function getAggregatedPlayer(targetUid) {
-    // Primary: use already-loaded rankingData (fast path, only if main ranking mode)
-    if (window.rankingData && window.rankingData.length && window._rankingMode === 'main') {
-      const found = window.rankingData.find(r => r.uid === targetUid);
-      if (found && ((found.matches||0)+(found.wins||0)+(found.goalsFor||0)) > 0) return found;
-    }
-    // Fallback: direct Firebase fetch per uid
-    let m=0, w=0, d=0, l=0, goals=0, goalsAgainst=0, mvp=0;
-    const DB = 'https://typ-championship-default-rtdb.firebaseio.com';
-    try {
-      const seasonsRes = await fetch(`${DB}/seasons.json?shallow=true`);
-      const seasonsObj = await seasonsRes.json();
-      const seasonKeys = seasonsObj ? Object.keys(seasonsObj) : [];
-
-      // fetch archived per-uid + current in parallel
-      const [archivedResults, currentData] = await Promise.all([
-        Promise.all(seasonKeys.map(async k => {
-          try { const r = await fetch(`${DB}/seasons/${k}/players/${targetUid}.json`); return await r.json(); }
-          catch(e) { return null; }
-        })),
-        fetch(`${DB}/users/${targetUid}.json`).then(r => r.json()).catch(() => null)
-      ]);
-
-      archivedResults.forEach(s => {
-        if (!s) return;
-        m += s.matches||0; w += s.wins||0; d += s.draws||0; l += s.losses||0;
-        goals += s.goalsFor||0; goalsAgainst += s.goalsAgainst||0; mvp += s.mvp||0;
-      });
-      if (currentData) {
-        m += currentData.matches||0; w += currentData.wins||0; d += currentData.draws||0;
-        l += currentData.losses||0; goals += currentData.goalsFor||0;
-        goalsAgainst += currentData.goalsAgainst||0; mvp += currentData.mvp||0;
-      }
-    } catch(e) {
-      console.warn('getAggregatedPlayer error', targetUid, e);
-    }
-    return { uid: targetUid, matches:m, wins:w, draws:d, losses:l, goalsFor:goals, goalsAgainst, mvp };
-  }
-
-  const [p1stats, p2stats] = await Promise.all([getAggregatedPlayer(p1raw.uid), getAggregatedPlayer(p2raw.uid)]);
+  const [p1stats, p2stats] = await Promise.all([window._cmpGetAggregated(p1raw.uid), window._cmpGetAggregated(p2raw.uid)]);
   const p1 = { ...p1raw, ...p1stats };
   const p2 = { ...p2raw, ...p2stats };
 
