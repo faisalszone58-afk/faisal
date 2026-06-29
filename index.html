@@ -5831,41 +5831,49 @@ window.selectCmpPlayer = async function(uid2) {
   document.getElementById('cmpResult').style.display = 'block';
   document.getElementById('cmpPlayerList').innerHTML = '';
 
-  // ── Load all-time aggregated stats ──
-  // Use global rankingData if already loaded (fast), else fetch fresh from Firebase
+  // ── Load all-time aggregated stats (same proven logic as profile page) ──
   async function getAggregatedPlayer(targetUid) {
-    // Primary: use already-loaded rankingData
-    if (window.rankingData && window.rankingData.length) {
+    // Primary: use already-loaded rankingData (fast path)
+    if (window.rankingData && window.rankingData.length && window._rankingMode === 'main') {
       const found = window.rankingData.find(r => r.uid === targetUid);
-      if (found && ((found.matches||0) > 0 || (found.wins||0) > 0)) return found;
+      if (found && ((found.matches||0)+(found.wins||0)+(found.goalsFor||0)) > 0) return found;
     }
-    // Fallback: build from archived seasons + current season
-    const totals = { uid: targetUid, matches:0, wins:0, draws:0, losses:0, goalsFor:0, goalsAgainst:0, mvp:0 };
+    // Fallback: fetch per-uid from Firebase (exact same logic as openPublicProfile)
+    let m=0, w=0, d=0, l=0, goals=0, goalsAgainst=0, mvp=0;
     try {
-      const seasonsRes = await fetch(`${RANKING_DB}/seasons.json?shallow=true`);
-      const seasonsKeysObj = await seasonsRes.json();
-      const seasonKeys = seasonsKeysObj ? Object.keys(seasonsKeysObj) : [];
-      const archivedArrays = await Promise.all(seasonKeys.map(async k => {
+      const [seasonsRes, currentRes] = await Promise.all([
+        fetch(`${RANKING_DB}/seasons.json?shallow=true`),
+        fetch(`${RANKING_DB}/users/${targetUid}.json`)
+      ]);
+      const seasonsObj = await seasonsRes.json();
+      const currentData = await currentRes.json();
+
+      const seasonKeys = seasonsObj ? Object.keys(seasonsObj) : [];
+      const archivedStats = await Promise.all(seasonKeys.map(async k => {
         try {
-          const r = await fetch(`${RANKING_DB}/seasons/${k}/players.json`);
-          const d = await r.json();
-          return d ? Object.entries(d).map(([u, val]) => ({ uid: u, ...(val||{}) })) : [];
-        } catch(e) { return []; }
+          const r = await fetch(`${RANKING_DB}/seasons/${k}/players/${targetUid}.json`);
+          return await r.json();
+        } catch(e) { return null; }
       }));
-      archivedArrays.forEach(arr => arr.forEach(p => {
-        if (p.uid !== targetUid) return;
-        totals.matches += (p.matches||0); totals.wins += (p.wins||0); totals.draws += (p.draws||0);
-        totals.losses += (p.losses||0); totals.goalsFor += (p.goalsFor||0); totals.goalsAgainst += (p.goalsAgainst||0); totals.mvp += (p.mvp||0);
-      }));
-    } catch(e) {}
-    // Add current season
-    const liveUsers = await getAllUsers();
-    const lp = liveUsers.find(u => u.uid === targetUid);
-    if (lp && ((lp.matches||0)>0||(lp.wins||0)>0||(lp.goalsFor||0)>0||(lp.mvp||0)>0)) {
-      totals.matches += (lp.matches||0); totals.wins += (lp.wins||0); totals.draws += (lp.draws||0);
-      totals.losses += (lp.losses||0); totals.goalsFor += (lp.goalsFor||0); totals.goalsAgainst += (lp.goalsAgainst||0); totals.mvp += (lp.mvp||0);
+
+      archivedStats.forEach(s => {
+        if (!s) return;
+        m += s.matches||0; w += s.wins||0; d += s.draws||0; l += s.losses||0;
+        goals += s.goalsFor||0; goalsAgainst += s.goalsAgainst||0; mvp += s.mvp||0;
+      });
+
+      if (currentData) {
+        m += currentData.matches||0; w += currentData.wins||0; d += currentData.draws||0;
+        l += currentData.losses||0; goals += currentData.goalsFor||0;
+        goalsAgainst += currentData.goalsAgainst||0; mvp += currentData.mvp||0;
+      }
+    } catch(e) {
+      // last resort: use raw user object stats
+      const liveUsers = await getAllUsers();
+      const lp = liveUsers.find(u => u.uid === targetUid);
+      if (lp) { m=lp.matches||0; w=lp.wins||0; d=lp.draws||0; l=lp.losses||0; goals=lp.goalsFor||0; goalsAgainst=lp.goalsAgainst||0; mvp=lp.mvp||0; }
     }
-    return totals;
+    return { uid: targetUid, matches:m, wins:w, draws:d, losses:l, goalsFor:goals, goalsAgainst, mvp };
   }
 
   const [p1stats, p2stats] = await Promise.all([getAggregatedPlayer(p1raw.uid), getAggregatedPlayer(p2raw.uid)]);
