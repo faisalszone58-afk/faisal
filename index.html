@@ -6304,7 +6304,7 @@ function renderGroupTable(tbodyId, standings, qualCount) {
       <td style="font-weight:700;color:${i<qualCount?'var(--gold)':'var(--text3)'};font-size:15px">${medals[i]||(i+1)}</td>
       <td>
         <div style="display:flex;align-items:center;gap:10px">
-          <div style="width:30px;height:30px;border-radius:50%;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0">${t.emoji}</div>
+          <div style="width:30px;height:30px;border-radius:50%;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;overflow:hidden">${t.logo ? `<img src="${t.logo}" style="width:100%;height:100%;object-fit:cover">` : t.emoji}</div>
           <div>
             <div style="font-weight:700;font-size:13px;color:var(--text)">${t.name}</div>
             ${i < qualCount ? '<div style="font-size:10px;color:var(--green);font-family:Inter,sans-serif">✅ QUALIFIED</div>' : ''}
@@ -6367,43 +6367,28 @@ window.loadTrnTeams = async function() {
     Object.entries(usersData).forEach(([uid, u]) => { userMap[uid] = u; });
 
     container.innerHTML = trnTeamsCache.map(t => {
-      const players = t.players || [];
-      const starters = players.filter(p => p.isStarter).slice(0, 8);
-      const subs = players.filter(p => !p.isStarter).slice(0, 4);
+      const players = (t.players || []).slice(0, 12);
 
-      const renderRow = (p, i, isSub) => {
+      const allRows = players.map((p, i) => {
         const u = userMap[p.uid] || {};
-        return `<div class="team-player-row" style="${isSub?'opacity:0.65':''}">
-          <div class="team-player-num" style="${isSub?'background:rgba(124,92,252,0.15);color:var(--gold)':''}">
-            ${isSub ? 'S' + (i+1) : (i+1)}
-          </div>
+        return `<div class="team-player-row">
+          <div class="team-player-num">${i + 1}</div>
           <div class="team-player-avatar">${u.avatarUrl ? `<img src="${u.avatarUrl}">` : '🎮'}</div>
           <div style="flex:1;font-size:13px;color:var(--text)">${p.name || u.name || '—'}</div>
-          ${isSub ? '<div style="font-size:10px;color:var(--gold);font-family:\'Share Tech Mono\',monospace;background:rgba(124,92,252,0.1);padding:2px 6px;border-radius:4px">SUB</div>' : ''}
         </div>`;
-      };
-
-      const starterRows = starters.map((p, i) => renderRow(p, i, false)).join('');
-      const subRows = subs.map((p, i) => renderRow(p, i, true)).join('');
+      }).join('');
 
       return `<div class="team-card">
         <div class="team-card-header">
-          <div class="team-badge">${t.emoji || '🏟️'}</div>
+          <div class="team-badge" style="width:44px;height:44px;border-radius:10px;overflow:hidden;display:flex;align-items:center;justify-content:center;background:var(--bg3);flex-shrink:0">${t.logo ? `<img src="${t.logo}" style="width:100%;height:100%;object-fit:cover">` : (t.emoji||'🏟️')}</div>
           <div>
             <div class="team-name">${t.name}</div>
             <div class="team-manager">👑 ${t.manager || '—'}</div>
-            <div style="font-size:11px;color:var(--text3);margin-top:3px;font-family:'Inter',sans-serif">${starters.length} starters · ${subs.length} subs</div>
+            <div style="font-size:11px;color:var(--text3);margin-top:3px;font-family:'Inter',sans-serif">${players.length} players</div>
           </div>
         </div>
         <div class="team-players-list">
-          ${starters.length ? `
-            <div style="font-size:10px;color:var(--cyan);font-family:'Inter',monospace;letter-spacing:1px;margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid var(--border)">▶ STARTING 8</div>
-            ${starterRows}
-          ` : '<div style="color:var(--text3);font-size:13px;padding:10px">No players assigned.</div>'}
-          ${subs.length ? `
-            <div style="font-size:10px;color:var(--gold);font-family:'Inter',monospace;letter-spacing:1px;margin-top:10px;margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid var(--border)">⬆ SUBSTITUTES</div>
-            ${subRows}
-          ` : ''}
+          ${players.length ? allRows : '<div style="color:var(--text3);font-size:13px;padding:10px">No players assigned.</div>'}
         </div>
       </div>`;
     }).join('');
@@ -6492,13 +6477,13 @@ window.filterFixtures = function(type, btn) {
 
       return `<div class="match1v1-row">
         <div class="match1v1-player" style="color:${winH?'var(--cyan)':'var(--text2)'}">
-          <span>${ht.emoji||'🏟️'}</span>
+          <span>${ht.logo ? `<img src="${ht.logo}" style="width:22px;height:22px;border-radius:4px;object-fit:cover">` : (ht.emoji||'🏟️')}</span>
           <span class="pname">${ht.name||match.homeTeam||'—'}</span>
         </div>
         <div class="match1v1-score ${scoreClass}">${scoreDisplay}</div>
         <div class="match1v1-player right" style="color:${winA?'var(--cyan)':'var(--text2)'}">
           <span class="pname">${at.name||match.awayTeam||'—'}</span>
-          <span>${at.emoji||'🏟️'}</span>
+          <span>${at.logo ? `<img src="${at.logo}" style="width:22px;height:22px;border-radius:4px;object-fit:cover">` : (at.emoji||'🏟️')}</span>
         </div>
         <div class="match1v1-badge" style="color:${badgeColor}">${badgeText}</div>
       </div>`;
