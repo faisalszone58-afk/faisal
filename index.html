@@ -7084,7 +7084,7 @@ window.saveTrnMatchResults = async function() {
   const statDelta = {}; // uid -> { matches, wins, draws, losses, goalsFor, goalsAgainst }
 
   const ensureDelta = (uid) => {
-    if (!statDelta[uid]) statDelta[uid] = { matches:0, wins:0, draws:0, losses:0, goalsFor:0, goalsAgainst:0 };
+    if (!statDelta[uid]) statDelta[uid] = { matches:0, wins:0, draws:0, losses:0, goalsFor:0 };
   };
 
   for (const inp of homeInputs) {
@@ -7129,11 +7129,9 @@ window.saveTrnMatchResults = async function() {
       statDelta[p1uid].matches += 1;
       statDelta[p2uid].matches += 1;
 
-      // goals
-      statDelta[p1uid].goalsFor     += homeScore;
-      statDelta[p1uid].goalsAgainst += awayScore;
-      statDelta[p2uid].goalsFor     += awayScore;
-      statDelta[p2uid].goalsAgainst += homeScore;
+      // goals (only goalsFor, no goalsAgainst)
+      statDelta[p1uid].goalsFor += homeScore;
+      statDelta[p2uid].goalsFor += awayScore;
 
       // win / draw / loss
       if (homeScore > awayScore) {
@@ -7157,12 +7155,11 @@ window.saveTrnMatchResults = async function() {
     const base = userMap[uid];
     if (!base) continue;
     const updated = {
-      matches:      (base.matches      || 0) + delta.matches,
-      wins:         (base.wins         || 0) + delta.wins,
-      draws:        (base.draws        || 0) + delta.draws,
-      losses:       (base.losses       || 0) + delta.losses,
-      goalsFor:     (base.goalsFor     || 0) + delta.goalsFor,
-      goalsAgainst: (base.goalsAgainst || 0) + delta.goalsAgainst,
+      matches:  (base.matches  || 0) + delta.matches,
+      wins:     (base.wins     || 0) + delta.wins,
+      draws:    (base.draws    || 0) + delta.draws,
+      losses:   (base.losses   || 0) + delta.losses,
+      goalsFor: (base.goalsFor || 0) + delta.goalsFor,
     };
     await fetch(`${DB}/users/${uid}.json`, {
       method: 'PATCH',
