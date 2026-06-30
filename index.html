@@ -8123,5 +8123,190 @@ function showPage(name) {
 }
 </script>
 
+<!-- ═══════════ TYP AI SUPPORT CHAT WIDGET ═══════════ -->
+<style>
+#typAiToggle {
+  position: fixed; bottom: 22px; right: 22px; z-index: 99990;
+  width: 58px; height: 58px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  border: 2px solid var(--gold);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; box-shadow: 0 6px 22px rgba(0,0,0,0.35);
+  transition: transform 0.2s ease;
+}
+#typAiToggle:hover { transform: scale(1.08); }
+#typAiToggle svg { width: 28px; height: 28px; }
+#typAiBadge {
+  position: absolute; top: -4px; right: -4px;
+  background: var(--gold); color: #1a1530; font-size: 9px; font-weight: 800;
+  padding: 2px 5px; border-radius: 8px; letter-spacing: 0.04em;
+}
+#typAiWindow {
+  position: fixed; bottom: 90px; right: 22px; z-index: 99991;
+  width: 340px; max-width: calc(100vw - 28px);
+  height: 480px; max-height: calc(100vh - 130px);
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 16px; box-shadow: 0 14px 50px rgba(0,0,0,0.45);
+  display: none; flex-direction: column; overflow: hidden;
+}
+#typAiWindow.open { display: flex; }
+#typAiHeader {
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  padding: 14px 16px; display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 2px solid var(--gold);
+}
+#typAiHeader .typ-ai-title { color: #fff; font-weight: 800; font-size: 14px; display:flex; align-items:center; gap:8px; }
+#typAiHeader .typ-ai-sub { color: rgba(255,255,255,0.75); font-size: 10px; margin-top:2px; }
+#typAiClose { cursor: pointer; color: #fff; opacity: 0.85; font-size: 20px; line-height:1; background:none; border:none; }
+#typAiClose:hover { opacity: 1; }
+#typAiMessages {
+  flex: 1; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 10px;
+  background: var(--bg);
+}
+.typ-ai-msg { max-width: 85%; padding: 9px 12px; border-radius: 12px; font-size: 13px; line-height: 1.5; white-space: pre-wrap; word-wrap: break-word; }
+.typ-ai-msg.bot { align-self: flex-start; background: var(--card2); color: var(--text); border: 1px solid var(--border); border-bottom-left-radius: 3px; }
+.typ-ai-msg.user { align-self: flex-end; background: var(--primary); color: #fff; border-bottom-right-radius: 3px; }
+.typ-ai-msg.typing { align-self: flex-start; background: var(--card2); color: var(--text3); border: 1px solid var(--border); font-style: italic; }
+#typAiInputRow {
+  display: flex; gap: 8px; padding: 10px; border-top: 1px solid var(--border); background: var(--card);
+}
+#typAiInput {
+  flex: 1; background: var(--bg2); border: 1px solid var(--border); border-radius: 10px;
+  padding: 10px 12px; color: var(--text); font-size: 13px; outline: none; resize: none;
+}
+#typAiInput:focus { border-color: var(--primary); }
+#typAiSend {
+  background: var(--gold); color: #1a1530; border: none; border-radius: 10px;
+  padding: 0 16px; font-weight: 800; font-size: 13px; cursor: pointer;
+}
+#typAiSend:hover { filter: brightness(1.08); }
+#typAiSend:disabled { opacity: 0.5; cursor: not-allowed; }
+@media (max-width: 480px) {
+  #typAiWindow { right: 12px; left: 12px; width: auto; bottom: 84px; }
+  #typAiToggle { right: 16px; bottom: 16px; }
+}
+</style>
+
+<button id="typAiToggle" title="TYP Support এর সাথে কথা বলুন" onclick="typAiToggleWindow()">
+  <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+  </svg>
+  <span id="typAiBadge">AI</span>
+</button>
+
+<div id="typAiWindow">
+  <div id="typAiHeader">
+    <div>
+      <div class="typ-ai-title">🤖 TYP Support</div>
+      <div class="typ-ai-sub">Rules, points, registration — যেকোনো প্রশ্ন করো</div>
+    </div>
+    <button id="typAiClose" onclick="typAiToggleWindow()">×</button>
+  </div>
+  <div id="typAiMessages"></div>
+  <div id="typAiInputRow">
+    <textarea id="typAiInput" rows="1" placeholder="তোমার প্রশ্ন লেখো..." onkeydown="typAiHandleKey(event)"></textarea>
+    <button id="typAiSend" onclick="typAiSendMessage()">পাঠাও</button>
+  </div>
+</div>
+
+<script>
+// ═══════════ TYP AI SUPPORT — Gemini powered ═══════════
+const TYP_AI_API_KEY = "AQ.Ab8RN6LRX3RfR_3lIEL0Se_498EJ3Bfwojsk0PB3I-swZMrkZQ";
+const TYP_AI_MODEL = "gemini-2.0-flash";
+const TYP_AI_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${TYP_AI_MODEL}:generateContent?key=${TYP_AI_API_KEY}`;
+
+// 📌 এখানে তোমার TYP Championship-এর rules/FAQ লেখো — bot এটা পড়ে উত্তর দেবে।
+// যত বিস্তারিত লিখবে, bot তত নির্ভুল উত্তর দিতে পারবে। প্রয়োজনমতো edit করো।
+const TYP_AI_RULES = `
+তুমি "TYP Support", TYP Championship (টেক্সট ইওর পেস - TYP) নামের একটা eFootball community platform-এর সহায়ক চ্যাটবট। ব্যবহারকারীদের বাংলায় (প্রয়োজনে ইংরেজি মিশিয়ে), সংক্ষিপ্ত ও স্পষ্টভাবে উত্তর দাও।
+
+প্ল্যাটফর্ম সম্পর্কে সাধারণ তথ্য:
+- TYP Championship হলো eFootball (PES) খেলোয়াড়দের জন্য একটা টুর্নামেন্ট ও র‍্যাংকিং প্ল্যাটফর্ম।
+- এখানে Season-ভিত্তিক লিগ, Friendly Match সিস্টেম, এবং Tournament (Group A/B + Knockout) চলে।
+- League ম্যাচে Bout (1v1 খেলা) জিতলে 3 পয়েন্ট, ড্র হলে উভয় দল 1 পয়েন্ট করে, হারলে 0 পয়েন্ট পায়।
+- প্রতিটা সিজনে খেলোয়াড়দের স্ট্যাটস (গোল, জয়-হার-ড্র, পয়েন্ট) আলাদাভাবে ট্র্যাক করা হয় এবং Season শেষে আর্কাইভ হয়ে যায়।
+- প্রতি মাসে সেরা পারফর্মারদের জন্য Ballon d'Or এওয়ার্ড দেওয়া হয় (admin override-এর মাধ্যমেও দেওয়া যায়)।
+- Friendly Match: খেলোয়াড়রা নিজেরা ফলাফল জমা দেয়, admin approve করলে স্ট্যাটস আপডেট হয় এবং আলাদা Friendly Leaderboard-এ যোগ হয়।
+- Tournament: Group A ও Group B-তে round-robin ম্যাচ হয়, এরপর knockout ব্র্যাকেট দিয়ে চ্যাম্পিয়ন নির্ধারিত হয়। ম্যাচ রেজাল্ট কার্ড PNG আকারে ডাউনলোড করা যায়।
+- প্রোফাইল ও প্লেয়ার স্ট্যাটস কার্ড শুধুমাত্র Admin দ্বারা পরিচালিত হয় (কোনো sign-up/login সিস্টেম নেই)।
+- Admin: Faisal (মূল administrator), Arafat (সহ-administrator)।
+
+নিয়মাবলী (প্রয়োজনে আরও বিস্তারিত করো):
+- নতুন খেলোয়াড় যোগ করতে চাইলে Admin-এর সাথে যোগাযোগ করতে হবে।
+- ম্যাচের ফলাফল নিয়ে কোনো বিরোধ হলে স্ক্রিনশট/প্রমাণসহ Admin-কে জানাতে হবে।
+- Fair play বজায় রাখতে হবে, কোনো ধরনের cheating/win-trading সহ্য করা হবে না।
+
+যদি কোনো প্রশ্নের উত্তর তোমার কাছে না থাকে বা নিশ্চিত না হও, সরাসরি বলে দাও যে এই বিষয়ে Admin (Faisal/Arafat)-এর সাথে যোগাযোগ করতে হবে। কখনো ভুল তথ্য বানিয়ে বলবে না। উত্তর সংক্ষিপ্ত (৩-৫ লাইনের মধ্যে) রাখার চেষ্টা করো যদি না বিস্তারিত প্রশ্ন করা হয়।
+`.trim();
+
+let typAiHistory = [];
+let typAiOpen = false;
+
+function typAiToggleWindow() {
+  typAiOpen = !typAiOpen;
+  const win = document.getElementById('typAiWindow');
+  win.classList.toggle('open', typAiOpen);
+  if (typAiOpen && typAiHistory.length === 0) {
+    typAiAppendMessage('bot', 'আসসালামু আলাইকুম! 👋 আমি TYP Support। TYP Championship-এর rules, points system, registration, tournament — যা জানতে চাও জিজ্ঞেস করো।');
+  }
+  if (typAiOpen) document.getElementById('typAiInput').focus();
+}
+
+function typAiHandleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    typAiSendMessage();
+  }
+}
+
+function typAiAppendMessage(role, text) {
+  const box = document.getElementById('typAiMessages');
+  const div = document.createElement('div');
+  div.className = 'typ-ai-msg ' + role;
+  div.textContent = text;
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
+  return div;
+}
+
+async function typAiSendMessage() {
+  const input = document.getElementById('typAiInput');
+  const text = input.value.trim();
+  if (!text) return;
+
+  typAiAppendMessage('user', text);
+  typAiHistory.push({ role: 'user', parts: [{ text }] });
+  input.value = '';
+
+  const sendBtn = document.getElementById('typAiSend');
+  sendBtn.disabled = true;
+  const typingEl = typAiAppendMessage('typing', 'লিখছে...');
+
+  try {
+    const res = await fetch(TYP_AI_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        system_instruction: { parts: [{ text: TYP_AI_RULES }] },
+        contents: typAiHistory
+      })
+    });
+    const data = await res.json();
+    typingEl.remove();
+
+    const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text
+      || 'দুঃখিত, এই মুহূর্তে উত্তর দিতে পারছি না। একটু পরে আবার চেষ্টা করো বা Admin-কে জিজ্ঞেস করো।';
+
+    typAiAppendMessage('bot', reply);
+    typAiHistory.push({ role: 'model', parts: [{ text: reply }] });
+  } catch (err) {
+    typingEl.remove();
+    typAiAppendMessage('bot', 'একটা সমস্যা হয়েছে। ইন্টারনেট কানেকশন চেক করো বা একটু পরে আবার চেষ্টা করো।');
+    console.error('TYP AI error:', err);
+  } finally {
+    sendBtn.disabled = false;
+  }
+}
+</script>
 </body>
 </html>
