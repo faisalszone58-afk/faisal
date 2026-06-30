@@ -8334,8 +8334,50 @@ const TYP_FALLBACK = 'দুঃখিত, এই প্রশ্নের সর
 
 const TYP_GREETING_WORDS = ['hi', 'hello', 'হাই', 'হ্যালো', 'আসসালামু', 'সালাম', 'হেলো'];
 
+// টেক্সট normalize করে — extra space, punctuation সরিয়ে, lowercase করে
+function typAiNormalize(str) {
+  return str
+    .toLowerCase()
+    .replace(/[।,.?!;:'"()\-_/\\]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+// দুইটা শব্দের মধ্যে edit distance (কয়টা অক্ষর change/add/remove করলে এক হবে) বের করে — spelling ভুল ধরার জন্য
+function typAiLevenshtein(a, b) {
+  const m = a.length, n = b.length;
+  if (m === 0) return n;
+  if (n === 0) return m;
+  const dp = Array.from({ length: m + 1 }, () => new Array(n + 1).fill(0));
+  for (let i = 0; i <= m; i++) dp[i][0] = i;
+  for (let j = 0; j <= n; j++) dp[0][j] = j;
+  for (let i = 1; i <= m; i++) {
+    for (let j = 1; j <= n; j++) {
+      const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+      dp[i][j] = Math.min(
+        dp[i - 1][j] + 1,      // delete
+        dp[i][j - 1] + 1,      // insert
+        dp[i - 1][j - 1] + cost // substitute
+      );
+    }
+  }
+  return dp[m][n];
+}
+
+// userText-এর প্রতিটা শব্দের মধ্যে kw-এর সাথে সবচেয়ে কাছের spelling মিল আছে কিনা চেক করে
+// (শব্দের length অনুযায়ী কত অক্ষর ভুল মেনে নেওয়া যাবে সেটা ঠিক করে)
+function typAiFuzzyIncludes(words, kw) {
+  const maxDist = kw.length <= 4 ? 1 : (kw.length <= 7 ? 2 : 3);
+  for (const w of words) {
+    if (Math.abs(w.length - kw.length) > maxDist) continue; // length অনেক আলাদা হলে স্কিপ (speed)
+    if (typAiLevenshtein(w, kw) <= maxDist) return true;
+  }
+  return false;
+}
+
 function typAiFindAnswer(userText) {
-  const t = userText.toLowerCase();
+  const t = typAiNormalize(userText);
+  const words = t.split(' ').filter(Boolean);
 
   if (TYP_GREETING_WORDS.some(w => t.includes(w))) {
     return 'ওয়ালাইকুম আসসালাম! 😊 বলো, কী জানতে চাও — points system, rules, registration, tournament, season, friendly match — যা ইচ্ছা জিজ্ঞেস করো।';
@@ -8343,17 +8385,158 @@ function typAiFindAnswer(userText) {
 
   let bestMatch = null;
   let bestScore = 0;
+
   for (const item of TYP_FAQ) {
     let score = 0;
     for (const kw of item.keywords) {
-      if (t.includes(kw.toLowerCase())) score++;
+      const kwNorm = typAiNormalize(kw);
+      if (!kwNorm) continue;
+
+      if (kwNorm.includes(' ')) {
+        // multi-word keyword (e.g. "smart assist") — পুরোটা মিলতে হবে, weight বেশি
+        if (t.includes(kwNorm)) {
+          score += 3 + kwNorm.length * 0.05;
+        } else {
+          // multi-word-এর প্রতিটা অংশ আলাদাভাবে spelling-tolerant মিল খোঁজে (সব অংশ মিললে তবেই কাউন্ট)
+          const parts = kwNorm.split(' ').filter(p => p.length >= 3);
+          if (parts.length > 1 && parts.every(p => typAiFuzzyIncludes(words, p))) {
+            score += 2;
+          }
+        }
+      } else {
+        // single-word keyword — আগে exact word-boundary মিল চেক
+        const re = new RegExp('(^|[^a-z0-9\\u0980-\\u09FF])' + kwNorm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '([^a-z0-9\\u0980-\\u09FF]|$)');
+        if (re.test(t)) {
+          score += kwNorm.length <= 3 ? 0.7 : 1.5;
+        } else if (kwNorm.length >= 4 && typAiFuzzyIncludes(words, kwNorm)) {
+          // spelling ভুল হলেও (যেমন "rejistration" ≈ "registration") কাছাকাছি মিল ধরবে, একটু কম weight
+          score += 1.1;
+        } else if (t.includes(kwNorm) && kwNorm.length >= 4) {
+          score += 0.5;
+        }
+      }
     }
     if (score > bestScore) {
       bestScore = score;
       bestMatch = item;
     }
   }
-  return bestMatch ? bestMatch.answer : TYP_FALLBACK;
+
+  // খুব দুর্বল মিল হলে fallback দেখানোই ভালো
+  return bestMatch && bestScore >= 0.7 ? bestMatch.answer : TYP_FALLBACK;
+}
+
+// ═══════════ Live Tournament Data Lookup (point/standings/next-match) ═══════════
+const TYP_AI_DB = 'https://typ-championship-default-rtdb.firebaseio.com';
+let typAiTeams = null;
+let typAiMatches = null;
+let typAiDataLoadedAt = 0;
+
+async function typAiLoadTournamentData(force) {
+  const now = Date.now();
+  if (!force && typAiTeams && (now - typAiDataLoadedAt) < 60000) return; // ৬০ সেকেন্ড cache
+  try {
+    const [teamsSnap, matchesSnap] = await Promise.all([
+      fetch(`${TYP_AI_DB}/tournament/teams.json`).then(r => r.json()),
+      fetch(`${TYP_AI_DB}/tournament/matches.json`).then(r => r.json())
+    ]);
+    typAiTeams = teamsSnap ? Object.entries(teamsSnap).map(([id, v]) => ({ id, ...v })) : [];
+    typAiMatches = matchesSnap ? Object.entries(matchesSnap).map(([id, v]) => ({ id, ...v })) : [];
+    typAiDataLoadedAt = now;
+  } catch (e) {
+    // fetch fail করলে পুরনো cache থাকলে সেটাই ব্যবহার হবে
+  }
+}
+
+// calcStandings() পেজের অন্য জায়গায় থাকা ফাংশন — এখানে নাম থাকলে সেটাই reuse করি
+function typAiCalcStandings() {
+  if (typeof calcStandings === 'function') return calcStandings(typAiTeams, typAiMatches);
+  return [];
+}
+
+// user-এর লেখা টেক্সটে কোন team-এর নাম আছে কিনা খুঁজে বের করে (spelling ভুল সহ্য করে)
+function typAiFindTeamByName(t, words) {
+  if (!typAiTeams || !typAiTeams.length) return null;
+  let best = null, bestDist = Infinity;
+  for (const team of typAiTeams) {
+    const nameNorm = typAiNormalize(team.name || '');
+    if (!nameNorm) continue;
+    if (t.includes(nameNorm)) return team; // exact substring মিল পেলে সাথে সাথে রিটার্ন
+    const nameWords = nameNorm.split(' ').filter(Boolean);
+    for (const nw of nameWords) {
+      if (nw.length < 3) continue;
+      for (const w of words) {
+        const maxDist = nw.length <= 5 ? 1 : 2;
+        const d = typAiLevenshtein(w, nw);
+        if (d <= maxDist && d < bestDist) { bestDist = d; best = team; }
+      }
+    }
+  }
+  return best;
+}
+
+function typAiOrdinalBn(n) {
+  return n + 'ম';
+}
+
+// দলের পরবর্তী (এখনো না খেলা) ম্যাচ খুঁজে বের করে
+function typAiNextMatchForTeam(teamId) {
+  const upcoming = typAiMatches
+    .filter(m => (m.homeTeam === teamId || m.awayTeam === teamId) && m.status !== 'completed')
+    .sort((a, b) => (a.day - b.day) || (a.matchday - b.matchday));
+  if (!upcoming.length) return null;
+  const m = upcoming[0];
+  const oppId = m.homeTeam === teamId ? m.awayTeam : m.homeTeam;
+  const opp = typAiTeams.find(t => t.id === oppId);
+  return { day: m.day, matchday: m.matchday, opponentName: opp ? opp.name : 'প্রতিপক্ষ' };
+}
+
+const TYP_POINT_INTENT = ['point', 'পয়েন্ট', 'পয়েন্ট কত', 'standing', 'স্ট্যান্ডিং', 'টেবিল', 'table', 'র‍্যাংক', 'rank'];
+const TYP_NEXT_MATCH_INTENT = ['next match', 'পরের ম্যাচ', 'পরবর্তী ম্যাচ', 'কবে', 'kobe', 'কার সাথে', 'কার শাথে', 'সাথে ম্যাচ', 'fixture', 'সিডিউল', 'schedule'];
+
+// Firebase থেকে লাইভ ডেটা দেখে dynamic উত্তর তৈরি করার চেষ্টা করে — না পারলে null রিটার্ন করে (তখন normal FAQ চলবে)
+async function typAiTryDynamicAnswer(userText) {
+  const t = typAiNormalize(userText);
+  const words = t.split(' ').filter(Boolean);
+
+  const wantsPoint = TYP_POINT_INTENT.some(kw => t.includes(typAiNormalize(kw)));
+  const wantsNextMatch = TYP_NEXT_MATCH_INTENT.some(kw => t.includes(typAiNormalize(kw)));
+
+  if (!wantsPoint && !wantsNextMatch) return null;
+
+  await typAiLoadTournamentData(false);
+  if (!typAiTeams || !typAiTeams.length) return null;
+
+  const team = typAiFindTeamByName(t, words);
+
+  // টিম নাম ছাড়া শুধু "standing/table/পয়েন্ট তালিকা" চাইলে পুরো টেবিল দেখাও
+  if (wantsPoint && !team) {
+    const standings = typAiCalcStandings();
+    if (!standings.length) return null;
+    let out = '📊 বর্তমান Standings:\n';
+    standings.forEach((s, i) => {
+      out += `${i + 1}. ${s.name} — ${s.pts} পয়েন্ট (খেলা ${s.mp}, জয় ${s.w}, ড্র ${s.d}, হার ${s.l})\n`;
+    });
+    return out.trim();
+  }
+
+  if (!team) return null; // team খুঁজে না পেলে FAQ fallback-এ যাবে
+
+  if (wantsPoint) {
+    const standings = typAiCalcStandings();
+    const row = standings.find(s => s.id === team.id);
+    if (!row) return `${team.name} এখনো কোনো ম্যাচ খেলেনি, তাই পয়েন্ট ০।`;
+    const pos = standings.findIndex(s => s.id === team.id) + 1;
+    return `📊 ${team.name}:\n• বর্তমান পয়েন্ট: ${row.pts}\n• টেবিলে অবস্থান: ${typAiOrdinalBn(pos)}\n• খেলা ${row.mp} | জয় ${row.w} | ড্র ${row.d} | হার ${row.l}\n• গোল ${row.gf}-${row.ga}`;
+  }
+
+  if (wantsNextMatch) {
+    const next = typAiNextMatchForTeam(team.id);
+    if (!next) return `${team.name}-এর কোনো আসন্ন ম্যাচ এই মুহূর্তে শিডিউলে নেই।`;
+    return `🆚 ${team.name}-এর পরবর্তী ম্যাচ:\nDay ${next.day}, Matchday ${next.matchday} — প্রতিপক্ষ ${next.opponentName}\n\n(সঠিক তারিখ/সময়ের জন্য Fixtures পেজ দেখো — কারণ admin শিডিউল আপডেট করতে পারে)`;
+  }
+
+  return null;
 }
 
 let typAiOpen = false;
@@ -8387,7 +8570,7 @@ function typAiAppendMessage(role, text) {
   return div;
 }
 
-function typAiSendMessage() {
+async function typAiSendMessage() {
   const input = document.getElementById('typAiInput');
   const text = input.value.trim();
   if (!text) return;
@@ -8399,13 +8582,18 @@ function typAiSendMessage() {
   sendBtn.disabled = true;
   const typingEl = typAiAppendMessage('typing', 'লিখছে...');
 
-  // ছোট delay দিয়ে natural feel — কোনো network call নেই, সম্পূর্ণ local
-  setTimeout(() => {
+  try {
+    // আগে live data lookup চেষ্টা করি (point/standings/next match), না পেলে normal FAQ
+    let reply = await typAiTryDynamicAnswer(text);
+    if (!reply) reply = typAiFindAnswer(text);
     typingEl.remove();
-    const reply = typAiFindAnswer(text);
     typAiAppendMessage('bot', reply);
+  } catch (e) {
+    typingEl.remove();
+    typAiAppendMessage('bot', typAiFindAnswer(text));
+  } finally {
     sendBtn.disabled = false;
-  }, 450);
+  }
 }
 </script>
 </body>
