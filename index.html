@@ -8235,32 +8235,98 @@ const TYP_FAQ = [
     answer: 'Friendly Match-এ খেলোয়াড়রা নিজেরা ম্যাচের ফলাফল জমা দেয়। Admin সেটা approve করলে তোমার স্ট্যাটস আপডেট হয় এবং আলাদা Friendly Leaderboard-এ যোগ হয়।'
   },
   {
-    keywords: ['tournament', 'টুর্নামেন্ট', 'গ্রুপ', 'group', 'knockout', 'নকআউট', 'কাপ'],
+    keywords: ['tournament', 'টুর্নামেন্ট', 'গ্রুপ এ', 'গ্রুপ বি', 'group', 'knockout', 'নকআউট', 'কাপ'],
     answer: 'Tournament-এ Group A ও Group B-তে round-robin ম্যাচ হয়, এরপর সেরা দলগুলো নিয়ে knockout ব্র্যাকেট হয়ে চ্যাম্পিয়ন নির্ধারিত হয়। প্রতিটা ম্যাচের রেজাল্ট কার্ড PNG আকারে ডাউনলোড করা যায়।'
   },
   {
     keywords: ['বিরোধ', 'dispute', 'ভুল ফলাফল', 'complain', 'অভিযোগ', 'রিপোর্ট'],
-    answer: 'ম্যাচের ফলাফল নিয়ে কোনো বিরোধ থাকলে স্ক্রিনশট/প্রমাণসহ Admin (Faisal/Arafat)-কে জানাও। Admin যাচাই করে প্রয়োজনে ফলাফল সংশোধন করবে।'
+    answer: 'ম্যাচের ফলাফল নিয়ে কোনো বিরোধ থাকলে স্ক্রিনশট/প্রমাণসহ Admin (Faisal/Arafat)-কে জানাও। Admin যাচাই করে প্রয়োজনে ফলাফল সংশোধন করবে। সকল অভিযোগ ও শাস্তি সংক্রান্ত সিদ্ধান্ত Admin Panel-এর — যা চূড়ান্ত।'
   },
   {
     keywords: ['cheat', 'চিট', 'win trading', 'ফেয়ার প্লে', 'fair play', 'নিয়ম ভাঙা'],
     answer: 'TYP Championship-এ ফেয়ার প্লে বাধ্যতামূলক। কোনো ধরনের cheating বা win-trading (ইচ্ছাকৃত হার-জিত সাজানো) সহ্য করা হবে না — ধরা পড়লে Admin ব্যবস্থা নেবে।'
   },
   {
-    keywords: ['admin', 'অ্যাডমিন', 'যোগাযোগ', 'contact', 'faisal', 'arafat'],
-    answer: 'TYP Championship-এর Admin: Faisal (মূল Administrator) এবং Arafat (সহ-Administrator)। যেকোনো সমস্যায় তাদের সরাসরি যোগাযোগ করতে পারো।'
+    keywords: ['admin', 'অ্যাডমিন', 'যোগাযোগ', 'contact', 'faisal', 'arafat', 'admin authority', 'চূড়ান্ত সিদ্ধান্ত'],
+    answer: 'TYP Championship-এর Admin: Faisal (মূল Administrator) এবং Arafat (সহ-Administrator)। সকল অভিযোগ, প্রমাণ, শাস্তি, Auto Win, Rematch ও Card সংক্রান্ত সিদ্ধান্ত Admin Panel-এর এবং তা চূড়ান্ত বলে গণ্য হবে।'
   },
   {
     keywords: ['ranking', 'র‍্যাংকিং', 'র‍্যাঙ্ক', 'লিডারবোর্ড', 'leaderboard', 'rank'],
     answer: 'Ranking পেজে সব খেলোয়াড়ের বর্তমান সিজনের পয়েন্ট, গোল ও জয়-হার-ড্র অনুযায়ী র‍্যাংক দেখানো হয়। সার্চ বক্স দিয়ে নির্দিষ্ট খেলোয়াড় খুঁজেও তার আসল র‍্যাংক দেখা যায়।'
   },
   {
-    keywords: ['স্ট্যাটস', 'stats', 'প্রোফাইল', 'profile', 'কার্ড', 'card'],
+    keywords: ['স্ট্যাটস', 'stats', 'প্রোফাইল', 'profile', 'প্লেয়ার কার্ড'],
     answer: 'প্রতিটা খেলোয়াড়ের একটা প্রোফাইল পেজ আছে যেখানে গোল, ম্যাচ, জয়-হার-ড্র, পয়েন্ট ইত্যাদি স্ট্যাটস দেখা যায়। চাইলে ডাউনলোডযোগ্য player stats card-ও পাওয়া যায়।'
+  },
+
+  // ── Tournament Rules (Rules পেজ থেকে) ──
+  {
+    keywords: ['lineup', 'line-up', 'লাইনআপ', 'স্কোয়াড', 'squad'],
+    answer: '📋 Squad Line-up Submission:\n• প্রতিটা Match Day-এর Squad Line-up ম্যাচের দিন দুপুর ১:০০ টার আগে Admin-এর Inbox-এ জমা দিতে হবে।\n• এই দায়িত্ব Team Manager অথবা Captain-এর।\n• সময়মতো জমা দিতে ব্যর্থ হলে আগের Match Day-এর Line-up স্বয়ংক্রিয়ভাবে কার্যকর হবে এবং সেটা দিয়েই Official Draw হবে — পরে কোনো আপত্তি গ্রহণযোগ্য হবে না।'
+  },
+  {
+    keywords: ['match day group', 'গ্রুপ তৈরি', 'group creation'],
+    answer: '👥 Match Day Group Creation: Fixture-এ যে দল Home Team, সেই দলের Manager/Captain Match Day Group তৈরি করবে এবং সেই গ্রুপে অবশ্যই Tournament Official ও Opponent দলের Manager/Captain-কে Add করতে হবে।'
+  },
+  {
+    keywords: ['fixture', 'ড্র', 'draw', 'official draw'],
+    answer: '🆚 Match Fixture Creation: Official Draw সম্পন্ন হওয়ার পর Home Team-এর Manager অথবা Captain Match Fixture তৈরি করবে।'
+  },
+  {
+    keywords: ['substitution', 'সাবস্টিটিউশন', 'পরিবর্তন', 'swap', 'সোয়াপ'],
+    answer: '🔄 Substitution & Swap Rules: প্রতিটা Match Day-তে খেলোয়াড়দের উপস্থিতি, Substitution ও Swap নির্ধারিত Deadline-এর মধ্যে সম্পন্ন করতে হবে। Deadline পার হলে কোনো Substitution/Swap গ্রহণযোগ্য হবে না।\n\n🎴 Card নিয়ম: প্রতি দলের কাছে প্রতি Match Day-তে ২টি Swap Card ও ২টি Substitution Card থাকে। Swap-এর জন্য "Typ: Swap Card" এবং Substitution-এর জন্য "Typ: Sub Card" ব্যবহার বাধ্যতামূলক। Card ব্যবহারের ৩ মিনিটের মধ্যে Cancel Request দেওয়া যায়, তারপর তা Final হয়ে যায়।'
+  },
+  {
+    keywords: ['manager conduct', 'penalty', 'জরিমানা', 'fine', 'অসদাচরণ'],
+    answer: '⚠️ Manager Conduct & Penalty: সকল Manager-কে খেলোয়াড়দের সাথে সম্মানজনক আচরণ করতে হবে। অসদাচরণের প্রমাণসহ অভিযোগ প্রমাণিত হলে ২০ টাকা জরিমানা আরোপ করা হবে। গুরুতর বা পুনরাবৃত্ত ক্ষেত্রে Tournament Authority অতিরিক্ত ব্যবস্থা নিতে পারে — তাদের সিদ্ধান্তই চূড়ান্ত।'
+  },
+  {
+    keywords: ['match fixing', 'ফিক্সিং', 'fixing'],
+    answer: '🚫 Match Fixing সম্পূর্ণ নিষিদ্ধ। কোনো Manager এতে জড়িত থাকলে সরাসরি Red Card দেওয়া হবে। দুই পক্ষ মিলে Fixing করলে: ম্যাচ ০-০ Null Result, উভয় Manager-কে Red Card, এবং TYP গ্রুপ থেকে ১ মাসের জন্য Ban।'
+  },
+  {
+    keywords: ['user id', 'ইউজার আইডি', 'device', 'ডিভাইস', 'device change'],
+    answer: '📱 User ID & Device Change: User ID পরিবর্তন প্রয়োজন হলে বিকাল ৫:০০ টার মধ্যে Manager Group-এ জানাতে হবে। Tournament চলাকালীন Device পরিবর্তন করা যায় না — শুধু Device নষ্ট/হারিয়ে গেলে Admin-কে প্রমাণসহ জানিয়ে অনুমতি নিয়ে Change করা যায়। অনুমতি ছাড়া Device পরিবর্তন Rule Violation হিসেবে গণ্য হবে।'
+  },
+  {
+    keywords: ['video', 'ভিডিও', 'প্রমাণ', 'proof', 'submission', 'জমা'],
+    answer: '🎥 Match Result Video Rules:\n• বিজয়ী/ড্র উভয় প্লেয়ারকে ভিডিওতে দেখাতে হবে: Match Result, SMART Assist OFF, User ID, Device Name।\n• ম্যাচ শেষের ১৫ মিনিটের মধ্যে ভিডিও Match Day গ্রুপে জমা দিতে হবে (নেটওয়ার্ক সমস্যায় Sending screenshot দিতে হবে)।\n• Winner হলে শুধু Result Screenshot দিলেই হবে, ভিডিও লাগবে না — তবে Room Create তাকেই করতে হবে।\n• ১৫ মিনিটের মধ্যে জমা না দিলে: Win Match হলে Rematch; Draw হলে Opponent ১ গোল লিড নিয়ে Rematch শুরু করবে।'
+  },
+  {
+    keywords: ['exit', 'disconnect', 'ডিসকানেক্ট', 'এক্সিট', 'বের হওয়া'],
+    answer: '🔌 Match Exit / Disconnect Rules: ম্যাচ শেষের আগে Exit করলে শুধু Exit করা প্লেয়ারকে ভিডিও প্রমাণ দিতে হবে।\n• Lead অবস্থায় Exit → 0-0 থেকে Rematch + ১টি Yellow Card\n• Draw অবস্থায় Exit → Opponent ১ গোল লিড নিয়ে Rematch + ১টি Yellow Card\n• Opponent Lead অবস্থায় Exit → শুধু ১টি Yellow Card, বাকি সময় থেকে ম্যাচ চলবে\nসকল Disconnect/Resume/Rematch ১৫ মিনিটের মধ্যে সম্পন্ন করতে হবে এবং Video Rules বাধ্যতামূলক।'
+  },
+  {
+    keywords: ['smart assist', 'স্মার্ট অ্যাসিস্ট'],
+    answer: '⚠️ SMART Assist কোনো প্লেয়ার ON করে খেললে সেই ম্যাচ Auto Loss এবং ১টি Yellow Card দেওয়া হবে। ভিডিওতে সবসময় SMART Assist OFF দেখাতে হবে।'
+  },
+  {
+    keywords: ['verification', 'auto loss', 'অটো লস', 'যাচাই'],
+    answer: '🔍 User ID & Device Verification: ম্যাচ শেষে দেখানো User ID বা Device Name আগে থেকে জমা দেওয়া তথ্যের সাথে না মিললে Auto Loss দেওয়া হবে। তাই ভিডিওতে সবসময় সঠিক SMART Assist OFF, User ID, Device Name, Match Result দেখাতে হবে।'
+  },
+  {
+    keywords: ['red card', 'রেড কার্ড', 'in-game red card'],
+    answer: '🟥 In-Game Red Card: কোনো প্লেয়ার ম্যাচ চলাকালীন Red Card পেয়ে Disconnect হলে Opponent অতিরিক্ত ১ গোল লিড নিয়ে বাকি সময় খেলবে (আগে থেকে Lead-এ থাকলে তার সাথে আরও ১ গোল যোগ হবে)।'
+  },
+  {
+    keywords: ['yellow card', 'হলুদ কার্ড', 'কার্ড সিস্টেম', 'card system'],
+    answer: '🟨🟥 Card System:\n• Yellow Card পাওয়ার কারণ: প্রমাণ ছাড়া Disconnect, সময়মতো না খেলা, অসহযোগিতা, গালিগালাজ ইত্যাদি।\n• ২টি Yellow Card = ১টি Red Card। Yellow Card ২ দিন পর্যন্ত কার্যকর থাকে।\n• Match Result-এর আগে Red Card পেলে Auto Loss; পরে পেলে Result বহাল থাকে।\n• Red Card পেলে পরবর্তী ২ ম্যাচ নিষিদ্ধ।'
+  },
+  {
+    keywords: ['formation', 'ফরমেশন', 'wall', 'ওয়াল'],
+    answer: '⚽ Formation Rules: Wall Formation সম্পূর্ণ নিষিদ্ধ — প্রমাণিত হলে Opponent +১ Goal Bonus পাবে। শুধু In-Game Default Formation ব্যবহার করা যাবে, Custom Formation নিষিদ্ধ। Double Defence ও Double Attack Allowed। অভিযোগ থাকলে ম্যাচের প্রথম ০-১০ সেকেন্ডের মধ্যেই Pause দিয়ে ভিডিওসহ জানাতে হবে।'
+  },
+  {
+    keywords: ['backpass', 'ব্যাকপাস'],
+    answer: '🚫 Backpass Rules: ইচ্ছাকৃত Backpass সম্পূর্ণ নিষিদ্ধ। Opponent ভিডিও প্রমাণ দিলে Admin Panel যাচাই করবে; প্রমাণিত হলে যত মিনিট Backpass খেলা হয়েছে, ঠিক তত মিনিট পুনরায় খেলতে হবে। ভিডিও প্রমাণ ছাড়া অভিযোগ গ্রহণযোগ্য নয়।'
+  },
+  {
+    keywords: ['auto win', 'mention', 'মেনশন', 'activity', 'inactive', 'ইনঅ্যাক্টিভ'],
+    answer: '⏱️ Auto Win & Activity Rules: Priority Time-এর মধ্যে অপোনেন্টকে কমপক্ষে ২ বার Mention করতে হবে (প্রতি Mention-এর মাঝে ন্যূনতম ২ মিনিট ব্যবধান)। ২ বারের কম Mention হলে এক্সটা ৫ মিনিট দেওয়া হয়; সেই সময়েও সাড়া না পেলে Auto Win আবেদনযোগ্য। Fixed Time শেষের ২০ মিনিটের মধ্যে Mention না করলে প্লেয়ারকে Inactive ধরা হবে। চূড়ান্ত সিদ্ধান্ত Admin Panel-এর।'
   },
   {
     keywords: ['রুলস', 'rule', 'rules', 'নিয়মাবলী', 'নিয়ম কি'],
-    answer: 'বিস্তারিত নিয়মাবলীর জন্য উপরের মেনু থেকে "Rules" পেজে যাও। সংক্ষেপে: প্রতি bout জিতলে 3, ড্র 1, হার 0 পয়েন্ট; ফেয়ার প্লে বাধ্যতামূলক; কোনো বিরোধ হলে প্রমাণসহ Admin-কে জানাতে হবে।'
+    answer: 'TYP Championship-এর পূর্ণাঙ্গ নিয়মাবলী উপরের মেনু থেকে "Rules" পেজে আছে — মোট ১৯টা বিভাগে (Line-up, Substitution, Video Rules, Card System, Formation, Backpass, Auto Win ইত্যাদি)। নির্দিষ্ট কোনো নিয়ম জানতে চাইলে সরাসরি জিজ্ঞেস করো — যেমন "video rules", "card system", "backpass rule", "formation" ইত্যাদি।'
   }
 ];
 
