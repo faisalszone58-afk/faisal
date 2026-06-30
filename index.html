@@ -8210,43 +8210,95 @@ function showPage(name) {
 </div>
 
 <script>
-// ═══════════ TYP AI SUPPORT — Gemini powered ═══════════
-const TYP_AI_API_KEY = "AQ.Ab8RN6LRX3RfR_3IIEL0Se_498EJ3Bfwojsk0PB3l-swZMrkZQ";
-const TYP_AI_MODEL = "gemini-2.0-flash";
-const TYP_AI_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${TYP_AI_MODEL}:generateContent?key=${TYP_AI_API_KEY}`;
+// ═══════════ TYP SUPPORT — Rule-based FAQ bot (no API key needed) ═══════════
+// 📌 এখানে তোমার FAQ গুলো keywords সহ লেখো। যত বেশি keyword দিবে, bot তত ভালোভাবে মিল খুঁজে পাবে।
+// নতুন প্রশ্ন/উত্তর যোগ করতে চাইলে নিচের array-তে নতুন { keywords: [...], answer: "..." } object যোগ করো।
+const TYP_FAQ = [
+  {
+    keywords: ['point', 'পয়েন্ট', 'পয়েন্ট সিস্টেম', 'win', 'জিত', '৩ পয়েন্ট', 'draw', 'ড্র'],
+    answer: 'TYP-এর League ম্যাচে পয়েন্ট সিস্টেম:\n• প্রতিটা bout (1v1) জিতলে = 3 পয়েন্ট\n• Draw হলে = উভয় দল 1 পয়েন্ট করে\n• হারলে = 0 পয়েন্ট\nMatchday summary card-এ এই মোট পয়েন্ট দেখানো হয়।'
+  },
+  {
+    keywords: ['registration', 'রেজিস্ট্রেশন', 'যোগ', 'নাম লেখা', 'join', 'খেলোয়াড় হতে', 'নতুন প্লেয়ার'],
+    answer: 'নতুন খেলোয়াড় হিসেবে যোগ হতে চাইলে সরাসরি Admin (Faisal বা Arafat)-এর সাথে যোগাযোগ করো। প্ল্যাটফর্মে কোনো self sign-up সিস্টেম নেই — সব প্রোফাইল Admin দ্বারা পরিচালিত হয়।'
+  },
+  {
+    keywords: ['season', 'সিজন', 'সীজন', 'আর্কাইভ', 'archive'],
+    answer: 'প্রতিটা Season-এ আলাদাভাবে খেলোয়াড়দের স্ট্যাটস (গোল, জয়-হার-ড্র, পয়েন্ট) ট্র্যাক করা হয়। Season শেষ হলে সেই সিজনের ডেটা আর্কাইভ হয়ে যায় এবং নতুন সিজন শুরু হয়।'
+  },
+  {
+    keywords: ['ballon', 'ব্যালন', "d'or", 'এওয়ার্ড', 'award', 'সেরা খেলোয়াড়'],
+    answer: 'প্রতি মাসে সেরা পারফর্মারদের জন্য Ballon d\'Or এওয়ার্ড দেওয়া হয়। এটা স্বয়ংক্রিয়ভাবে স্ট্যাটস অনুযায়ী নির্ধারিত হয়, তবে প্রয়োজনে Admin override করেও দিতে পারে।'
+  },
+  {
+    keywords: ['friendly', 'ফ্রেন্ডলি'],
+    answer: 'Friendly Match-এ খেলোয়াড়রা নিজেরা ম্যাচের ফলাফল জমা দেয়। Admin সেটা approve করলে তোমার স্ট্যাটস আপডেট হয় এবং আলাদা Friendly Leaderboard-এ যোগ হয়।'
+  },
+  {
+    keywords: ['tournament', 'টুর্নামেন্ট', 'গ্রুপ', 'group', 'knockout', 'নকআউট', 'কাপ'],
+    answer: 'Tournament-এ Group A ও Group B-তে round-robin ম্যাচ হয়, এরপর সেরা দলগুলো নিয়ে knockout ব্র্যাকেট হয়ে চ্যাম্পিয়ন নির্ধারিত হয়। প্রতিটা ম্যাচের রেজাল্ট কার্ড PNG আকারে ডাউনলোড করা যায়।'
+  },
+  {
+    keywords: ['বিরোধ', 'dispute', 'ভুল ফলাফল', 'complain', 'অভিযোগ', 'রিপোর্ট'],
+    answer: 'ম্যাচের ফলাফল নিয়ে কোনো বিরোধ থাকলে স্ক্রিনশট/প্রমাণসহ Admin (Faisal/Arafat)-কে জানাও। Admin যাচাই করে প্রয়োজনে ফলাফল সংশোধন করবে।'
+  },
+  {
+    keywords: ['cheat', 'চিট', 'win trading', 'ফেয়ার প্লে', 'fair play', 'নিয়ম ভাঙা'],
+    answer: 'TYP Championship-এ ফেয়ার প্লে বাধ্যতামূলক। কোনো ধরনের cheating বা win-trading (ইচ্ছাকৃত হার-জিত সাজানো) সহ্য করা হবে না — ধরা পড়লে Admin ব্যবস্থা নেবে।'
+  },
+  {
+    keywords: ['admin', 'অ্যাডমিন', 'যোগাযোগ', 'contact', 'faisal', 'arafat'],
+    answer: 'TYP Championship-এর Admin: Faisal (মূল Administrator) এবং Arafat (সহ-Administrator)। যেকোনো সমস্যায় তাদের সরাসরি যোগাযোগ করতে পারো।'
+  },
+  {
+    keywords: ['ranking', 'র‍্যাংকিং', 'র‍্যাঙ্ক', 'লিডারবোর্ড', 'leaderboard', 'rank'],
+    answer: 'Ranking পেজে সব খেলোয়াড়ের বর্তমান সিজনের পয়েন্ট, গোল ও জয়-হার-ড্র অনুযায়ী র‍্যাংক দেখানো হয়। সার্চ বক্স দিয়ে নির্দিষ্ট খেলোয়াড় খুঁজেও তার আসল র‍্যাংক দেখা যায়।'
+  },
+  {
+    keywords: ['স্ট্যাটস', 'stats', 'প্রোফাইল', 'profile', 'কার্ড', 'card'],
+    answer: 'প্রতিটা খেলোয়াড়ের একটা প্রোফাইল পেজ আছে যেখানে গোল, ম্যাচ, জয়-হার-ড্র, পয়েন্ট ইত্যাদি স্ট্যাটস দেখা যায়। চাইলে ডাউনলোডযোগ্য player stats card-ও পাওয়া যায়।'
+  },
+  {
+    keywords: ['রুলস', 'rule', 'rules', 'নিয়মাবলী', 'নিয়ম কি'],
+    answer: 'বিস্তারিত নিয়মাবলীর জন্য উপরের মেনু থেকে "Rules" পেজে যাও। সংক্ষেপে: প্রতি bout জিতলে 3, ড্র 1, হার 0 পয়েন্ট; ফেয়ার প্লে বাধ্যতামূলক; কোনো বিরোধ হলে প্রমাণসহ Admin-কে জানাতে হবে।'
+  }
+];
 
-// 📌 এখানে তোমার TYP Championship-এর rules/FAQ লেখো — bot এটা পড়ে উত্তর দেবে।
-// যত বিস্তারিত লিখবে, bot তত নির্ভুল উত্তর দিতে পারবে। প্রয়োজনমতো edit করো।
-const TYP_AI_RULES = `
-তুমি "TYP Support", TYP Championship (টেক্সট ইওর পেস - TYP) নামের একটা eFootball community platform-এর সহায়ক চ্যাটবট। ব্যবহারকারীদের বাংলায় (প্রয়োজনে ইংরেজি মিশিয়ে), সংক্ষিপ্ত ও স্পষ্টভাবে উত্তর দাও।
+const TYP_FALLBACK = 'দুঃখিত, এই প্রশ্নের সরাসরি উত্তর আমার কাছে নেই। অনুগ্রহ করে Admin (Faisal বা Arafat)-কে সরাসরি জিজ্ঞেস করো, অথবা উপরের মেনু থেকে "Rules" পেজে দেখো।';
 
-প্ল্যাটফর্ম সম্পর্কে সাধারণ তথ্য:
-- TYP Championship হলো eFootball (PES) খেলোয়াড়দের জন্য একটা টুর্নামেন্ট ও র‍্যাংকিং প্ল্যাটফর্ম।
-- এখানে Season-ভিত্তিক লিগ, Friendly Match সিস্টেম, এবং Tournament (Group A/B + Knockout) চলে।
-- League ম্যাচে Bout (1v1 খেলা) জিতলে 3 পয়েন্ট, ড্র হলে উভয় দল 1 পয়েন্ট করে, হারলে 0 পয়েন্ট পায়।
-- প্রতিটা সিজনে খেলোয়াড়দের স্ট্যাটস (গোল, জয়-হার-ড্র, পয়েন্ট) আলাদাভাবে ট্র্যাক করা হয় এবং Season শেষে আর্কাইভ হয়ে যায়।
-- প্রতি মাসে সেরা পারফর্মারদের জন্য Ballon d'Or এওয়ার্ড দেওয়া হয় (admin override-এর মাধ্যমেও দেওয়া যায়)।
-- Friendly Match: খেলোয়াড়রা নিজেরা ফলাফল জমা দেয়, admin approve করলে স্ট্যাটস আপডেট হয় এবং আলাদা Friendly Leaderboard-এ যোগ হয়।
-- Tournament: Group A ও Group B-তে round-robin ম্যাচ হয়, এরপর knockout ব্র্যাকেট দিয়ে চ্যাম্পিয়ন নির্ধারিত হয়। ম্যাচ রেজাল্ট কার্ড PNG আকারে ডাউনলোড করা যায়।
-- প্রোফাইল ও প্লেয়ার স্ট্যাটস কার্ড শুধুমাত্র Admin দ্বারা পরিচালিত হয় (কোনো sign-up/login সিস্টেম নেই)।
-- Admin: Faisal (মূল administrator), Arafat (সহ-administrator)।
+const TYP_GREETING_WORDS = ['hi', 'hello', 'হাই', 'হ্যালো', 'আসসালামু', 'সালাম', 'হেলো'];
 
-নিয়মাবলী (প্রয়োজনে আরও বিস্তারিত করো):
-- নতুন খেলোয়াড় যোগ করতে চাইলে Admin-এর সাথে যোগাযোগ করতে হবে।
-- ম্যাচের ফলাফল নিয়ে কোনো বিরোধ হলে স্ক্রিনশট/প্রমাণসহ Admin-কে জানাতে হবে।
-- Fair play বজায় রাখতে হবে, কোনো ধরনের cheating/win-trading সহ্য করা হবে না।
+function typAiFindAnswer(userText) {
+  const t = userText.toLowerCase();
 
-যদি কোনো প্রশ্নের উত্তর তোমার কাছে না থাকে বা নিশ্চিত না হও, সরাসরি বলে দাও যে এই বিষয়ে Admin (Faisal/Arafat)-এর সাথে যোগাযোগ করতে হবে। কখনো ভুল তথ্য বানিয়ে বলবে না। উত্তর সংক্ষিপ্ত (৩-৫ লাইনের মধ্যে) রাখার চেষ্টা করো যদি না বিস্তারিত প্রশ্ন করা হয়।
-`.trim();
+  if (TYP_GREETING_WORDS.some(w => t.includes(w))) {
+    return 'ওয়ালাইকুম আসসালাম! 😊 বলো, কী জানতে চাও — points system, rules, registration, tournament, season, friendly match — যা ইচ্ছা জিজ্ঞেস করো।';
+  }
 
-let typAiHistory = [];
+  let bestMatch = null;
+  let bestScore = 0;
+  for (const item of TYP_FAQ) {
+    let score = 0;
+    for (const kw of item.keywords) {
+      if (t.includes(kw.toLowerCase())) score++;
+    }
+    if (score > bestScore) {
+      bestScore = score;
+      bestMatch = item;
+    }
+  }
+  return bestMatch ? bestMatch.answer : TYP_FALLBACK;
+}
+
 let typAiOpen = false;
+let typAiGreeted = false;
 
 function typAiToggleWindow() {
   typAiOpen = !typAiOpen;
   const win = document.getElementById('typAiWindow');
   win.classList.toggle('open', typAiOpen);
-  if (typAiOpen && typAiHistory.length === 0) {
+  if (typAiOpen && !typAiGreeted) {
+    typAiGreeted = true;
     typAiAppendMessage('bot', 'আসসালামু আলাইকুম! 👋 আমি TYP Support। TYP Championship-এর rules, points system, registration, tournament — যা জানতে চাও জিজ্ঞেস করো।');
   }
   if (typAiOpen) document.getElementById('typAiInput').focus();
@@ -8269,43 +8321,25 @@ function typAiAppendMessage(role, text) {
   return div;
 }
 
-async function typAiSendMessage() {
+function typAiSendMessage() {
   const input = document.getElementById('typAiInput');
   const text = input.value.trim();
   if (!text) return;
 
   typAiAppendMessage('user', text);
-  typAiHistory.push({ role: 'user', parts: [{ text }] });
   input.value = '';
 
   const sendBtn = document.getElementById('typAiSend');
   sendBtn.disabled = true;
   const typingEl = typAiAppendMessage('typing', 'লিখছে...');
 
-  try {
-    const res = await fetch(TYP_AI_ENDPOINT, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        system_instruction: { parts: [{ text: TYP_AI_RULES }] },
-        contents: typAiHistory
-      })
-    });
-    const data = await res.json();
+  // ছোট delay দিয়ে natural feel — কোনো network call নেই, সম্পূর্ণ local
+  setTimeout(() => {
     typingEl.remove();
-
-    const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text
-      || 'দুঃখিত, এই মুহূর্তে উত্তর দিতে পারছি না। একটু পরে আবার চেষ্টা করো বা Admin-কে জিজ্ঞেস করো।';
-
+    const reply = typAiFindAnswer(text);
     typAiAppendMessage('bot', reply);
-    typAiHistory.push({ role: 'model', parts: [{ text: reply }] });
-  } catch (err) {
-    typingEl.remove();
-    typAiAppendMessage('bot', 'একটা সমস্যা হয়েছে। ইন্টারনেট কানেকশন চেক করো বা একটু পরে আবার চেষ্টা করো।');
-    console.error('TYP AI error:', err);
-  } finally {
     sendBtn.disabled = false;
-  }
+  }, 450);
 }
 </script>
 </body>
