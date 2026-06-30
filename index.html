@@ -2715,10 +2715,15 @@ if (document.readyState === 'loading') {
       </select>
       <button class="btn btn-outline" onclick="loadTrnMatchdays()" style="padding:9px 16px;font-size:12px">🔄 Load</button>
     </div>
+    <div id="trnMatchupSelectWrap" style="margin-bottom:12px;display:none">
+      <select class="form-input" id="trnMatchupSelect" style="width:100%" onchange="renderSelectedMatchup()">
+        <option value="">-- একটা matchup (team vs team) select করুন --</option>
+      </select>
+    </div>
     <div id="trnMatchEntryArea"></div>
     <div style="margin-top:12px;display:none" id="trnSaveMatchBtnWrap">
-      <button class="btn btn-gold" onclick="saveTrnMatchResults()" style="padding:10px 24px">💾 Save All Results</button>
-      <button class="btn btn-outline" onclick="downloadMatchdayResultCard()" style="padding:10px 20px;margin-left:8px;background:linear-gradient(135deg,rgba(113,50,202,0.12),rgba(48,28,160,0.12));border:1.5px solid var(--gold);color:var(--gold)">📸 Export Result Card</button>
+      <button class="btn btn-gold" onclick="saveTrnMatchResults()" style="padding:10px 24px">💾 Save Results</button>
+      <button class="btn btn-outline" id="trnExportThisMatchupBtn" onclick="downloadCurrentMatchupCard()" style="padding:10px 20px;margin-left:8px;background:linear-gradient(135deg,rgba(113,50,202,0.12),rgba(48,28,160,0.12));border:1.5px solid var(--gold);color:var(--gold)">📸 Export এই Matchup-এর Card</button>
       <span id="trnMatchSaveStatus" style="margin-left:12px;font-size:13px;color:var(--green)"></span>
     </div>
   </div>
@@ -5296,6 +5301,9 @@ async function loadHomeLiveMatchday() {
 
       const homeWins = mdMatches.filter(m => m.homeScore !== undefined && m.homeScore > m.awayScore).length;
       const awayWins = mdMatches.filter(m => m.awayScore !== undefined && m.awayScore > m.homeScore).length;
+      const draws = mdMatches.filter(m => m.homeScore !== undefined && m.homeScore === m.awayScore).length;
+      const homePoints = (homeWins * 3) + (draws * 1);
+      const awayPoints = (awayWins * 3) + (draws * 1);
       const played_count = mdMatches.filter(m => m.homeScore !== undefined).length;
       const total = mdMatches.length;
       const hasResults = played_count > 0;
@@ -5312,8 +5320,8 @@ async function loadHomeLiveMatchday() {
           </div>
           <div style="text-align:center;min-width:80px">
             ${hasResults
-              ? `<div style="font-size:28px;font-weight:900;font-family:'Inter',monospace;color:var(--cyan)">${homeWins} <span style="color:var(--text3);font-size:18px">–</span> ${awayWins}</div>
-                 <div style="font-size:10px;color:var(--text3);margin-top:2px">wins</div>`
+              ? `<div style="font-size:28px;font-weight:900;font-family:'Inter',monospace;color:var(--cyan)">${homePoints} <span style="color:var(--text3);font-size:18px">–</span> ${awayPoints}</div>
+                 <div style="font-size:10px;color:var(--text3);margin-top:2px">points</div>`
               : `<div style="font-size:20px;color:var(--text3)">vs</div>`}
           </div>
           <div style="flex:1;text-align:center">
@@ -7017,22 +7025,25 @@ window.loadTrnMatchdays = async function() {
     }).join('');
 };
 
+// Step 1: Matchday select হলে শুধু matchup dropdown populate হবে, bout area খালি থাকবে
 window.loadMatchdayForEntry = function() {
   const day = document.getElementById('trnMatchdaySelect').value;
   const area = document.getElementById('trnMatchEntryArea');
   const btnWrap = document.getElementById('trnSaveMatchBtnWrap');
-  if (!day) { area.innerHTML = ''; btnWrap.style.display = 'none'; return; }
+  const matchupWrap = document.getElementById('trnMatchupSelectWrap');
+  const matchupSel = document.getElementById('trnMatchupSelect');
 
-  // Support both old (GRP-A Day 1) and new (Matchday 1) label formats
+  area.innerHTML = '';
+  btnWrap.style.display = 'none';
+  matchupSel.innerHTML = '<option value="">-- একটা matchup (team vs team) select করুন --</option>';
+
+  if (!day) { matchupWrap.style.display = 'none'; return; }
+
   const normDay = raw => (raw||'').replace(/\s*—.*$/, '').trim().replace(/^GRP-[AB]\s+Day\s+(\d+)$/i, 'Matchday $1');
   const matches = trnMatchesCache.filter(m => normDay(m.matchday) === day);
   const teamMap = {};
   trnTeamsCache.forEach(t => { teamMap[t.id] = t; });
 
-  // Build player options for each team
-  const allUsers = window._trnAllUsers || [];
-
-  // Group bouts by team match (homeTeam_awayTeam)
   const matchGroups = {};
   const matchOrder = [];
   matches.forEach(m => {
@@ -7041,76 +7052,111 @@ window.loadMatchdayForEntry = function() {
     matchGroups[key].push(m);
   });
 
-  area.innerHTML = matchOrder.map(key => {
-    const groupMatches = matchGroups[key].sort((a,b) => (a.boutNumber||0)-(b.boutNumber||0));
-    const ht = teamMap[groupMatches[0].homeTeam] || {};
-    const at = teamMap[groupMatches[0].awayTeam] || {};
-    const doneCount = groupMatches.filter(m => m.status === 'completed').length;
-    const grp = groupMatches[0].group || '';
+  window._trnCurrentMatchGroups = matchGroups;
+  window._trnCurrentTeamMap = teamMap;
+  window._trnCurrentDay = day;
 
-    const boutRows = groupMatches.map(m => {
-      const done = m.status === 'completed';
-      const htPlayers = (ht.players || []);
-      const atPlayers = (at.players || []);
-      const homeOpts = htPlayers.map(p =>
-        `<option value="${p.uid}" ${p.uid === m.player1uid ? 'selected' : ''}>${p.name}</option>`
-      ).join('');
-      const awayOpts = atPlayers.map(p =>
-        `<option value="${p.uid}" ${p.uid === m.player2uid ? 'selected' : ''}>${p.name}</option>`
-      ).join('');
+  matchupSel.innerHTML += matchOrder.map(key => {
+    const gm = matchGroups[key].sort((a,b) => (a.boutNumber||0)-(b.boutNumber||0));
+    const ht = teamMap[gm[0].homeTeam] || {};
+    const at = teamMap[gm[0].awayTeam] || {};
+    const doneCount = gm.filter(m => m.status === 'completed').length;
+    const allDone = doneCount === gm.length;
+    const label = `${ht.name||'—'}  VS  ${at.name||'—'}   (${doneCount}/${gm.length} bouts${allDone?' ✓':''})`;
+    return `<option value="${key}">${label}</option>`;
+  }).join('');
 
-      return `<div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:6px">
-        <input type="hidden" class="trn-match-id" value="${m.id}">
-        <div style="font-size:10px;color:var(--text3);font-family:'Inter',monospace;margin-bottom:8px;letter-spacing:1px">
-          BOUT ${m.boutNumber || '?'} ${done ? '<span style="color:var(--green)">✅</span>' : ''}
-        </div>
-        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-          <div style="flex:1;min-width:100px">
-            <div style="font-size:10px;color:var(--cyan);margin-bottom:4px">🏠 HOME</div>
-            <select class="form-input trn-player1-select" data-id="${m.id}" style="font-size:12px;padding:7px 10px">
-              <option value="">-- Select --</option>
-              ${homeOpts}
-            </select>
-          </div>
-          <div style="display:flex;align-items:center;gap:6px;padding-top:16px">
-            <input type="number" min="0" max="99" value="${done ? m.homeScore : ''}" placeholder="0"
-              class="form-input trn-score-home" data-id="${m.id}"
-              style="width:52px;text-align:center;padding:8px 4px;font-size:16px;font-weight:700">
-            <span style="color:var(--text3);font-weight:700">—</span>
-            <input type="number" min="0" max="99" value="${done ? m.awayScore : ''}" placeholder="0"
-              class="form-input trn-score-away" data-id="${m.id}"
-              style="width:52px;text-align:center;padding:8px 4px;font-size:16px;font-weight:700">
-          </div>
-          <div style="flex:1;min-width:100px">
-            <div style="font-size:10px;color:var(--gold);margin-bottom:4px;text-align:right">AWAY 🏟️</div>
-            <select class="form-input trn-player2-select" data-id="${m.id}" style="font-size:12px;padding:7px 10px">
-              <option value="">-- Select --</option>
-              ${awayOpts}
-            </select>
-          </div>
-        </div>
-      </div>`;
-    }).join('');
+  matchupWrap.style.display = matchOrder.length ? 'block' : 'none';
+};
 
-    return `<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:16px;overflow:hidden">
-      <div style="background:linear-gradient(135deg,var(--primary),var(--primary-dark));padding:12px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-        <div style="font-size:10px;color:rgba(255,255,255,0.6);font-weight:700;letter-spacing:2px;font-family:'Inter',monospace">GRP-${grp}</div>
-        <div style="flex:1;display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;color:#fff">
-          <span>${ht.emoji||'🏟️'}</span>
-          <span>${ht.name||'—'}</span>
-          <span style="font-size:11px;color:rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);padding:2px 8px;border-radius:6px">VS</span>
-          <span>${at.name||'—'}</span>
-          <span>${at.emoji||'🏟️'}</span>
+// Step 2: একটা specific matchup select হলে শুধু সেই 8টা bout দেখাবে
+window.renderSelectedMatchup = function() {
+  const key = document.getElementById('trnMatchupSelect').value;
+  const area = document.getElementById('trnMatchEntryArea');
+  const btnWrap = document.getElementById('trnSaveMatchBtnWrap');
+
+  if (!key) { area.innerHTML = ''; btnWrap.style.display = 'none'; return; }
+
+  const matchGroups = window._trnCurrentMatchGroups || {};
+  const teamMap = window._trnCurrentTeamMap || {};
+  const groupMatches = (matchGroups[key] || []).sort((a,b) => (a.boutNumber||0)-(b.boutNumber||0));
+  if (!groupMatches.length) { area.innerHTML = ''; btnWrap.style.display = 'none'; return; }
+
+  const ht = teamMap[groupMatches[0].homeTeam] || {};
+  const at = teamMap[groupMatches[0].awayTeam] || {};
+  const doneCount = groupMatches.filter(m => m.status === 'completed').length;
+  const grp = groupMatches[0].group || '';
+
+  const boutRows = groupMatches.map(m => {
+    const done = m.status === 'completed';
+    const htPlayers = (ht.players || []);
+    const atPlayers = (at.players || []);
+    const homeOpts = htPlayers.map(p =>
+      `<option value="${p.uid}" ${p.uid === m.player1uid ? 'selected' : ''}>${p.name}</option>`
+    ).join('');
+    const awayOpts = atPlayers.map(p =>
+      `<option value="${p.uid}" ${p.uid === m.player2uid ? 'selected' : ''}>${p.name}</option>`
+    ).join('');
+
+    return `<div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:6px">
+      <input type="hidden" class="trn-match-id" value="${m.id}">
+      <div style="font-size:10px;color:var(--text3);font-family:'Inter',monospace;margin-bottom:8px;letter-spacing:1px">
+        BOUT ${m.boutNumber || '?'} ${done ? '<span style="color:var(--green)">✅</span>' : ''}
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <div style="flex:1;min-width:100px">
+          <div style="font-size:10px;color:var(--cyan);margin-bottom:4px">🏠 HOME</div>
+          <select class="form-input trn-player1-select" data-id="${m.id}" style="font-size:12px;padding:7px 10px">
+            <option value="">-- Select --</option>
+            ${homeOpts}
+          </select>
         </div>
-        <div style="font-size:11px;color:${doneCount===groupMatches.length?'#34d399':doneCount>0?'#fbbf24':'rgba(255,255,255,0.5)'};font-weight:600">
-          ${doneCount}/${groupMatches.length} bouts
+        <div style="display:flex;align-items:center;gap:6px;padding-top:16px">
+          <input type="number" min="0" max="99" value="${done ? m.homeScore : ''}" placeholder="0"
+            class="form-input trn-score-home" data-id="${m.id}"
+            style="width:52px;text-align:center;padding:8px 4px;font-size:16px;font-weight:700">
+          <span style="color:var(--text3);font-weight:700">—</span>
+          <input type="number" min="0" max="99" value="${done ? m.awayScore : ''}" placeholder="0"
+            class="form-input trn-score-away" data-id="${m.id}"
+            style="width:52px;text-align:center;padding:8px 4px;font-size:16px;font-weight:700">
+        </div>
+        <div style="flex:1;min-width:100px">
+          <div style="font-size:10px;color:var(--gold);margin-bottom:4px;text-align:right">AWAY 🏟️</div>
+          <select class="form-input trn-player2-select" data-id="${m.id}" style="font-size:12px;padding:7px 10px">
+            <option value="">-- Select --</option>
+            ${awayOpts}
+          </select>
         </div>
       </div>
-      <div style="padding:12px">${boutRows}</div>
     </div>`;
   }).join('');
 
+  area.innerHTML = `<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:16px;overflow:hidden">
+    <div style="background:linear-gradient(135deg,var(--primary),var(--primary-dark));padding:12px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+      <div style="font-size:10px;color:rgba(255,255,255,0.6);font-weight:700;letter-spacing:2px;font-family:'Inter',monospace">GRP-${grp}</div>
+      <div style="flex:1;display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;color:#fff">
+        <span>${ht.emoji||'🏟️'}</span>
+        <span>${ht.name||'—'}</span>
+        <span style="font-size:11px;color:rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);padding:2px 8px;border-radius:6px">VS</span>
+        <span>${at.name||'—'}</span>
+        <span>${at.emoji||'🏟️'}</span>
+      </div>
+      <div style="font-size:11px;color:${doneCount===groupMatches.length?'#34d399':doneCount>0?'#fbbf24':'rgba(255,255,255,0.5)'};font-weight:600">
+        ${doneCount}/${groupMatches.length} bouts
+      </div>
+    </div>
+    <div style="padding:12px">${boutRows}</div>
+  </div>`;
+
+  window._trnCurrentMatchupKey = key;
   btnWrap.style.display = 'block';
+};
+
+// Export বাটন এখন current selected matchup এর card বানাবে
+window.downloadCurrentMatchupCard = function() {
+  const key = window._trnCurrentMatchupKey;
+  if (!key) { alert('⚠️ আগে একটা matchup select করুন।'); return; }
+  return downloadMatchupResultCard(key);
 };
 
 window.saveTrnMatchResults = async function() {
@@ -7195,7 +7241,7 @@ window.saveTrnMatchResults = async function() {
   }
 
   // ── FLUSH STAT DELTAS TO FIREBASE ──
-  const DB = 'https://typ-championship-default-rtdb.firebaseio.com';
+  const DB = TRN_DB;
   for (const [uid, delta] of Object.entries(statDelta)) {
     const base = userMap[uid];
     if (!base) continue;
@@ -7214,8 +7260,21 @@ window.saveTrnMatchResults = async function() {
   }
 
   window._allUsersCache = [];
+  const _savedDay = document.getElementById('trnMatchdaySelect').value;
+  const _savedMatchupKey = window._trnCurrentMatchupKey;
   await fetchTrnData();
-  loadTrnMatchdays();
+  await loadTrnMatchdays();
+  // Restore matchday + matchup selection so Save/Export keeps working after save
+  if (_savedDay) {
+    const daySel = document.getElementById('trnMatchdaySelect');
+    daySel.value = _savedDay;
+    loadMatchdayForEntry();
+    if (_savedMatchupKey) {
+      const mSel = document.getElementById('trnMatchupSelect');
+      mSel.value = _savedMatchupKey;
+      renderSelectedMatchup();
+    }
+  }
   statusEl.textContent = `✅ ${saved} bout saved! 👤 ${profilesUpdated} player profile updated.`;
   setTimeout(() => statusEl.textContent = '', 5000);
 };
@@ -7438,6 +7497,49 @@ window.downloadFixturePDF = async function() {
 // ══════════════════════════════════════════
 // 📸 CANVAS RESULT CARD — cobegbd style
 // ══════════════════════════════════════════
+window.downloadMatchupResultCard = async function(matchupKey) {
+  const dayVal = document.getElementById('trnMatchdaySelect').value || window._trnCurrentDay || '';
+  if (!dayVal) { alert('⚠️ আগে একটা matchday select করুন।'); return; }
+
+  const normDayVal = raw => (raw||'').replace(/\s*—.*$/, '').trim().replace(/^GRP-[AB]\s+Day\s+(\d+)$/i, 'Matchday $1');
+  const baseMatches = trnMatchesCache.filter(m => normDayVal(m.matchday) === dayVal && `${m.homeTeam}_${m.awayTeam}` === matchupKey);
+  if (!baseMatches.length) { alert('⚠️ এই matchup এর bout পাওয়া যায়নি।'); return; }
+
+  const matches = baseMatches.map(m => {
+    const homeInp = document.querySelector(`.trn-score-home[data-id="${m.id}"]`);
+    const awayInp = document.querySelector(`.trn-score-away[data-id="${m.id}"]`);
+    const p1Sel   = document.querySelector(`.trn-player1-select[data-id="${m.id}"]`);
+    const p2Sel   = document.querySelector(`.trn-player2-select[data-id="${m.id}"]`);
+    const hs = homeInp && homeInp.value !== '' ? parseInt(homeInp.value) : (m.homeScore ?? null);
+    const as_ = awayInp && awayInp.value !== '' ? parseInt(awayInp.value) : (m.awayScore ?? null);
+    const getPlayerName = (sel, fallback) => {
+      if (sel && sel.value) {
+        const opt = sel.options[sel.selectedIndex];
+        return opt ? opt.text : fallback;
+      }
+      return fallback;
+    };
+    return {
+      ...m,
+      homeScore: hs,
+      awayScore: as_,
+      player1: getPlayerName(p1Sel, m.player1),
+      player2: getPlayerName(p2Sel, m.player2),
+    };
+  }).filter(m => m.homeScore !== null && m.awayScore !== null)
+    .sort((a,b) => (a.boutNumber||0)-(b.boutNumber||0));
+
+  if (!matches.length) { alert('⚠️ এই matchup-এ কোনো bout-এ score enter করা হয়নি।'); return; }
+
+  const teamMap = {};
+  trnTeamsCache.forEach(t => { teamMap[t.id] = t; });
+  const sampleM = matches[0];
+  const homeTeam = teamMap[sampleM.homeTeam] || { name: 'HOME', emoji: '🏟️' };
+  const awayTeam = teamMap[sampleM.awayTeam] || { name: 'AWAY', emoji: '🏟️' };
+
+  await _renderResultCard({ matches, homeTeam, awayTeam, dayVal, fileSuffix: `${homeTeam.name||'Home'}-vs-${awayTeam.name||'Away'}` });
+};
+
 window.downloadMatchdayResultCard = async function() {
   const dayVal = document.getElementById('trnMatchdaySelect').value;
   if (!dayVal) { alert('⚠️ আগে একটা matchday select করুন।'); return; }
@@ -7480,6 +7582,12 @@ window.downloadMatchdayResultCard = async function() {
   const homeTeam = teamMap[sampleM.homeTeam] || { name: 'HOME', emoji: '🏟️' };
   const awayTeam = teamMap[sampleM.awayTeam] || { name: 'AWAY', emoji: '🏟️' };
 
+  await _renderResultCard({ matches, homeTeam, awayTeam, dayVal, fileSuffix: dayVal });
+};
+
+// Shared canvas-drawing routine used by both full-matchday and per-matchup exports
+async function _renderResultCard({ matches, homeTeam, awayTeam, dayVal, fileSuffix }) {
+
   // Tally matchday winner
   let homeWins = 0, awayWins = 0, draws = 0;
   matches.forEach(m => {
@@ -7488,6 +7596,9 @@ window.downloadMatchdayResultCard = async function() {
     else if (as_ > hs) awayWins++;
     else draws++;
   });
+  // 3-1-0 point system: win=3, draw=1, loss=0
+  const homePoints = (homeWins * 3) + (draws * 1);
+  const awayPoints = (awayWins * 3) + (draws * 1);
   const homeTotal = matches.reduce((s,m)=>s+(parseInt(m.homeScore)||0),0);
   const awayTotal = matches.reduce((s,m)=>s+(parseInt(m.awayScore)||0),0);
 
@@ -7511,7 +7622,7 @@ window.downloadMatchdayResultCard = async function() {
   const ROW_H = 52;
   const HEADER_H = 180;
   const SCORE_ROW_H = 80;
-  const FOOTER_H = 46;
+  const FOOTER_H = 38;
   const CARD_H = HEADER_H + SCORE_ROW_H + matches.length * ROW_H + FOOTER_H;
 
   const canvas = document.createElement('canvas');
@@ -7528,44 +7639,61 @@ window.downloadMatchdayResultCard = async function() {
     img.src = window.TYP_LOGO_DATA;
   });
 
-  // ── BACKGROUND ──
-  const bgGrad = ctx.createLinearGradient(0, 0, CARD_W, CARD_H);
-  bgGrad.addColorStop(0,   '#0b0820');
-  bgGrad.addColorStop(0.5, '#12093a');
-  bgGrad.addColorStop(1,   '#0e0b28');
-  ctx.fillStyle = bgGrad;
+  // ── BACKGROUND (off-white theme matching website) ──
+  // Rounded outer corners for the whole card
+  ctx.save();
+  roundRectCanvas(ctx, 0, 0, CARD_W, CARD_H, 18);
+  ctx.clip();
+
+  ctx.fillStyle = '#f5faf7';
   ctx.fillRect(0, 0, CARD_W, CARD_H);
 
   // subtle grid lines
-  ctx.strokeStyle = 'rgba(113,50,202,0.06)';
+  ctx.strokeStyle = 'rgba(15,128,90,0.05)';
   ctx.lineWidth = 1;
   for (let x = 0; x < CARD_W; x += 60) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,CARD_H); ctx.stroke(); }
   for (let y = 0; y < CARD_H; y += 60) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(CARD_W,y); ctx.stroke(); }
 
-  // ── HEADER BG ──
-  const hGrad = ctx.createLinearGradient(0,0,CARD_W,0);
-  hGrad.addColorStop(0,   'rgba(113,50,202,0.35)');
-  hGrad.addColorStop(0.5, 'rgba(48,28,160,0.25)');
-  hGrad.addColorStop(1,   'rgba(113,50,202,0.35)');
+  // ── HEADER BG (premium diagonal gradient with depth) ──
+  const hGrad = ctx.createLinearGradient(0,0,CARD_W,HEADER_H);
+  hGrad.addColorStop(0,    '#0f5132');
+  hGrad.addColorStop(0.45, '#15805a');
+  hGrad.addColorStop(0.55, '#1a9468');
+  hGrad.addColorStop(1,    '#0f5132');
   ctx.fillStyle = hGrad;
   ctx.fillRect(0, 0, CARD_W, HEADER_H);
 
-  // header border bottom
-  const hbGrad = ctx.createLinearGradient(0,0,CARD_W,0);
-  hbGrad.addColorStop(0,   'transparent');
-  hbGrad.addColorStop(0.2, '#7132CA');
-  hbGrad.addColorStop(0.8, '#7132CA');
-  hbGrad.addColorStop(1,   'transparent');
-  ctx.strokeStyle = hbGrad;
-  ctx.lineWidth = 2;
+  // decorative glow circles for depth
+  ctx.save();
+  ctx.globalAlpha = 0.12;
+  ctx.fillStyle = '#ffffff';
+  ctx.beginPath(); ctx.arc(CARD_W - 60, -20, 130, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(-30, HEADER_H + 10, 100, 0, Math.PI*2); ctx.fill();
+  ctx.restore();
+
+  // header bottom: gold accent line + soft shadow fade
+  const fadeGrad = ctx.createLinearGradient(0, HEADER_H-10, 0, HEADER_H);
+  fadeGrad.addColorStop(0, 'rgba(0,0,0,0)');
+  fadeGrad.addColorStop(1, 'rgba(0,0,0,0.08)');
+  ctx.fillStyle = fadeGrad;
+  ctx.fillRect(0, HEADER_H-10, CARD_W, 10);
+
+  const accentGrad = ctx.createLinearGradient(0,0,CARD_W,0);
+  accentGrad.addColorStop(0,   'transparent');
+  accentGrad.addColorStop(0.15,'#c9a84c');
+  accentGrad.addColorStop(0.5, '#e0c878');
+  accentGrad.addColorStop(0.85,'#c9a84c');
+  accentGrad.addColorStop(1,   'transparent');
+  ctx.strokeStyle = accentGrad;
+  ctx.lineWidth = 3;
   ctx.beginPath(); ctx.moveTo(0,HEADER_H); ctx.lineTo(CARD_W,HEADER_H); ctx.stroke();
 
-  // ── TYP LOGO (top-left watermark) ──
+  // ── TYP LOGO (top-left watermark, white on green header) ──
   if (typLogoImg) {
     const lh = 56;
     const lw = typLogoImg.width * (lh / typLogoImg.height);
     ctx.save();
-    ctx.globalAlpha = 0.92;
+    ctx.globalAlpha = 0.95;
     ctx.filter = 'brightness(0) invert(1)';
     ctx.drawImage(typLogoImg, 18, 10, lw, lh);
     ctx.restore();
@@ -7573,35 +7701,39 @@ window.downloadMatchdayResultCard = async function() {
 
   // ── TITLE ──
   ctx.textAlign = 'center';
-  ctx.fillStyle = '#d4b8ff';
+  ctx.fillStyle = '#ffffff';
   ctx.font = '700 11px Inter, Arial';
   ctx.letterSpacing = '0.2em';
-  ctx.fillText('INTER COLLEGE TOURNAMENT', CARD_W/2, 36);
+  ctx.fillText('TYP AUCTION TOURNAMENT', CARD_W/2, 36);
   ctx.letterSpacing = '0';
 
-  ctx.fillStyle = 'rgba(164,120,255,0.5)';
+  ctx.fillStyle = 'rgba(255,255,255,0.75)';
   ctx.font = '500 10px Inter, Arial';
   ctx.fillText(dayLabel + '  •  ' + new Date().toLocaleDateString('en-BD',{day:'2-digit',month:'short',year:'numeric'}).toUpperCase(), CARD_W/2, 56);
 
   // divider line under title
-  ctx.strokeStyle = 'rgba(113,50,202,0.4)';
+  ctx.strokeStyle = 'rgba(255,255,255,0.3)';
   ctx.lineWidth = 1;
   ctx.beginPath(); ctx.moveTo(CARD_W/2-160,66); ctx.lineTo(CARD_W/2+160,66); ctx.stroke();
 
-  // ── TEAM LOGOS (emoji as placeholder) ──
+  // ── TEAM LOGOS (emoji as placeholder, with depth shadow) ──
   const logoSize = 64;
   const logoY = 82;
-  // home logo circle
   const drawLogoCircle = (cx, cy, emoji, logoUrl) => {
     ctx.save();
+    ctx.shadowColor = 'rgba(0,0,0,0.2)';
+    ctx.shadowBlur = 10;
+    ctx.shadowOffsetY = 3;
     ctx.beginPath();
     ctx.arc(cx, cy, logoSize/2, 0, Math.PI*2);
-    ctx.fillStyle = 'rgba(113,50,202,0.18)';
+    ctx.fillStyle = 'rgba(255,255,255,0.25)';
     ctx.fill();
-    ctx.strokeStyle = 'rgba(113,50,202,0.6)';
-    ctx.lineWidth = 2;
-    ctx.stroke();
     ctx.restore();
+    ctx.beginPath();
+    ctx.arc(cx, cy, logoSize/2, 0, Math.PI*2);
+    ctx.strokeStyle = 'rgba(255,255,255,0.75)';
+    ctx.lineWidth = 2.5;
+    ctx.stroke();
     ctx.font = `${logoSize*0.45}px serif`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
@@ -7614,7 +7746,7 @@ window.downloadMatchdayResultCard = async function() {
 
   // ── TEAM NAMES ──
   ctx.textAlign = 'left';
-  ctx.fillStyle = '#ede8ff';
+  ctx.fillStyle = '#ffffff';
   ctx.font = '700 15px Inter, Arial';
   const homeNameLines = wrapTextCanvas(ctx, (homeTeam.name||'HOME').toUpperCase(), 130);
   homeNameLines.forEach((ln, i) => ctx.fillText(ln, 290, logoY + 16 + i*18));
@@ -7623,41 +7755,68 @@ window.downloadMatchdayResultCard = async function() {
   const awayNameLines = wrapTextCanvas(ctx, (awayTeam.name||'AWAY').toUpperCase(), 130);
   awayNameLines.forEach((ln, i) => ctx.fillText(ln, CARD_W-290, logoY + 16 + i*18));
 
-  // ── SCORE BADGE ──
-  const sbW = 110, sbH = 48;
+  // ── SCORE BADGE (premium with shadow & gold ring, dynamic width for any digit count) ──
+  ctx.font = '800 27px Inter, Arial';
+  const homeStr = String(homePoints);
+  const awayStr = String(awayPoints);
+  const homeNumW = ctx.measureText(homeStr).width;
+  const awayNumW = ctx.measureText(awayStr).width;
+  const dashW = ctx.measureText('-').width;
+  const numGap = 12; // space between each number and the dash
+  const contentW = homeNumW + awayNumW + dashW + numGap * 2;
+  const sbPadX = 24;
+  const sbW = Math.max(116, contentW + sbPadX * 2), sbH = 52;
   const sbX = CARD_W/2 - sbW/2;
-  const sbY = logoY + 8;
-  roundRectCanvas(ctx, sbX, sbY, sbW, sbH, 10);
-  const sbGrad = ctx.createLinearGradient(sbX,sbY,sbX+sbW,sbY);
-  sbGrad.addColorStop(0,'#4B1FA0'); sbGrad.addColorStop(1,'#7132CA');
-  ctx.fillStyle = sbGrad; ctx.fill();
-  ctx.strokeStyle = 'rgba(164,120,255,0.5)'; ctx.lineWidth = 1.5; ctx.stroke();
+  const sbY = logoY + 6;
+
+  // shadow
+  ctx.save();
+  ctx.shadowColor = 'rgba(0,0,0,0.25)';
+  ctx.shadowBlur = 14;
+  ctx.shadowOffsetY = 4;
+  roundRectCanvas(ctx, sbX, sbY, sbW, sbH, 12);
+  ctx.fillStyle = '#ffffff'; ctx.fill();
+  ctx.restore();
+
+  roundRectCanvas(ctx, sbX, sbY, sbW, sbH, 12);
+  ctx.strokeStyle = '#c9a84c'; ctx.lineWidth = 2; ctx.stroke();
+
+  ctx.fillStyle = '#0f5132';
+  ctx.font = '800 27px Inter, Arial';
+  ctx.textAlign = 'right';
+  ctx.fillText(homeStr, CARD_W/2 - dashW/2 - numGap, sbY + 33);
+  ctx.textAlign = 'center';
+  ctx.fillText('-', CARD_W/2, sbY + 33);
+  ctx.textAlign = 'left';
+  ctx.fillText(awayStr, CARD_W/2 + dashW/2 + numGap, sbY + 33);
 
   ctx.textAlign = 'center';
-  ctx.fillStyle = '#ffffff';
-  ctx.font = '800 28px Inter, Arial';
-  ctx.fillText(`${homeWins}   ${awayWins}`, CARD_W/2, sbY + 34);
+  ctx.font = '700 8px Inter, Arial';
+  ctx.letterSpacing = '0.15em';
+  ctx.fillStyle = '#a07830';
+  ctx.fillText('POINTS', CARD_W/2, sbY + sbH - 6);
+  ctx.letterSpacing = '0';
   // small divider
-  ctx.fillStyle = 'rgba(255,255,255,0.3)';
-  ctx.fillRect(CARD_W/2-1, sbY+8, 2, sbH-16);
+  ctx.fillStyle = 'rgba(15,128,90,0.2)';
+  ctx.fillRect(CARD_W/2-1, sbY+10, 2, sbH-22);
 
   // ── COLUMN HEADERS ──
   const colY = HEADER_H + SCORE_ROW_H;
-  ctx.fillStyle = 'rgba(255,255,255,0.04)';
+  ctx.fillStyle = '#e3f3ec';
   ctx.fillRect(0, HEADER_H + SCORE_ROW_H - ROW_H, CARD_W, ROW_H);
-  ctx.strokeStyle = 'rgba(113,50,202,0.3)';
+  ctx.strokeStyle = 'rgba(15,128,90,0.25)';
   ctx.lineWidth = 1;
   ctx.beginPath(); ctx.moveTo(0,HEADER_H+SCORE_ROW_H-ROW_H); ctx.lineTo(CARD_W,HEADER_H+SCORE_ROW_H-ROW_H); ctx.stroke();
 
   ctx.font = '700 10px Inter, Arial';
-  ctx.fillStyle = '#a374e8';
+  ctx.fillStyle = '#0f5132';
   const colHY = HEADER_H + SCORE_ROW_H - ROW_H/2 + 4;
   ctx.textAlign = 'left';  ctx.fillText('HOME PLAYER', 56, colHY);
   ctx.textAlign = 'center'; ctx.fillText('SCORE', CARD_W/2, colHY);
   ctx.textAlign = 'right';  ctx.fillText('AWAY PLAYER', CARD_W - 56, colHY);
 
   // score row team total bg
-  ctx.fillStyle = 'rgba(255,255,255,0.02)';
+  ctx.fillStyle = '#f6fbf8';
   ctx.fillRect(0, HEADER_H, CARD_W, SCORE_ROW_H - ROW_H);
 
   // ── BOUT ROWS ──
@@ -7669,20 +7828,16 @@ window.downloadMatchdayResultCard = async function() {
 
     // row bg
     if (isMVP) {
-      const mvpGrad = ctx.createLinearGradient(0, ry, CARD_W, ry);
-      mvpGrad.addColorStop(0,   'rgba(212,175,55,0.18)');
-      mvpGrad.addColorStop(0.5, 'rgba(255,215,0,0.10)');
-      mvpGrad.addColorStop(1,   'rgba(212,175,55,0.18)');
-      ctx.fillStyle = mvpGrad;
+      ctx.fillStyle = '#fdf6e3';
     } else if (idx % 2 === 0) {
-      ctx.fillStyle = 'rgba(255,255,255,0.025)';
+      ctx.fillStyle = '#f6fbf8';
     } else {
-      ctx.fillStyle = 'transparent';
+      ctx.fillStyle = '#ffffff';
     }
     ctx.fillRect(0, ry, CARD_W, ROW_H);
 
     // row border bottom
-    ctx.strokeStyle = 'rgba(113,50,202,0.12)';
+    ctx.strokeStyle = 'rgba(15,128,90,0.12)';
     ctx.lineWidth = 1;
     ctx.beginPath(); ctx.moveTo(0,ry+ROW_H); ctx.lineTo(CARD_W,ry+ROW_H); ctx.stroke();
 
@@ -7691,20 +7846,20 @@ window.downloadMatchdayResultCard = async function() {
     const avCY = ry + ROW_H/2;
     // home avatar
     ctx.beginPath(); ctx.arc(30, avCY, avR, 0, Math.PI*2);
-    ctx.fillStyle = 'rgba(113,50,202,0.22)'; ctx.fill();
-    ctx.strokeStyle = isMVP && m.player1===mvpName ? '#d4af37' : 'rgba(113,50,202,0.3)';
+    ctx.fillStyle = 'rgba(15,128,90,0.12)'; ctx.fill();
+    ctx.strokeStyle = isMVP && m.player1===mvpName ? '#c9a84c' : 'rgba(15,128,90,0.35)';
     ctx.lineWidth = 1.5; ctx.stroke();
     ctx.font = '10px serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
-    ctx.fillStyle='rgba(200,180,255,0.7)'; ctx.fillText('👤', 30, avCY);
+    ctx.fillStyle='rgba(15,128,90,0.6)'; ctx.fillText('👤', 30, avCY);
     ctx.textBaseline='alphabetic';
 
     // away avatar
     ctx.beginPath(); ctx.arc(CARD_W-30, avCY, avR, 0, Math.PI*2);
-    ctx.fillStyle = 'rgba(113,50,202,0.22)'; ctx.fill();
-    ctx.strokeStyle = isMVP && m.player2===mvpName ? '#d4af37' : 'rgba(113,50,202,0.3)';
+    ctx.fillStyle = 'rgba(15,128,90,0.12)'; ctx.fill();
+    ctx.strokeStyle = isMVP && m.player2===mvpName ? '#c9a84c' : 'rgba(15,128,90,0.35)';
     ctx.lineWidth = 1.5; ctx.stroke();
     ctx.font = '10px serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
-    ctx.fillStyle='rgba(200,180,255,0.7)'; ctx.fillText('👤', CARD_W-30, avCY);
+    ctx.fillStyle='rgba(15,128,90,0.6)'; ctx.fillText('👤', CARD_W-30, avCY);
     ctx.textBaseline='alphabetic';
 
     const textY = ry + ROW_H/2 + 5;
@@ -7712,10 +7867,10 @@ window.downloadMatchdayResultCard = async function() {
     // home player name
     ctx.textAlign = 'left';
     if (isMVP && m.player1 === mvpName) {
-      ctx.fillStyle = '#FFD700';
+      ctx.fillStyle = '#a07830';
       ctx.font = '700 13px Inter, Arial';
     } else {
-      ctx.fillStyle = hs > as_ ? '#ede8ff' : 'rgba(200,180,255,0.6)';
+      ctx.fillStyle = hs > as_ ? '#0f0c1e' : 'rgba(15,12,30,0.45)';
       ctx.font = hs > as_ ? '700 13px Inter, Arial' : '400 13px Inter, Arial';
     }
     ctx.fillText((m.player1||'—').toUpperCase(), 56, textY);
@@ -7723,10 +7878,10 @@ window.downloadMatchdayResultCard = async function() {
     // away player name
     ctx.textAlign = 'right';
     if (isMVP && m.player2 === mvpName) {
-      ctx.fillStyle = '#FFD700';
+      ctx.fillStyle = '#a07830';
       ctx.font = '700 13px Inter, Arial';
     } else {
-      ctx.fillStyle = as_ > hs ? '#ede8ff' : 'rgba(200,180,255,0.6)';
+      ctx.fillStyle = as_ > hs ? '#0f0c1e' : 'rgba(15,12,30,0.45)';
       ctx.font = as_ > hs ? '700 13px Inter, Arial' : '400 13px Inter, Arial';
     }
     ctx.fillText((m.player2||'—').toUpperCase(), CARD_W-56, textY);
@@ -7735,46 +7890,62 @@ window.downloadMatchdayResultCard = async function() {
     ctx.textAlign = 'center';
     ctx.font = '700 16px Inter, Arial';
     // home score
-    ctx.fillStyle = hs > as_ ? '#ffffff' : 'rgba(200,180,255,0.55)';
+    ctx.fillStyle = hs > as_ ? '#0f5132' : 'rgba(15,12,30,0.4)';
     ctx.fillText(String(hs), CARD_W/2 - 20, textY);
     // separator
-    ctx.fillStyle = 'rgba(164,120,255,0.4)';
+    ctx.fillStyle = 'rgba(15,128,90,0.35)';
     ctx.fillText('|', CARD_W/2, textY);
     // away score
-    ctx.fillStyle = as_ > hs ? '#ffffff' : 'rgba(200,180,255,0.55)';
+    ctx.fillStyle = as_ > hs ? '#0f5132' : 'rgba(15,12,30,0.4)';
     ctx.fillText(String(as_), CARD_W/2 + 20, textY);
 
     // MVP star badge
     if (isMVP) {
       const mvpX = isMVP && m.player1===mvpName ? CARD_W/2 - 65 : CARD_W/2 + 65;
       ctx.font = '700 9px Inter, Arial';
-      ctx.fillStyle = '#FFD700';
+      ctx.fillStyle = '#a07830';
       ctx.textAlign = 'center';
       ctx.fillText('★ MVP', mvpX, textY - 12);
     }
   });
 
-  // ── FOOTER ──
+  // ── FOOTER (clean gold accent strip, no sponsor text) ──
   const footerY = CARD_H - FOOTER_H;
-  ctx.strokeStyle = 'rgba(113,50,202,0.3)';
-  ctx.lineWidth = 1;
-  ctx.beginPath(); ctx.moveTo(0,footerY); ctx.lineTo(CARD_W,footerY); ctx.stroke();
-
-  ctx.fillStyle = 'rgba(113,50,202,0.08)';
+  ctx.fillStyle = '#0f5132';
   ctx.fillRect(0, footerY, CARD_W, FOOTER_H);
 
+  const footerAccent = ctx.createLinearGradient(0,0,CARD_W,0);
+  footerAccent.addColorStop(0,   'transparent');
+  footerAccent.addColorStop(0.15,'#c9a84c');
+  footerAccent.addColorStop(0.5, '#e0c878');
+  footerAccent.addColorStop(0.85,'#c9a84c');
+  footerAccent.addColorStop(1,   'transparent');
+  ctx.strokeStyle = footerAccent;
+  ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.moveTo(0,footerY); ctx.lineTo(CARD_W,footerY); ctx.stroke();
+
   ctx.textAlign = 'center';
-  ctx.fillStyle = 'rgba(164,120,255,0.6)';
-  ctx.font = '600 10px Inter, Arial';
-  ctx.fillText('SPONSORED BY COBEG BD  •  WWW.COBEGBD.COM', CARD_W/2, footerY + 28);
+  ctx.fillStyle = 'rgba(255,255,255,0.85)';
+  ctx.font = '700 9px Inter, Arial';
+  ctx.letterSpacing = '0.18em';
+  ctx.fillText('TYP CHAMPIONSHIP', CARD_W/2, footerY + FOOTER_H/2 + 4);
+  ctx.letterSpacing = '0';
+
+  ctx.restore(); // end rounded-corner clip
+
+  // outer border for polished card edge
+  roundRectCanvas(ctx, 1, 1, CARD_W-2, CARD_H-2, 18);
+  ctx.strokeStyle = 'rgba(15,128,90,0.25)';
+  ctx.lineWidth = 2;
+  ctx.stroke();
 
   // ── DOWNLOAD ──
   const link = document.createElement('a');
-  const safeDay = dayVal.replace(/[^a-zA-Z0-9\-_]/g,'_').slice(0,40);
-  link.download = `TYP-Result-${safeDay}.png`;
+  const safeName = (fileSuffix||dayVal).replace(/[^a-zA-Z0-9\-_]/g,'_').slice(0,60);
+  link.download = `TYP-Result-${safeName}.png`;
   link.href = canvas.toDataURL('image/png');
   link.click();
-};
+}
 
 // helper: wrap text for canvas
 function wrapTextCanvas(ctx, text, maxW) {
