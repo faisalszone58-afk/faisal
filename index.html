@@ -2234,6 +2234,7 @@ if (document.readyState === 'loading') {
         <div class="admin-tab" onclick="switchAdminTab('tournament')">🏟️ Tournament</div>
         <div class="admin-tab" onclick="switchAdminTab('notice')">📢 Notice</div>
         <div class="admin-tab" onclick="switchAdminTab('boutdraw')">🎲 Bout Draw</div>
+        <div class="admin-tab" onclick="switchAdminTab('aiqa')">🤖 AI Bot <span id="aiqaUnansweredCount" style="background:var(--red);color:#fff;border-radius:10px;padding:1px 6px;font-size:11px;margin-left:4px;display:none">0</span></div>
       </div>
 
       <!-- PLAYERS TAB -->
@@ -2673,6 +2674,41 @@ if (document.readyState === 'loading') {
   </div>
 </div>
 
+<!-- ADMIN AI BOT SECTION -->
+<div class="admin-section" id="adminTab-aiqa">
+  <div style="max-width:640px">
+    <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px">🤖 TYP AI Bot Training</div>
+    <div style="font-size:13px;color:var(--text3);margin-bottom:18px">নিচে দেখা যাবে বট যে প্রশ্নের উত্তর দিতে পারেনি — সেখান থেকে সরাসরি নতুন FAQ বানিয়ে বটকে "train" করা যাবে। কোনো code edit লাগবে না।</div>
+
+    <!-- Unanswered Questions -->
+    <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px">❓ Unanswered Questions <span id="aiqaUnansweredCount2" style="color:var(--text3);font-weight:400"></span></div>
+    <div id="aiqaUnansweredList" style="display:flex;flex-direction:column;gap:8px;margin-bottom:24px">
+      <div style="color:var(--text3);font-size:13px">লোড হচ্ছে...</div>
+    </div>
+
+    <!-- Add Custom FAQ -->
+    <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px;border-top:1px solid var(--border);padding-top:18px">➕ নতুন FAQ যোগ করো</div>
+    <div class="form-group">
+      <label class="form-label">Keywords (কমা দিয়ে আলাদা করো)</label>
+      <input class="form-input" id="aiqaNewKeywords" placeholder="e.g. jersey, জার্সি, kit">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Answer</label>
+      <textarea class="form-input" id="aiqaNewAnswer" rows="3" placeholder="বটের উত্তর এখানে লেখো..." style="resize:vertical"></textarea>
+    </div>
+    <div style="display:flex;gap:10px;margin-bottom:8px">
+      <button class="btn btn-gold" onclick="aiqaSaveCustomFaq()" style="padding:10px 24px">💾 FAQ Save করো</button>
+    </div>
+    <div id="aiqaSaveStatus" style="font-size:13px;color:var(--green);margin-bottom:20px"></div>
+
+    <!-- Existing Custom FAQ list -->
+    <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px;border-top:1px solid var(--border);padding-top:18px">📚 বটের শেখানো FAQ গুলো</div>
+    <div id="aiqaCustomFaqList" style="display:flex;flex-direction:column;gap:8px">
+      <div style="color:var(--text3);font-size:13px">লোড হচ্ছে...</div>
+    </div>
+  </div>
+</div>
+
 <!-- ADMIN TOURNAMENT SECTION -->
 <div class="admin-section" id="adminTab-tournament">
   <div class="trn-admin-section">
@@ -2950,7 +2986,7 @@ if (document.readyState === 'loading') {
 <!-- FIREBASE SDK -->
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-import { getDatabase, ref, set, get, child } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+import { getDatabase, ref, set, get, child, push, remove, update } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
 
 // ════════════════════════════════════════
 // 🔥 FIREBASE CONFIG — নিজের config দাও
@@ -2985,6 +3021,9 @@ window._ref = ref;
 window._get = get;
 window._set = set;
 window._child = child;
+window._push = push;
+window._remove = remove;
+window._update = update;
 window._allUsersCache = allUsersCache;
 window._isAdminSession = false;
 
@@ -5180,6 +5219,7 @@ window.switchAdminTab = function(tab) {
     }).catch(()=>{});
   }
   if (tab === 'tournament') loadTrnAdminTeams();
+  if (tab === 'aiqa' && typeof loadAdminAiQa === 'function') loadAdminAiQa();
 };
 
 window.homeSearchPlayer = function(q) {
@@ -8203,6 +8243,7 @@ function showPage(name) {
     <button id="typAiClose" onclick="typAiToggleWindow()">×</button>
   </div>
   <div id="typAiMessages"></div>
+  <div id="typAiQuickReplies" style="display:flex;flex-wrap:wrap;gap:6px;padding:0 12px 8px"></div>
   <div id="typAiInputRow">
     <textarea id="typAiInput" rows="1" placeholder="তোমার প্রশ্ন লেখো..." onkeydown="typAiHandleKey(event)"></textarea>
     <button id="typAiSend" onclick="typAiSendMessage()">পাঠাও</button>
@@ -8332,7 +8373,49 @@ const TYP_FAQ = [
 
 const TYP_FALLBACK = 'দুঃখিত, এই প্রশ্নের সরাসরি উত্তর আমার কাছে নেই। অনুগ্রহ করে Admin (Faisal বা Arafat)-কে সরাসরি জিজ্ঞেস করো, অথবা উপরের মেনু থেকে "Rules" পেজে দেখো।';
 
-const TYP_GREETING_WORDS = ['hi', 'hello', 'হাই', 'হ্যালো', 'আসসালামু', 'সালাম', 'হেলো'];
+const TYP_GREETING_WORDS = ['hi', 'hello', 'হাই', 'হ্যালো', 'আসসালামু', 'সালাম', 'হেলো', 'assalamualaikum', 'salam'];
+
+// user নিজেকে বোঝাতে যেসব শব্দ ব্যবহার করে ("আমার rank কত")
+const TYP_SELF_WORDS = ['আমার', 'আমি', 'amar', 'ami', 'my', 'আমারে', 'নিজের'];
+
+// কথোপকথনের মধ্যে শেষ কোন Team/Player নিয়ে কথা হচ্ছিল সেটা মনে রাখার জন্য (follow-up প্রশ্নের জন্য)
+let typAiContext = { teamId: null, teamName: null, playerUid: null, playerName: null, awaitingSelfName: false, pendingIntent: null };
+
+// Firebase থেকে Admin-এর যোগ করা extra FAQ (self-learning) — এগুলো TYP_FAQ-এর সাথে merge হয়
+let TYP_CUSTOM_FAQ = [];
+let typAiCustomFaqLoaded = false;
+
+async function typAiLoadCustomFaq() {
+  if (typAiCustomFaqLoaded) return;
+  typAiCustomFaqLoaded = true;
+  try {
+    const snap = await fetch(`${TYP_AI_DB}/chatbotCustomFaq.json`).then(r => r.json());
+    if (snap) {
+      TYP_CUSTOM_FAQ = Object.entries(snap).map(([id, v]) => ({
+        id,
+        keywords: (v.keywords || []),
+        answer: v.answer || ''
+      })).filter(f => f.keywords.length && f.answer);
+    }
+  } catch (e) { /* fetch fail করলে normal FAQ-ই চলবে */ }
+}
+
+// প্রশ্নের সরাসরি উত্তর না পেলে সেটা Firebase-এ log করে — Admin পরে দেখে নতুন FAQ বানাতে পারবে
+async function typAiLogUnanswered(text) {
+  try {
+    if (window._db && window._push && window._ref) {
+      await window._push(window._ref(window._db, 'chatbotUnanswered'), {
+        question: text,
+        ts: Date.now()
+      });
+    } else {
+      await fetch(`${TYP_AI_DB}/chatbotUnanswered.json`, {
+        method: 'POST',
+        body: JSON.stringify({ question: text, ts: Date.now() })
+      });
+    }
+  } catch (e) { /* log fail হলে চুপচাপ ignore */ }
+}
 
 // টেক্সট normalize করে — extra space, punctuation সরিয়ে, lowercase করে
 function typAiNormalize(str) {
@@ -8386,7 +8469,7 @@ function typAiFindAnswer(userText) {
   let bestMatch = null;
   let bestScore = 0;
 
-  for (const item of TYP_FAQ) {
+  for (const item of TYP_FAQ.concat(TYP_CUSTOM_FAQ)) {
     let score = 0;
     for (const kw of item.keywords) {
       const kwNorm = typAiNormalize(kw);
@@ -8491,23 +8574,140 @@ function typAiNextMatchForTeam(teamId) {
   return { day: m.day, matchday: m.matchday, opponentName: opp ? opp.name : 'প্রতিপক্ষ' };
 }
 
-const TYP_POINT_INTENT = ['point', 'পয়েন্ট', 'পয়েন্ট কত', 'standing', 'স্ট্যান্ডিং', 'টেবিল', 'table', 'র‍্যাংক', 'rank'];
+// ═══════════ Player (User) লাইভ ডেটা লুকআপ ═══════════
+let typAiUsers = null;
+let typAiUsersLoadedAt = 0;
+
+async function typAiLoadUsersData(force) {
+  const now = Date.now();
+  if (!force && typAiUsers && (now - typAiUsersLoadedAt) < 60000) return; // ৬০ সেকেন্ড cache
+  try {
+    const snap = await fetch(`${TYP_AI_DB}/users.json`).then(r => r.json());
+    typAiUsers = snap ? Object.entries(snap).map(([uid, v]) => ({ uid, ...v })) : [];
+    typAiUsersLoadedAt = now;
+  } catch (e) { /* fetch fail করলে পুরনো cache থাকলে সেটাই ব্যবহার হবে */ }
+}
+
+// player score/rank বের করার formula — ranking পেজের সাথে হুবহু মিল রেখে
+function typAiPlayerScore(p) {
+  return (p.wins || 0) * 9 + (p.mvp || 0) * 5 + (p.draws || 0) * 3 + (p.goalsFor || 0) * 1;
+}
+
+// সব player-কে score অনুযায়ী sort করে rank বসিয়ে দেয়
+function typAiCalcPlayerRanking() {
+  if (!typAiUsers || !typAiUsers.length) return [];
+  return [...typAiUsers]
+    .sort((a, b) => typAiPlayerScore(b) - typAiPlayerScore(a) || (b.goalsFor || 0) - (a.goalsFor || 0));
+}
+
+// টেক্সটে কোনো player-এর নাম/username আছে কিনা খুঁজে বের করে (spelling ভুল সহ্য করে)
+function typAiFindPlayerByName(t, words) {
+  if (!typAiUsers || !typAiUsers.length) return null;
+  let best = null, bestDist = Infinity;
+  for (const p of typAiUsers) {
+    const nameNorm = typAiNormalize(p.name || '');
+    const userNorm = typAiNormalize(p.username || '');
+    if (nameNorm && t.includes(nameNorm)) return p; // exact substring মিল
+    if (userNorm && userNorm.length >= 3 && t.includes(userNorm)) return p;
+    const nameWords = nameNorm.split(' ').filter(w => w.length >= 3);
+    for (const nw of nameWords) {
+      for (const w of words) {
+        const maxDist = nw.length <= 5 ? 1 : 2;
+        const d = typAiLevenshtein(w, nw);
+        if (d <= maxDist && d < bestDist) { bestDist = d; best = p; }
+      }
+    }
+  }
+  return best;
+}
+
+const TYP_POINT_INTENT = ['point', 'পয়েন্ট', 'পয়েন্ট কত', 'standing', 'স্ট্যান্ডিং', 'টেবিল', 'table'];
 const TYP_NEXT_MATCH_INTENT = ['next match', 'পরের ম্যাচ', 'পরবর্তী ম্যাচ', 'কবে', 'kobe', 'কার সাথে', 'কার শাথে', 'সাথে ম্যাচ', 'fixture', 'সিডিউল', 'schedule'];
+const TYP_PLAYER_RANK_INTENT = ['rank', 'র‍্যাংক', 'র‍্যাঙ্ক', 'অবস্থান', 'কত নম্বরে', 'কততম', 'কত নাম্বার'];
+const TYP_PLAYER_STATS_INTENT = ['গোল কত', 'গোল সংখ্যা', 'score কত', 'স্কোর কত', 'stats', 'স্ট্যাটস', 'পারফরম্যান্স', 'mvp কত', 'জয় কত', 'ম্যাচ কত', 'ওভারঅল', 'প্রোফাইল দেখাও'];
+
+// user-এর প্রশ্নে নিজেকে বোঝানো হয়েছে কিনা (আমার/amar/my) চেক করে
+function typAiHasSelfWord(t) {
+  return TYP_SELF_WORDS.some(w => {
+    const re = new RegExp('(^|[^a-z0-9\\u0980-\\u09FF])' + typAiNormalize(w) + '([^a-z0-9\\u0980-\\u09FF]|$)');
+    return re.test(t);
+  });
+}
+
+// player-এর stats/rank সুন্দর করে ফরম্যাট করে
+function typAiFormatPlayerAnswer(p, wantsRank, wantsStats) {
+  const ranking = typAiCalcPlayerRanking();
+  const pos = ranking.findIndex(r => r.uid === p.uid) + 1;
+  const score = typAiPlayerScore(p);
+  let out = `👤 ${p.name || p.username || 'Player'}:\n`;
+  if (wantsRank || (!wantsRank && !wantsStats)) {
+    out += `• র‍্যাংকিং-এ অবস্থান: ${pos > 0 ? typAiOrdinalBn(pos) : 'এখনো র‍্যাংকিং-এ নেই'} (মোট ${ranking.length} জনের মধ্যে)\n`;
+  }
+  out += `• স্কোর: ${score}\n• ম্যাচ ${p.matches || (p.wins||0)+(p.draws||0)+(p.losses||0)} | জয় ${p.wins||0} | ড্র ${p.draws||0} | হার ${p.losses||0}\n• গোল ${p.goalsFor||0} | MVP ${p.mvp||0}`;
+  return out;
+}
 
 // Firebase থেকে লাইভ ডেটা দেখে dynamic উত্তর তৈরি করার চেষ্টা করে — না পারলে null রিটার্ন করে (তখন normal FAQ চলবে)
 async function typAiTryDynamicAnswer(userText) {
   const t = typAiNormalize(userText);
   const words = t.split(' ').filter(Boolean);
 
+  // ── আগের প্রশ্নে "তোমার নাম কি বলো" জিজ্ঞেস করা হয়ে থাকলে, এই মেসেজটাকেই নাম ধরে খোঁজা হবে ──
+  if (typAiContext.awaitingSelfName) {
+    typAiContext.awaitingSelfName = false;
+    const pendingIntent = typAiContext.pendingIntent;
+    typAiContext.pendingIntent = null;
+    await typAiLoadUsersData(false);
+    const p = typAiFindPlayerByName(t, words);
+    if (!p) return `দুঃখিত, এই নামে কোনো player খুঁজে পেলাম না। সঠিক নাম বা username দিয়ে আবার চেষ্টা করো, অথবা Ranking পেজে সার্চ করে দেখো।`;
+    typAiContext.playerUid = p.uid;
+    typAiContext.playerName = p.name;
+    return typAiFormatPlayerAnswer(p, pendingIntent === 'rank', pendingIntent === 'stats');
+  }
+
   const wantsPoint = TYP_POINT_INTENT.some(kw => t.includes(typAiNormalize(kw)));
   const wantsNextMatch = TYP_NEXT_MATCH_INTENT.some(kw => t.includes(typAiNormalize(kw)));
+  const wantsPlayerRank = TYP_PLAYER_RANK_INTENT.some(kw => t.includes(typAiNormalize(kw)));
+  const wantsPlayerStats = TYP_PLAYER_STATS_INTENT.some(kw => t.includes(typAiNormalize(kw)));
+  const hasSelf = typAiHasSelfWord(t);
+
+  // ── Player rank/stats সংক্রান্ত প্রশ্ন ──
+  if (wantsPlayerRank || wantsPlayerStats || (hasSelf && (wantsPoint || wantsPlayerRank || wantsPlayerStats))) {
+    await typAiLoadUsersData(false);
+    if (typAiUsers && typAiUsers.length) {
+      let player = typAiFindPlayerByName(t, words);
+
+      // নাম না পেলে কিন্তু "আমার/amar" বলেছে → নাম জিজ্ঞেস করে wait করবে
+      if (!player && hasSelf) {
+        typAiContext.awaitingSelfName = true;
+        typAiContext.pendingIntent = wantsPlayerStats ? 'stats' : 'rank';
+        return 'তোমার Ranking পেজে যে নামে/username-এ profile আছে, সেটা বলো — তাহলে আমি বলে দিতে পারব। 🙂';
+      }
+
+      // নাম না পেলে কিন্তু আগের কথোপকথনে কোনো player mention হয়ে থাকলে, সেটাই ধরে নেবে (follow-up প্রশ্ন)
+      if (!player && typAiContext.playerUid) {
+        player = typAiUsers.find(u => u.uid === typAiContext.playerUid) || null;
+      }
+
+      if (player) {
+        typAiContext.playerUid = player.uid;
+        typAiContext.playerName = player.name;
+        return typAiFormatPlayerAnswer(player, wantsPlayerRank, wantsPlayerStats);
+      }
+    }
+  }
 
   if (!wantsPoint && !wantsNextMatch) return null;
 
   await typAiLoadTournamentData(false);
   if (!typAiTeams || !typAiTeams.length) return null;
 
-  const team = typAiFindTeamByName(t, words);
+  let team = typAiFindTeamByName(t, words);
+
+  // টিম নাম না পেলে কিন্তু আগে কোনো টিম নিয়ে কথা হয়ে থাকলে সেটাই ধরে নেবে (follow-up প্রশ্ন)
+  if (!team && typAiContext.teamId) {
+    team = typAiTeams.find(tm => tm.id === typAiContext.teamId) || null;
+  }
 
   // টিম নাম ছাড়া শুধু "standing/table/পয়েন্ট তালিকা" চাইলে পুরো টেবিল দেখাও
   if (wantsPoint && !team) {
@@ -8521,6 +8721,9 @@ async function typAiTryDynamicAnswer(userText) {
   }
 
   if (!team) return null; // team খুঁজে না পেলে FAQ fallback-এ যাবে
+
+  typAiContext.teamId = team.id;
+  typAiContext.teamName = team.name;
 
   if (wantsPoint) {
     const standings = typAiCalcStandings();
@@ -8542,13 +8745,37 @@ async function typAiTryDynamicAnswer(userText) {
 let typAiOpen = false;
 let typAiGreeted = false;
 
+const TYP_QUICK_REPLIES = [
+  { label: '🏆 Points System', text: 'পয়েন্ট সিস্টেম কি?' },
+  { label: '📊 আমার Rank', text: 'আমার rank কত?' },
+  { label: '📋 Rules', text: 'নিয়মাবলী কি কি?' },
+  { label: '🤝 Friendly Match', text: 'friendly match কিভাবে খেলবো?' },
+  { label: '📝 Registration', text: 'নতুন প্লেয়ার হিসেবে কিভাবে যোগ হবো?' }
+];
+
+function typAiRenderQuickReplies() {
+  const box = document.getElementById('typAiQuickReplies');
+  if (!box) return;
+  box.innerHTML = TYP_QUICK_REPLIES.map(q =>
+    `<button onclick="typAiQuickAsk('${q.text.replace(/'/g, "\\'")}')" style="padding:6px 12px;border-radius:20px;border:1px solid var(--border);background:var(--card2);color:var(--text);font-size:12px;cursor:pointer;white-space:nowrap">${q.label}</button>`
+  ).join('');
+}
+
+function typAiQuickAsk(text) {
+  const input = document.getElementById('typAiInput');
+  input.value = text;
+  typAiSendMessage();
+}
+
 function typAiToggleWindow() {
   typAiOpen = !typAiOpen;
   const win = document.getElementById('typAiWindow');
   win.classList.toggle('open', typAiOpen);
+  typAiLoadCustomFaq();
   if (typAiOpen && !typAiGreeted) {
     typAiGreeted = true;
-    typAiAppendMessage('bot', 'আসসালামু আলাইকুম! 👋 আমি TYP Support। TYP Championship-এর rules, points system, registration, tournament — যা জানতে চাও জিজ্ঞেস করো।');
+    typAiAppendMessage('bot', 'আসসালামু আলাইকুম! 👋 আমি TYP Support। TYP Championship-এর rules, points system, registration, tournament, আমার rank/stats — যা জানতে চাও জিজ্ঞেস করো, বা নিচের বাটনে ট্যাপ করো।');
+    typAiRenderQuickReplies();
   }
   if (typAiOpen) document.getElementById('typAiInput').focus();
 }
@@ -8577,24 +8804,161 @@ async function typAiSendMessage() {
 
   typAiAppendMessage('user', text);
   input.value = '';
+  const qr = document.getElementById('typAiQuickReplies');
+  if (qr) qr.innerHTML = '';
 
   const sendBtn = document.getElementById('typAiSend');
   sendBtn.disabled = true;
   const typingEl = typAiAppendMessage('typing', 'লিখছে...');
 
   try {
-    // আগে live data lookup চেষ্টা করি (point/standings/next match), না পেলে normal FAQ
+    // আগে live data lookup চেষ্টা করি (point/standings/next match/player stats), না পেলে normal FAQ
     let reply = await typAiTryDynamicAnswer(text);
-    if (!reply) reply = typAiFindAnswer(text);
+    let wasFallback = false;
+    if (!reply) {
+      reply = typAiFindAnswer(text);
+      wasFallback = (reply === TYP_FALLBACK);
+    }
     typingEl.remove();
     typAiAppendMessage('bot', reply);
+    if (wasFallback) typAiLogUnanswered(text);
   } catch (e) {
     typingEl.remove();
-    typAiAppendMessage('bot', typAiFindAnswer(text));
+    const fallbackReply = typAiFindAnswer(text);
+    typAiAppendMessage('bot', fallbackReply);
+    if (fallbackReply === TYP_FALLBACK) typAiLogUnanswered(text);
   } finally {
     sendBtn.disabled = false;
   }
 }
+
+// ═══════════ Admin: AI Bot Training Panel ═══════════
+function typAiEscapeHtml(s) {
+  return String(s || '').replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+}
+
+async function loadAdminAiQa() {
+  await Promise.all([aiqaLoadUnanswered(), aiqaLoadCustomFaqList()]);
+}
+
+async function aiqaLoadUnanswered() {
+  const box = document.getElementById('aiqaUnansweredList');
+  if (!box) return;
+  box.innerHTML = '<div style="color:var(--text3);font-size:13px">লোড হচ্ছে...</div>';
+  try {
+    const snap = await window._get(window._ref(window._db, 'chatbotUnanswered'));
+    const val = snap.val();
+    const items = val ? Object.entries(val).map(([id, v]) => ({ id, ...v })) : [];
+    items.sort((a, b) => (b.ts || 0) - (a.ts || 0));
+
+    const countEl1 = document.getElementById('aiqaUnansweredCount');
+    const countEl2 = document.getElementById('aiqaUnansweredCount2');
+    if (countEl1) { countEl1.textContent = items.length; countEl1.style.display = items.length ? 'inline-block' : 'none'; }
+    if (countEl2) countEl2.textContent = `(${items.length}টা)`;
+
+    if (!items.length) {
+      box.innerHTML = '<div style="color:var(--text3);font-size:13px">এখন পর্যন্ত কোনো অনুত্তরিত প্রশ্ন নেই। 🎉</div>';
+      return;
+    }
+
+    box.innerHTML = items.map(it => `
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;gap:10px">
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;color:var(--text);word-break:break-word">${typAiEscapeHtml(it.question)}</div>
+          <div style="font-size:10px;color:var(--text3);margin-top:2px">${it.ts ? new Date(it.ts).toLocaleString('bn-BD') : ''}</div>
+        </div>
+        <div style="display:flex;gap:6px;flex-shrink:0">
+          <button onclick="aiqaUseAsFaq('${it.id}', '${it.question.replace(/'/g,"\\'").replace(/\n/g,' ')}')" style="padding:6px 10px;border-radius:6px;border:none;background:var(--primary);color:#fff;font-size:11px;cursor:pointer">FAQ বানাও</button>
+          <button onclick="aiqaDeleteUnanswered('${it.id}')" style="padding:6px 10px;border-radius:6px;border:none;background:var(--red);color:#fff;font-size:11px;cursor:pointer">✕</button>
+        </div>
+      </div>`).join('');
+  } catch (e) {
+    box.innerHTML = '<div style="color:var(--red);font-size:13px">লোড করতে সমস্যা হয়েছে।</div>';
+  }
+}
+
+function aiqaUseAsFaq(id, questionText) {
+  document.getElementById('aiqaNewKeywords').value = questionText;
+  document.getElementById('aiqaNewAnswer').focus();
+  document.getElementById('aiqaNewKeywords').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  window._aiqaPendingResolveId = id;
+}
+
+async function aiqaDeleteUnanswered(id) {
+  try {
+    await window._remove(window._ref(window._db, 'chatbotUnanswered/' + id));
+    aiqaLoadUnanswered();
+  } catch (e) { alert('Delete করতে সমস্যা হয়েছে।'); }
+}
+
+async function aiqaSaveCustomFaq() {
+  const kwRaw = document.getElementById('aiqaNewKeywords').value.trim();
+  const answer = document.getElementById('aiqaNewAnswer').value.trim();
+  const statusEl = document.getElementById('aiqaSaveStatus');
+  if (!kwRaw || !answer) {
+    statusEl.style.color = 'var(--red)';
+    statusEl.textContent = 'Keywords আর Answer দুটোই দিতে হবে।';
+    return;
+  }
+  const keywords = kwRaw.split(',').map(k => k.trim()).filter(Boolean);
+  try {
+    await window._push(window._ref(window._db, 'chatbotCustomFaq'), { keywords, answer, createdAt: Date.now() });
+    if (window._aiqaPendingResolveId) {
+      await window._remove(window._ref(window._db, 'chatbotUnanswered/' + window._aiqaPendingResolveId)).catch(()=>{});
+      window._aiqaPendingResolveId = null;
+    }
+    document.getElementById('aiqaNewKeywords').value = '';
+    document.getElementById('aiqaNewAnswer').value = '';
+    statusEl.style.color = 'var(--green)';
+    statusEl.textContent = '✅ FAQ সেভ হয়েছে! বট এখন থেকে এটা দিয়ে উত্তর দিতে পারবে।';
+    setTimeout(() => { statusEl.textContent = ''; }, 4000);
+    loadAdminAiQa();
+  } catch (e) {
+    statusEl.style.color = 'var(--red)';
+    statusEl.textContent = 'সেভ করতে সমস্যা হয়েছে।';
+  }
+}
+
+async function aiqaLoadCustomFaqList() {
+  const box = document.getElementById('aiqaCustomFaqList');
+  if (!box) return;
+  box.innerHTML = '<div style="color:var(--text3);font-size:13px">লোড হচ্ছে...</div>';
+  try {
+    const snap = await window._get(window._ref(window._db, 'chatbotCustomFaq'));
+    const val = snap.val();
+    const items = val ? Object.entries(val).map(([id, v]) => ({ id, ...v })) : [];
+    items.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+    if (!items.length) {
+      box.innerHTML = '<div style="color:var(--text3);font-size:13px">এখনো কোনো custom FAQ যোগ করা হয়নি।</div>';
+      return;
+    }
+
+    box.innerHTML = items.map(it => `
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 14px;display:flex;justify-content:space-between;align-items:start;gap:10px">
+        <div style="flex:1;min-width:0">
+          <div style="font-size:11px;color:var(--primary);font-weight:600">${typAiEscapeHtml((it.keywords||[]).join(', '))}</div>
+          <div style="font-size:13px;color:var(--text);margin-top:3px;word-break:break-word;white-space:pre-wrap">${typAiEscapeHtml(it.answer)}</div>
+        </div>
+        <button onclick="aiqaDeleteCustomFaq('${it.id}')" style="padding:6px 10px;border-radius:6px;border:none;background:var(--red);color:#fff;font-size:11px;cursor:pointer;flex-shrink:0">✕</button>
+      </div>`).join('');
+  } catch (e) {
+    box.innerHTML = '<div style="color:var(--red);font-size:13px">লোড করতে সমস্যা হয়েছে।</div>';
+  }
+}
+
+async function aiqaDeleteCustomFaq(id) {
+  try {
+    await window._remove(window._ref(window._db, 'chatbotCustomFaq/' + id));
+    aiqaLoadCustomFaqList();
+  } catch (e) { alert('Delete করতে সমস্যা হয়েছে।'); }
+}
+
+window.loadAdminAiQa = loadAdminAiQa;
+window.aiqaSaveCustomFaq = aiqaSaveCustomFaq;
+window.aiqaDeleteCustomFaq = aiqaDeleteCustomFaq;
+window.aiqaDeleteUnanswered = aiqaDeleteUnanswered;
+window.aiqaUseAsFaq = aiqaUseAsFaq;
 </script>
 </body>
 </html>
