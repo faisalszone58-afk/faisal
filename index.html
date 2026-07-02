@@ -2633,7 +2633,7 @@ if (document.readyState === 'loading') {
         Deadline 2<span style="display:block;font-size:10px;font-weight:400;margin-top:2px;opacity:.7">2v2</span>
       </button>
       <button id="bdtab-3" onclick="bdSetDeadline(3,this)" style="flex:1;padding:8px 4px;border-radius:7px;border:none;background:transparent;color:var(--text3);font-family:'Inter',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all .18s;position:relative">
-        Deadline 3<span style="display:block;font-size:10px;font-weight:400;margin-top:2px;opacity:.7">3v3</span>
+        Deadline 3<span style="display:block;font-size:10px;font-weight:400;margin-top:2px;opacity:.7">4v4</span>
       </button>
     </div>
 
@@ -3140,6 +3140,67 @@ window.loadRanking = async function() {
     console.error('Ranking error:', e);
     container.innerHTML = `<div class="card text-center" style="padding:40px;color:var(--red)">❌ Data load হয়নি। Error: ${e.message}</div>`;
   }
+};
+
+// Core computation of MAIN (all-time cumulative) ranking — reusable, independent of which
+// ranking tab/mode is currently on screen. Cached briefly to avoid repeated heavy fetches.
+window.computeMainRankingData = async function() {
+  if (window._mainRankingCache && (Date.now() - window._mainRankingCache.ts) < 60000) {
+    return window._mainRankingCache.data;
+  }
+  const liveUsers = await getAllUsers();
+  const seasonsRes = await fetch(`${RANKING_DB}/seasons.json?shallow=true`);
+  const seasonsKeysObj = await seasonsRes.json();
+  const seasonKeys = seasonsKeysObj ? Object.keys(seasonsKeysObj) : [];
+
+  const archivedPlayersArrays = await Promise.all(seasonKeys.map(async k => {
+    try {
+      const r = await fetch(`${RANKING_DB}/seasons/${k}/players.json`);
+      const d = await r.json();
+      return d ? Object.entries(d).map(([uid, val]) => ({ uid, ...(val||{}) })) : [];
+    } catch(e) { return []; }
+  }));
+
+  const archivedUids = new Set();
+  archivedPlayersArrays.forEach(arr => arr.forEach(p => { if(p.uid) archivedUids.add(p.uid); }));
+
+  const totals = {};
+  function addToTotal(p) {
+    if (!p.uid) return;
+    if (!totals[p.uid]) {
+      totals[p.uid] = { uid: p.uid, name: p.name, club: p.club, district: p.district, avatarUrl: p.avatarUrl,
+        matches:0, wins:0, draws:0, losses:0, goalsFor:0, goalsAgainst:0, mvp:0 };
+    }
+    const t = totals[p.uid];
+    if (p.name) t.name = p.name;
+    if (p.avatarUrl) t.avatarUrl = p.avatarUrl;
+    if (p.club) t.club = p.club;
+    if (p.district) t.district = p.district;
+    t.matches += (p.matches||0); t.wins += (p.wins||0); t.draws += (p.draws||0); t.losses += (p.losses||0);
+    t.goalsFor += (p.goalsFor||0); t.goalsAgainst += (p.goalsAgainst||0); t.mvp += (p.mvp||0);
+  }
+
+  archivedPlayersArrays.forEach(arr => arr.forEach(addToTotal));
+
+  liveUsers.forEach(p => {
+    const hasCurrentStats = (p.matches||0) > 0 || (p.wins||0) > 0 || (p.goalsFor||0) > 0 || (p.mvp||0) > 0;
+    if (hasCurrentStats) {
+      addToTotal(p);
+    } else if (!archivedUids.has(p.uid)) {
+      addToTotal(p);
+    } else {
+      if (!totals[p.uid]) return;
+      if (p.name) totals[p.uid].name = p.name;
+      if (p.avatarUrl) totals[p.uid].avatarUrl = p.avatarUrl;
+      if (p.club) totals[p.uid].club = p.club;
+      if (p.district) totals[p.uid].district = p.district;
+    }
+  });
+
+  const arr = Object.values(totals);
+  sortRankingData(arr);
+  window._mainRankingCache = { ts: Date.now(), data: arr };
+  return arr;
 };
 
 // Main Ranking = cumulative all-time stats across current + every archived season, summed by uid
@@ -3979,7 +4040,7 @@ window.switchAdminTab = function(tab) {
 const BD_CONFIG = {
   1:{count:3,label:'Deadline 1',boutLabel:'3v3 Bout Draw'},
   2:{count:2,label:'Deadline 2',boutLabel:'2v2 Bout Draw'},
-  3:{count:3,label:'Deadline 3',boutLabel:'3v3 Bout Draw'},
+  3:{count:4,label:'Deadline 3',boutLabel:'4v4 Bout Draw'},
 };
 let bdCurrentDL = 1;
 const bdSaved = {1:null,2:null,3:null};
@@ -4127,7 +4188,7 @@ window.bdDownloadAll = async function() {
   const SCALE=2,W=560,PAD=28;
   const ROW_H=44,ROW_GAP=6,SECTION_GAP=22,SEC_LABEL_H=30;
   const HEADER_H=102,FOOTER_H=38;
-  const totalRows=3+2+3;
+  const totalRows=BD_CONFIG[1].count+BD_CONFIG[2].count+BD_CONFIG[3].count;
   const totalH=HEADER_H+3*SEC_LABEL_H+totalRows*(ROW_H+ROW_GAP)-ROW_GAP+2*SECTION_GAP+FOOTER_H+24;
   const canvas=document.createElement('canvas');
   canvas.width=W*SCALE; canvas.height=totalH*SCALE;
@@ -5723,26 +5784,20 @@ window.openPublicProfile = async function(uid) {
   }
 
   // Store for download — inject live rank
-  // Use global rankingData if already loaded (most reliable), else sort from users
+  // Always use MAIN (all-time cumulative) ranking here, regardless of which ranking tab
+  // (current season / archived / main) the user last viewed — profile card rank should
+  // never flip to a season-only rank just because someone browsed the season filter.
   try {
-    let rankSource = (window.rankingData && window.rankingData.length)
-      ? window.rankingData
-      : [...users].sort((a,b)=>{
-          const sa=(a.wins||0)*9+(a.mvp||0)*5+(a.draws||0)*3+(a.goalsFor||0);
-          const sb=(b.wins||0)*9+(b.mvp||0)*5+(b.draws||0)*3+(b.goalsFor||0);
-          if(sb!==sa) return sb-sa;
-          if((b.wins||0)!==(a.wins||0)) return (b.wins||0)-(a.wins||0);
-          return (b.goalsFor||0)-(a.goalsFor||0);
-        });
+    const mainRankSource = await computeMainRankingData();
     // Only rank players who have played
-    const activePlayers = rankSource.filter(u=>(u.wins||0)+(u.draws||0)+(u.losses||0)+(u.matches||0)>0);
+    const activePlayers = mainRankSource.filter(u=>(u.wins||0)+(u.draws||0)+(u.losses||0)+(u.matches||0)>0);
     const liveRankIdx = activePlayers.findIndex(u => u.uid === p.uid || u.name === p.name);
     p._liveRank = liveRankIdx !== -1 ? liveRankIdx + 1 : null;
   } catch(e) { p._liveRank = null; }
   window._ppCurrentPlayer = p;
   window._ppCurrentStats = { m, w, d, l, goals, mvp, score, wp, ga: p.goalsAgainst||0 };
 
-  document.getElementById('ppRank').textContent = p.rank ? `RANK #${p.rank} • TYP PLAYER` : 'TYP PLAYER';
+  document.getElementById('ppRank').textContent = (p._liveRank || p.rank) ? `RANK #${p._liveRank || p.rank} • TYP PLAYER` : 'TYP PLAYER';
   document.getElementById('ppName').textContent = p.name || '—';
   document.getElementById('ppClub').textContent = p.club || '—';
   document.getElementById('ppDistrict').textContent = p.district || '—';
@@ -7681,17 +7736,39 @@ async function _renderResultCard({ matches, homeTeam, awayTeam, dayVal, fileSuff
   const homeTotal = matches.reduce((s,m)=>s+(parseInt(m.homeScore)||0),0);
   const awayTotal = matches.reduce((s,m)=>s+(parseInt(m.awayScore)||0),0);
 
-  // Find MVP: player with highest individual score (homeScore for home players, awayScore for away)
-  // Build player goal tally
-  const playerGoals = {};
+  // Find MVP: MUST be from the WINNING team (based on matchday points, homePoints vs awayPoints).
+  // Among the winning team's players, MVP = whoever has the highest GOAL DIFFERENCE (gf-ga) in
+  // this matchday — NOT simply whoever scored the most goals overall. A losing-team player who
+  // scored a lot (e.g. 10 goals) can never be MVP if their team lost the matchday.
+  const playerStats = {}; // name -> { gf, ga, side: 'home'|'away' }
   matches.forEach(m => {
     const hs = parseInt(m.homeScore)||0, as_ = parseInt(m.awayScore)||0;
     const p1 = m.player1 || '—';
     const p2 = m.player2 || '—';
-    playerGoals[p1] = (playerGoals[p1]||0) + hs;
-    playerGoals[p2] = (playerGoals[p2]||0) + as_;
+    if (!playerStats[p1]) playerStats[p1] = { gf:0, ga:0, side:'home' };
+    if (!playerStats[p2]) playerStats[p2] = { gf:0, ga:0, side:'away' };
+    playerStats[p1].gf += hs; playerStats[p1].ga += as_;
+    playerStats[p2].gf += as_; playerStats[p2].ga += hs;
   });
-  const mvpName = Object.entries(playerGoals).sort((a,b)=>b[1]-a[1])[0]?.[0] || '';
+
+  let winSide = null; // 'home' | 'away' | null (overall matchday draw)
+  if (homePoints > awayPoints) winSide = 'home';
+  else if (awayPoints > homePoints) winSide = 'away';
+
+  let mvpName = '';
+  if (winSide) {
+    const winSidePlayers = Object.entries(playerStats).filter(([, s]) => s.side === winSide);
+    winSidePlayers.sort((a, b) => {
+      const gdA = a[1].gf - a[1].ga, gdB = b[1].gf - b[1].ga;
+      if (gdB !== gdA) return gdB - gdA; // primary: highest GD wins
+      return b[1].gf - a[1].gf;          // tiebreak: more goals scored
+    });
+    mvpName = winSidePlayers[0]?.[0] || '';
+  }
+  // Fallback (matchday overall is a draw, no single winning side) — use highest total goals
+  if (!mvpName) {
+    mvpName = Object.entries(playerStats).sort((a,b)=>(b[1].gf)-(a[1].gf))[0]?.[0] || '';
+  }
 
   // Parse matchday label for display
   const dayLabel = dayVal.replace('—', '•');
@@ -7823,18 +7900,7 @@ async function _renderResultCard({ matches, homeTeam, awayTeam, dayVal, fileSuff
   drawLogoCircle(220, logoY + logoSize/2, homeTeam.emoji || '🏟️');
   drawLogoCircle(CARD_W - 220, logoY + logoSize/2, awayTeam.emoji || '🏟️');
 
-  // ── TEAM NAMES ──
-  ctx.textAlign = 'left';
-  ctx.fillStyle = '#ffffff';
-  ctx.font = '700 15px Inter, Arial';
-  const homeNameLines = wrapTextCanvas(ctx, (homeTeam.name||'HOME').toUpperCase(), 130);
-  homeNameLines.forEach((ln, i) => ctx.fillText(ln, 290, logoY + 16 + i*18));
-
-  ctx.textAlign = 'right';
-  const awayNameLines = wrapTextCanvas(ctx, (awayTeam.name||'AWAY').toUpperCase(), 130);
-  awayNameLines.forEach((ln, i) => ctx.fillText(ln, CARD_W-290, logoY + 16 + i*18));
-
-  // ── SCORE BADGE (premium with shadow & gold ring, dynamic width for any digit count) ──
+  // ── SCORE BADGE GEOMETRY (computed early so team names can be constrained to not overlap it) ──
   ctx.font = '800 27px Inter, Arial';
   const homeStr = String(homePoints);
   const awayStr = String(awayPoints);
@@ -7847,6 +7913,44 @@ async function _renderResultCard({ matches, homeTeam, awayTeam, dayVal, fileSuff
   const sbW = Math.max(116, contentW + sbPadX * 2), sbH = 52;
   const sbX = CARD_W/2 - sbW/2;
   const sbY = logoY + 6;
+
+  // ── TEAM NAMES (auto-shrink/wrap so text never runs into the score badge) ──
+  const nameGapFromBadge = 14;
+  const homeNameStartX = 290;
+  const awayNameStartX = CARD_W - 290;
+  const homeNameMaxWidth = Math.max(50, (sbX - nameGapFromBadge) - homeNameStartX);
+  const awayNameMaxWidth = Math.max(50, awayNameStartX - (CARD_W - sbX + nameGapFromBadge));
+
+  const fitTeamNameLines = (text, maxWidth) => {
+    let fontSize = 15;
+    const minFontSize = 8;
+    let lines = [text];
+    while (fontSize >= minFontSize) {
+      ctx.font = `700 ${fontSize}px Inter, Arial`;
+      lines = wrapTextCanvas(ctx, text, maxWidth);
+      const fits = lines.length <= 2 && lines.every(ln => ctx.measureText(ln).width <= maxWidth);
+      if (fits) break;
+      fontSize -= 1;
+    }
+    return { lines, fontSize: Math.max(fontSize, minFontSize) };
+  };
+
+  ctx.fillStyle = '#ffffff';
+  ctx.textAlign = 'left';
+  const homeFit = fitTeamNameLines((homeTeam.name||'HOME').toUpperCase(), homeNameMaxWidth);
+  ctx.font = `700 ${homeFit.fontSize}px Inter, Arial`;
+  const homeLineH = homeFit.fontSize + 3;
+  const homeStartY = logoY + 16 - (homeFit.lines.length - 1) * homeLineH/2;
+  homeFit.lines.forEach((ln, i) => ctx.fillText(ln, homeNameStartX, homeStartY + i*homeLineH));
+
+  ctx.textAlign = 'right';
+  const awayFit = fitTeamNameLines((awayTeam.name||'AWAY').toUpperCase(), awayNameMaxWidth);
+  ctx.font = `700 ${awayFit.fontSize}px Inter, Arial`;
+  const awayLineH = awayFit.fontSize + 3;
+  const awayStartY = logoY + 16 - (awayFit.lines.length - 1) * awayLineH/2;
+  awayFit.lines.forEach((ln, i) => ctx.fillText(ln, awayNameStartX, awayStartY + i*awayLineH));
+
+  // ── SCORE BADGE (premium with shadow & gold ring, dynamic width for any digit count) ──
 
   // shadow
   ctx.save();
