@@ -2742,6 +2742,7 @@ if (document.readyState === 'loading') {
       <button class="btn btn-outline" onclick="loadTrnAdminTeams()" style="padding:9px 20px;font-size:13px">🔄 Load Teams</button>
       <button class="btn btn-outline" onclick="openCreateTeamModal()" style="padding:9px 20px;font-size:13px">➕ Create New Team</button>
       <button class="btn" onclick="confirmRegenerateFixtures()" style="padding:9px 20px;font-size:13px;background:rgba(52,211,153,0.1);border:1px solid var(--green);color:var(--green)">🔄 Regenerate Fixtures</button>
+      <button class="btn" onclick="fixStartersTo9()" style="padding:9px 20px;font-size:13px;background:rgba(251,191,36,0.1);border:1px solid var(--gold);color:var(--gold)">🔧 Fix Starters (8→9)</button>
     </div>
   </div>
 
@@ -7039,6 +7040,41 @@ window.confirmRegenerateFixtures = async function() {
   trnTeamsCache = savedTeams;
   await generateFixtures();
   loadTrnMatchdays();
+};
+
+// ── Admin: One-click fix — promote each team's players so first 9 (existing order) become starters ──
+window.fixStartersTo9 = async function() {
+  if (!confirm('সব টিমের প্লেয়ার লিস্ট চেক করে প্রথম ৯ জনকে starter বানিয়ে দেওয়া হবে (আগের ক্রম অনুযায়ী)। Continue?')) return;
+
+  const res = await fetch(`${TRN_DB}/tournament/teams.json`);
+  const data = await res.json() || {};
+  const teamEntries = Object.entries(data);
+
+  if (!teamEntries.length) { alert('❌ কোনো team পাওয়া যায়নি।'); return; }
+
+  let fixedCount = 0;
+  let skippedCount = 0;
+
+  for (const [teamId, team] of teamEntries) {
+    const players = team.players || [];
+    if (!players.length) { skippedCount++; continue; }
+
+    const alreadyNine = players.filter(p => p.isStarter).length === Math.min(players.length, 9);
+    const updatedPlayers = players.map((p, i) => ({ ...p, isStarter: i < 9 }));
+
+    if (alreadyNine && JSON.stringify(updatedPlayers) === JSON.stringify(players)) { skippedCount++; continue; }
+
+    const patchRes = await fetch(`${TRN_DB}/tournament/teams/${teamId}.json`, {
+      method: 'PATCH',
+      body: JSON.stringify({ players: updatedPlayers })
+    });
+    if (patchRes.ok) fixedCount++;
+    await new Promise(r => setTimeout(r, 150)); // Firebase-কে একটু breathing room দেওয়া
+  }
+
+  alert(`✅ Fix সম্পন্ন!\n${fixedCount}টা team আপডেট হয়েছে, ${skippedCount}টা আগে থেকেই ঠিক ছিল।\n\nএখন "🔄 Regenerate Fixtures" বাটনে চাপ দাও — তাহলে সব ম্যাচে 9/9 bout দেখাবে।`);
+
+  await loadTrnAdminTeams();
 };
 
 // ── Admin: Load Matchdays for Entry ──
