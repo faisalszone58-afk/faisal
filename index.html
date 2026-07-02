@@ -773,6 +773,9 @@ select.form-input option { background: var(--card); color: var(--text); }
 }
 
 /* ── TOURNAMENT ── */
+.trn-header { text-align:center; margin-bottom:20px; }
+.trn-title { font-size:20px; font-weight:800; color:var(--text); letter-spacing:0.04em; margin-bottom:4px; }
+.trn-subtitle { font-size:12px; color:var(--text3); font-family:'Inter',sans-serif; line-height:1.5; }
 .trn-tabs { display:flex; gap:4px; margin-bottom:20px; flex-wrap:wrap; }
 .trn-tab { padding:8px 16px; border-radius:8px; border:1px solid var(--border); background:var(--card); color:var(--text3); font-size:12px; font-weight:600; cursor:pointer; transition:all 0.15s; }
 .trn-tab.active, .trn-tab:hover { background:var(--primary); color:#fff; border-color:var(--primary); }
@@ -1826,7 +1829,7 @@ if (document.readyState === 'loading') {
     </div>
 
     <div style="margin-top:16px;font-size:12px;color:var(--text3);font-family:'Inter',sans-serif">
-      * Group A ও B এর Top 2 করে মোট 4 team → Semi-Final। প্রতিটা matchday: 4 match (GRP-A × 2 + GRP-B × 2) × 8 bout। Double round-robin — প্রতি team ৬ ম্যাচ খেলবে।
+      * Group A ও B এর Top 2 করে মোট 4 team → Semi-Final। প্রতিটা matchday: 4 match (GRP-A × 2 + GRP-B × 2) × 9 bout। Double round-robin — প্রতি team ৬ ম্যাচ খেলবে।
     </div>
   </div>
 
@@ -2744,7 +2747,7 @@ if (document.readyState === 'loading') {
 
   <div class="trn-admin-section">
     <div class="trn-admin-section-title">⚽ Enter Match Results</div>
-    <p style="font-size:13px;color:var(--text3);margin-bottom:14px">Select a matchday to enter bout results. প্রতিটা matchday = 4 matches × 8 bout (double round-robin)।</p>
+    <p style="font-size:13px;color:var(--text3);margin-bottom:14px">Select a matchday to enter bout results. প্রতিটা matchday = 4 matches × 9 bout (double round-robin)।</p>
     <div style="margin-bottom:12px;display:flex;gap:10px;flex-wrap:wrap">
       <select class="form-input" id="trnMatchdaySelect" style="flex:1;min-width:200px" onchange="loadMatchdayForEntry()">
         <option value="">-- Select Matchday --</option>
@@ -2810,7 +2813,7 @@ if (document.readyState === 'loading') {
       </div>
     </div>
     <div class="form-group">
-      <label class="form-label">Select Players (8 starters + 4 subs = 12 max)</label>
+      <label class="form-label">Select Players (9 starters + 3 subs = 12 max)</label>
       <input type="text" class="form-input" id="playerPickSearch" placeholder="🔍 Search player..." oninput="filterPlayerPick()" style="margin-bottom:8px">
       <div class="player-pick-list" id="playerPickList"></div>
       <div style="margin-top:8px;font-size:12px;color:var(--cyan)" id="playerPickCount">0 selected</div>
@@ -6720,7 +6723,7 @@ function renderAdminTeamsList() {
       </div>
       <div style="flex:1">
         <div style="font-weight:700;font-size:14px;color:var(--text)">${safeName}</div>
-        <div style="font-size:12px;color:var(--text3)">👑 ${t.manager||'—'} • ${(t.players||[]).filter(p=>p&&p.isStarter).length}/8 starters · ${(t.players||[]).filter(p=>p&&!p.isStarter).length}/4 subs</div>
+        <div style="font-size:12px;color:var(--text3)">👑 ${t.manager||'—'} • ${(t.players||[]).filter(p=>p&&p.isStarter).length}/9 starters · ${(t.players||[]).filter(p=>p&&!p.isStarter).length}/3 subs</div>
       </div>
       <button class="btn-admin-edit" onclick="openEditTeamModal('${t.id}')">✏️ Edit</button>
       <button class="btn-admin-del" onclick="deleteTeam('${t.id}','${safeNameAttr}')">🗑️</button>
@@ -6817,7 +6820,7 @@ window.togglePlayerPick = function(uid, el) {
   const idx = _playerPickSelected.indexOf(uid);
   const cb = el.querySelector('input[type=checkbox]');
   if (idx === -1) {
-    if (_playerPickSelected.length >= 12) { alert('Maximum 12 players (8 starters + 4 subs)।'); return; }
+    if (_playerPickSelected.length >= 12) { alert('Maximum 12 players (9 starters + 3 subs)।'); return; }
     _playerPickSelected.push(uid);
     el.classList.add('selected'); if(cb) cb.checked = true;
   } else {
@@ -6829,7 +6832,7 @@ window.togglePlayerPick = function(uid, el) {
 
 function updatePlayerPickCount() {
   const el = document.getElementById('playerPickCount');
-  if (el) el.textContent = `${_playerPickSelected.length} selected (${Math.min(_playerPickSelected.length,8)} starters + ${Math.max(0,_playerPickSelected.length-8)} subs)`;
+  if (el) el.textContent = `${_playerPickSelected.length} selected (${Math.min(_playerPickSelected.length,9)} starters + ${Math.max(0,_playerPickSelected.length-9)} subs)`;
 }
 
 window.previewTeamLogo = function(input) {
@@ -6856,7 +6859,7 @@ window.saveTeam = async function() {
   const allUsers = window._trnAllUsers || [];
   const players = _playerPickSelected.map((uid, i) => {
     const u = allUsers.find(u => u.uid === uid) || {};
-    return { uid, name: u.name || '—', isStarter: i < 8 };
+    return { uid, name: u.name || '—', isStarter: i < 9 };
   });
 
   const teamId = document.getElementById('editTeamId').value;
@@ -6941,7 +6944,7 @@ window.deleteTeam = async function(id, name) {
 
 // ── Auto-generate Round Robin Fixtures ──
 // Group A/B double round robin: 4 teams each group, 6 matchdays per group
-// Each matchday = 4 matches (2 GRP-A + 2 GRP-B) × 8 x 1v1 bouts
+// Each matchday = 4 matches (2 GRP-A + 2 GRP-B) × 9 x 1v1 bouts
 async function generateFixtures() {
   const teams = trnTeamsCache;
   if (teams.length !== 8) { alert('ঠিক 8টা team লাগবে fixture generate করতে।'); return; }
@@ -6983,9 +6986,9 @@ async function generateFixtures() {
 
   // Helper to push bouts for a match
   function pushBouts(t1, t2, matchdayNum, matchIdx, group) {
-    const t1S = (t1.players||[]).filter(p=>p.isStarter).slice(0,8);
-    const t2S = (t2.players||[]).filter(p=>p.isStarter).slice(0,8);
-    const bouts = Math.min(t1S.length, t2S.length, 8);
+    const t1S = (t1.players||[]).filter(p=>p.isStarter).slice(0,9);
+    const t2S = (t2.players||[]).filter(p=>p.isStarter).slice(0,9);
+    const bouts = Math.min(t1S.length, t2S.length, 9);
     const matchdayLabel = `Matchday ${matchdayNum} — GRP-${group} Match ${matchIdx+1}: ${t1.name} vs ${t2.name}`;
     for (let k = 0; k < bouts; k++) {
       allFixtures.push({
