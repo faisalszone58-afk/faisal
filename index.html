@@ -5375,11 +5375,22 @@ async function loadHomeLiveMatchday() {
     const fixtures = matches.filter(m => m.homeScore === undefined && m.awayScore === undefined);
 
     // Determine current/latest active matchday
+    const allDays = [...new Set(matches.map(m => m.day))].sort((a,b) => a - b);
     let currentDay = null;
     if (played.length) {
       // Get the latest day that has results
       const days = [...new Set(played.map(m => m.day))].sort((a,b) => b - a);
       currentDay = days[0];
+
+      // If EVERY match in currentDay already has a result (matchday fully complete),
+      // advance to the next day so upcoming fixtures show instead of the finished one.
+      const currentDayMatches = matches.filter(m => m.day === currentDay);
+      const currentDayFullyPlayed = currentDayMatches.length > 0 &&
+        currentDayMatches.every(m => m.homeScore !== undefined && m.awayScore !== undefined);
+      if (currentDayFullyPlayed) {
+        const nextDay = allDays.find(d => d > currentDay);
+        if (nextDay !== undefined) currentDay = nextDay;
+      }
     } else if (fixtures.length) {
       // No results yet, show day 1
       const days = [...new Set(fixtures.map(m => m.day))].sort((a,b) => a - b);
