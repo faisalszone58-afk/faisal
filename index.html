@@ -8750,7 +8750,7 @@ function typAiLevenshtein(a, b) {
 // userText-এর প্রতিটা শব্দের মধ্যে kw-এর সাথে সবচেয়ে কাছের spelling মিল আছে কিনা চেক করে
 // (শব্দের length অনুযায়ী কত অক্ষর ভুল মেনে নেওয়া যাবে সেটা ঠিক করে)
 function typAiFuzzyIncludes(words, kw) {
-  const maxDist = kw.length <= 4 ? 1 : (kw.length <= 7 ? 2 : 3);
+  const maxDist = kw.length <= 4 ? 1 : (kw.length <= 10 ? 1 : 2);
   for (const w of words) {
     if (Math.abs(w.length - kw.length) > maxDist) continue; // length অনেক আলাদা হলে স্কিপ (speed)
     if (typAiLevenshtein(w, kw) <= maxDist) return true;
@@ -9139,20 +9139,19 @@ async function typAiSendMessage() {
   const typingEl = typAiAppendMessage('typing', 'লিখছে...');
 
   try {
-    // আগে live data lookup চেষ্টা করি (point/standings/next match/player stats), না পেলে normal FAQ
+    // আগে live data lookup চেষ্টা করি (point/standings/next match/player stats) — এটা সঠিক ডাটাবেস তথ্য দেয়
     let reply = await typAiTryDynamicAnswer(text);
     let wasFallback = false;
-    if (!reply) {
-      reply = typAiFindAnswer(text);
-      wasFallback = (reply === TYP_FALLBACK);
-    }
 
-    // FAQ-তেও উত্তর না মিললে, শেষ ধাপে real AI (Gemini) কে জিজ্ঞেস করি
-    if (wasFallback) {
+    if (!reply) {
+      // বাকি সব প্রশ্নেই এখন সরাসরি Gemini — FAQ keyword-matching আর ব্যবহার হচ্ছে না
       const aiReply = await typAiAskGemini(text);
       if (aiReply) {
         reply = aiReply;
-        wasFallback = false;
+      } else {
+        // Gemini fail করলে (proxy down/quota শেষ) পুরনো keyword FAQ কে emergency fallback হিসেবে রাখা
+        reply = typAiFindAnswer(text);
+        wasFallback = (reply === TYP_FALLBACK);
       }
     }
 
