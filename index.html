@@ -8665,6 +8665,33 @@ function typAiFindAnswer(userText) {
 
 // ═══════════ Live Tournament Data Lookup (point/standings/next-match) ═══════════
 const TYP_AI_DB = 'https://typ-championship-default-rtdb.firebaseio.com';
+
+// ⚠️ Cloudflare Worker deploy করার পর এখানে আপনার Worker URL বসিয়ে দিন
+// উদাহরণ: 'https://typ-ai-proxy.yourname.workers.dev'
+const TYP_AI_PROXY_URL = 'https://typ-ai-proxy.vercel.app/api/ask';
+
+// TYP_FAQ + Admin-এর যোগ করা Custom FAQ থেকে Gemini-র জন্য knowledge base বানায়
+function typAiBuildKnowledgeBase() {
+  const all = [...TYP_FAQ, ...TYP_CUSTOM_FAQ];
+  return all.map(f => `- ${f.answer}`).join('\n').slice(0, 6000);
+}
+
+// FAQ/Dynamic answer এ না মিললে, শেষ ধাপে real AI (Gemini) কে জিজ্ঞেস করে
+async function typAiAskGemini(question) {
+  if (!TYP_AI_PROXY_URL || TYP_AI_PROXY_URL.includes('PASTE_YOUR')) return null;
+  try {
+    const res = await fetch(TYP_AI_PROXY_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ question, context: typAiBuildKnowledgeBase() }),
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data.answer || null;
+  } catch (e) {
+    return null; // network/proxy fail করলে চুপচাপ null — normal fallback দেখাবে
+  }
+}
 let typAiTeams = null;
 let typAiMatches = null;
 let typAiDataLoadedAt = 0;
@@ -8973,6 +9000,16 @@ async function typAiSendMessage() {
       reply = typAiFindAnswer(text);
       wasFallback = (reply === TYP_FALLBACK);
     }
+
+    // FAQ-তেও উত্তর না মিললে, শেষ ধাপে real AI (Gemini) কে জিজ্ঞেস করি
+    if (wasFallback) {
+      const aiReply = await typAiAskGemini(text);
+      if (aiReply) {
+        reply = aiReply;
+        wasFallback = false;
+      }
+    }
+
     typingEl.remove();
     typAiAppendMessage('bot', reply);
     if (wasFallback) typAiLogUnanswered(text);
