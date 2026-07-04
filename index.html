@@ -8408,6 +8408,152 @@ function showPage(name) {
 // ═══════════ TYP SUPPORT — Rule-based FAQ bot (no API key needed) ═══════════
 // 📌 এখানে তোমার FAQ গুলো keywords সহ লেখো। যত বেশি keyword দিবে, bot তত ভালোভাবে মিল খুঁজে পাবে।
 // নতুন প্রশ্ন/উত্তর যোগ করতে চাইলে নিচের array-তে নতুন { keywords: [...], answer: "..." } object যোগ করো।
+const TYP_FULL_RULES_TEXT = `
+OFFICIAL DOCUMENT
+TYP AUCTION TOURNAMENT
+RULES & REGULATIONS
+📋
+Squad Line-up Submission
+▼
+A প্রত্যেক Match Day-এর জন্য Squad Line-up ম্যাচের দিন দুপুর ১:০০ টার আগে Admin-এর Inbox-এ জমা দিতে হবে।
+B Line-up জমা দেওয়ার দায়িত্ব সংশ্লিষ্ট Team Manager অথবা Captain -এর।
+C Line-up জমা দিতে ব্যর্থ হলে: দুপুর ১:০০ টার মধ্যে জমা দিতে ব্যর্থ হলে আগের Match Day-এর Line-up স্বয়ংক্রিয়ভাবে কার্যকর বলে গণ্য হবে এবং উক্ত Line-up ব্যবহার করে Official Draw সম্পন্ন করা হবে। পরবর্তীতে কোনো আপত্তি গ্রহণযোগ্য হবে না।
+👥
+Match Day Group Creation
+▼
+যে দল Fixture-এ Home Team হিসেবে থাকবে, সেই দলের Manager অথবা Captain Match Day Group তৈরি করবে।
+Group তৈরির পর অবশ্যই নিম্নলিখিত ব্যক্তিদের Add করতে হবে: ✅ Tournament Official এবং ✅ Opponent Team-এর Manager অথবা Captain ।
+🗂️
+Match Fixture Creation
+▼
+Official Draw সম্পন্ন হওয়ার পর Home Team -এর Manager অথবা Captain Match Fixture তৈরি করবে।
+🔄
+Substitution & Swap Rules
+▼
+প্রত্যেক Match Day-এ খেলোয়াড়দের উপস্থিতি, Substitution এবং Swap নির্ধারিত Deadline-এর মধ্যে সম্পন্ন করতে হবে।
+🕚 1ST DEADLINE — রাত ১১:০০
+Attendance Deadline: রাত ১১:০০ । Priority Time: রাত ১০:৪৫ । Sub/Swap Deadline: রাত ১০:৪৪:৫৯ ।
+🕛 2ND DEADLINE — রাত ১২:০০
+Attendance Deadline: রাত ১২:০০ । Priority Time: রাত ১১:৪৫ । Sub/Swap Deadline: রাত ১১:৪৪:৫৯ ।
+🕐 3RD DEADLINE — রাত ১:০০
+Attendance Deadline: রাত ১:০০ । Priority Time: রাত ১২:৪৫ । Sub/Swap Deadline: রাত ১২:৪৪:৫৯ ।
+⚠️ নির্ধারিত Substitution/Swap Deadline অতিক্রম করার পর কোনো Substitution বা Swap গ্রহণযোগ্য হবে না। সকল Manager এবং Captain-কে নির্ধারিত সময়সীমা মেনে চলতে হবে।
+🃏
+Substitution & Swap Card Rules
+▼
+প্রত্যেক Team-এর কাছে প্রত্যেক Match Day-তে থাকবে: 🔄 ২টি Swap Card ও 🔁 ২টি Substitution Card ।
+📍 Card Usage Rules
+Swap করার জন্য অবশ্যই "Typ: Swap Card" এবং Substitution করার জন্য অবশ্যই "Typ: Sub Card" ব্যবহার করতে হবে। নির্ধারিত TYP Card ব্যবহার না করে করা কোনো Swap বা Substitution গ্রহণযোগ্য হবে না।
+📍 Card Cancellation Rules
+Card ব্যবহারের সময় থেকে সর্বোচ্চ ৩ মিনিটের মধ্যে Cancel Request জানাতে হবে — তাহলে Card Usage বাতিল বলে গণ্য হবে এবং Card পুনরায় ব্যবহারযোগ্য থাকবে।
+⛔ ৩ মিনিট অতিক্রম করার পর আর কোনো অবস্থাতেই Card Usage Cancel করা যাবে না — Swap/Substitution চূড়ান্ত (Final) বলে গণ্য হবে।
+⚠️
+Manager Conduct & Penalty Rules
+▼
+সকল Team Manager-কে খেলোয়াড় ও দল সদস্যদের সাথে সম্মানজনক আচরণ করতে হবে।
+কোনো Manager যদি তার দলের কোনো Player-এর সাথে অসদাচরণ, অপমানজনক ভাষা বা অশোভন আচরণ করে এবং এ বিষয়ে Admin-এর কাছে প্রমাণসহ অভিযোগ জমা পড়ে, তাহলে বিষয়টি তদন্ত করা হবে।
+৳ অভিযোগ সত্য প্রমাণিত হলে সংশ্লিষ্ট Manager-এর বিরুদ্ধে ২০ টাকা জরিমানা আরোপ করা হবে।
+গুরুতর বা পুনরাবৃত্ত অসদাচরণের ক্ষেত্রে Tournament Authority অতিরিক্ত শাস্তিমূলক ব্যবস্থা গ্রহণের অধিকার সংরক্ষণ করবে। Tournament Authority-এর সিদ্ধান্তই চূড়ান্ত।
+🚫
+Match Fixing & Disciplinary Action
+▼
+Tournament-এ Match Fixing সম্পূর্ণরূপে নিষিদ্ধ। কোনো Manager Match Fixing করার চেষ্টা করলে বা জড়িত থাকার প্রমাণ পাওয়া গেলে সরাসরি Red Card প্রদান করা হবে।
+📍 Mutual Match Fixing
+উভয় দলের Manager পারস্পরিক সমঝোতায় Match Fixing করলে: ❌ ম্যাচ ০-০ Null Result , 🟥 উভয় Manager-কে Red Card এবং 🚫 TYP Group থেকে ১ মাসের জন্য Ban ।
+Tournament Authority প্রয়োজনে অতিরিক্ত শাস্তিমূলক ব্যবস্থা নিতে পারবে। সকল সিদ্ধান্ত তদন্তের ভিত্তিতে নেওয়া হবে এবং চূড়ান্ত বলে গণ্য হবে।
+📲
+Communication, User ID & Device Change
+▼
+📍 Admin Communication
+Match Day চলাকালীন যেকোনো সমস্যা বা গুরুত্বপূর্ণ বিষয় Match Day Group-এ Admin-কে Mention করে জানাতে হবে। সিদ্ধান্তের আগে Admin-এর নির্দেশনার জন্য অপেক্ষা করতে হবে। Admin Active না থাকলে সরাসরি Admin-এর Inbox-এ যোগাযোগ করতে হবে।
+📍 User ID Information Change
+User ID পরিবর্তনের প্রয়োজন হলে বিকাল ৫:০০ টার মধ্যে Manager Group-এ নতুন User ID Submit করতে হবে। নির্ধারিত সময়ের পরে আবেদন গ্রহণযোগ্য হবে না, যদি না Tournament Authority বিশেষ অনুমতি দেয়।
+📍 Device Change Rules
+Running Tournament চলাকালীন কোনো Player নিজের Device পরিবর্তন করতে পারবে না। Tournament শুরুতে জমা দেওয়া Device Information-ই শেষ পর্যন্ত বৈধ বলে গণ্য হবে।
+📍 Emergency Device Change
+Device নষ্ট/হারিয়ে গেলে বা বাস্তব সমস্যা হলে Admin-কে অবিলম্বে জানিয়ে প্রমাণ জমা দিতে হবে। Admin যাচাই করে অনুমতি দিলেই Device Change করা যাবে। অনুমতি ছাড়া Device Change করলে তা Rule Violation হিসেবে গণ্য হবে।
+★ User ID ও Device Change সংক্রান্ত সকল বিষয়ে Tournament Authority-এর সিদ্ধান্তই চূড়ান্ত।
+🎬
+Match Result Video Rules
+▼
+🏅 Win / 🤝 Draw Match
+বিজয়ী/ড্র উভয় প্লেয়ারকে ভিডিওতে অবশ্যই দেখাতে হবে: ✅ Match Result , ✅ SMART Assist OFF , ✅ User ID , ✅ Device Name । ভিডিও ম্যাচ ডে গ্রুপে জমা দিতে হবে।
+📍 Black Screen / Loading Issue
+এই সমস্যায় Match Result দেখা না গেলে সেই অবস্থা থেকেই রেকর্ডিং শুরু করতে হবে এবং বের হয়ে SMART Assist OFF, Device Name, User ID, Match History দেখাতে হবে।
+📍 Video Submission Time
+ম্যাচ শেষের ১৫ মিনিটের মধ্যে ভিডিও জমা দিতে হবে। নেটওয়ার্ক সমস্যায় Sending অবস্থার স্ক্রিনশট দিতে হবে।
+⛔ ১৫ মিনিটের মধ্যে জমা না দিলে: Win Match হলে Rematch ; Draw Match হলে Opponent ১ গোল লিড নিয়ে Rematch শুরু করবে। কোনো অজুহাত গ্রহণযোগ্য নয়।
+📡
+Match Exit / Disconnect Rules
+▼
+ম্যাচ শেষ হওয়ার আগে Exit করলে শুধুমাত্র Exit করা প্লেয়ারকে ভিডিও প্রমাণ দিতে হবে — সমস্যার প্রমাণ, কেন Exit করেছে, SMART Assist OFF, Device Name, User ID দেখাতে হবে।
+📍 প্রমাণ দিতে না পারলে
+📈 Lead অবস্থায় Exit: 0-0 থেকে Rematch + 🟨 ১টি Yellow Card।
+🤝 Draw অবস্থায় Exit: Opponent ১ গোল লিড নিয়ে Rematch + 🟨 ১টি Yellow Card।
+📉 Opponent Lead অবস্থায় Exit: শুধুমাত্র 🟨 ১টি Yellow Card, বাকি সময় থেকে ম্যাচ সম্পন্ন করতে হবে।
+🚪 যাকে Winner দেখাবে সে-ই Room Create করবে এবং তাকে ভিডিও দিতে হবে না — শুধু Winner Result-এর Screenshot দিলেই যথেষ্ট।
+গেমের টেকনিক্যাল সমস্যায় বের করে দিলে সেটিও ভিডিওতে স্পষ্টভাবে দেখাতে হবে।
+⛔ সঠিক প্রমাণ দিতে ব্যর্থ হলে Opponent ১ গোল লিড নিয়ে বাকি সময় থেকে ম্যাচ সম্পন্ন করবে।
+⏱️ সকল Disconnect Match, Resume Match ও Rematch সর্বোচ্চ ১৫ মিনিটের মধ্যে সম্পন্ন করতে হবে। সকল Rematch-এও Video Rules বাধ্যতামূলক।
+🎮
+SMART Assist Rules
+▼
+⛔ কোনো প্লেয়ার SMART Assist ON করে খেললে সেই ম্যাচ ❌ Auto Loss এবং 🟨 ১টি Yellow Card ।
+🪪
+User ID & Device Verification
+▼
+ম্যাচ শেষে দেখানো User ID বা Device Name ম্যাচে ব্যবহৃত তথ্যের সাথে না মিললে ❌ Auto Loss ।
+ভিডিওতে অবশ্যই দেখাতে হবে: ✅ SMART Assist OFF , ✅ User ID , ✅ Device Name , ✅ Match Result ।
+🟥
+In-Game Red Card Rules
+▼
+কোনো প্লেয়ার ম্যাচ চলাকালীন Red Card পেয়ে Disconnect হলে: Opponent অতিরিক্ত ১ গোল লিড নিয়ে বাকি সময় খেলবে। Opponent আগে থেকেই Lead-এ থাকলে সেই Lead-এর সাথে আরও ১ গোল যুক্ত হবে।
+📝 উদাহরণ: স্কোর 2-1 অবস্থায় Red Card পাওয়া প্লেয়ার Disconnect করলে ম্যাচ 3-1 স্কোর থেকে Resume হবে।
+🟨
+Card System
+▼
+🟨 Yellow Card পাওয়ার কারণ
+প্রমাণ ছাড়া Disconnect • সময়মতো ম্যাচ না খেলা • অসহযোগিতা • অযৌক্তিক আচরণ • গালিগালাজ • ব্যক্তিগত আক্রমণ • হাহা রিঅ্যাক্ট, ইত্যাদি।
+🟥 Red Card পাওয়ার কারণ
+গুরুতর অসদাচরণ • অফিসিয়ালদের অসম্মান, ইত্যাদি।
+📍 Card Rules
+🟨 ২টি Yellow Card = ১টি Red Card। ❌ Match Result-এর আগে Red Card = Auto Loss। ✅ Match Result-এর পরে Red Card = Result বহাল থাকবে।
+⏳ Yellow Card ২ দিন পর্যন্ত কার্যকর থাকবে — এই সময়ে আরেকটি Yellow Card পেলে Red Card হবে। 🚫 Red Card পেলে পরবর্তী ২ ম্যাচ নিষিদ্ধ।
+🛡️
+Formation Rules
+▼
+🚫 Wall Formation সম্পূর্ণ নিষিদ্ধ। প্রমাণিত হলে Opponent +১ Goal Bonus পাবে। শুধুমাত্র In-Game Default Formation ব্যবহার করা যাবে, Custom Formation নিষিদ্ধ।
+📍 Appeal Rule
+ম্যাচ শুরুর প্রথম ০-১০ সেকেন্ডের মধ্যে Pause দিয়ে ভিডিওসহ অভিযোগ করতে হবে। Half Time বা Full Time-এর পরে অভিযোগ গ্রহণযোগ্য হবে না।
+✅ Double Defence Allowed  |  ✅ Double Attack Allowed
+⛔
+Backpass Rules
+▼
+🚫 ইচ্ছাকৃত Backpass সম্পূর্ণ নিষিদ্ধ। Opponent ভিডিও প্রমাণ দিলে Admin Panel যাচাই করবে। অভিযোগ প্রমাণিত হলে যত মিনিট Backpass খেলা হয়েছে, ঠিক তত মিনিট পুনরায় খেলতে হবে। ভিডিও প্রমাণ ছাড়া অভিযোগ গ্রহণযোগ্য হবে না।
+⚡
+Auto Win & Activity Rules
+▼
+📍 Activity Verification
+প্লেয়ার ক্যাটাগরি অনুযায়ী Priority Time-এর Activity বিবেচনা করে Result Count করা হবে। Priority Time-এর মধ্যে প্রতিপক্ষকে কমপক্ষে ২ বার Mention করতে হবে, প্রতিটি Mention-এর মধ্যে ন্যূনতম ২ মিনিটের ব্যবধান থাকতে হবে।
+২ বারের কম Mention হলে ডেডলাইন শেষ হওয়ার পরও এক্সটা ৫ মিনিট দেওয়া হবে। সেই ৫ মিনিটের মধ্যেও অপোনেন্ট না আসলে Auto Win আবেদন গ্রহণযোগ্য হবে।
+📍 Inactive Rules
+Fixed Time শেষ হওয়ার পর সর্বোচ্চ ২০ মিনিটের মধ্যে Mention না করলে সংশ্লিষ্ট প্লেয়ারকে Inactive ধরা হবে।
+★ Activity Record ও Mention যাচাই করে Admin Panel Auto Win-এর সিদ্ধান্ত দেবে — যা চূড়ান্ত।
+📝
+Final Notes
+▼
+📍 সকল Video Proof-এ বাধ্যতামূলক
+✅ SMART Assist OFF   ✅ Device Name   ✅ User ID   ✅ Match Result
+📍 সকল Rematch-এর ক্ষেত্রে
+✅ Video Rules বাধ্যতামূলক এবং ✅ Disconnect Match ও Rematch ১৫ মিনিটের মধ্যে সম্পন্ন করতে হবে।
+🏛️
+Admin Authority
+▼
+সকল অভিযোগ, প্রমাণ, শাস্তি, Auto Win, Rematch ও Card সংক্রান্ত বিষয়ে Admin Panel-এর সিদ্ধান্তই চূড়ান্ত এবং সর্বশেষ সিদ্ধান্ত হিসেবে গণ্য হবে।
+CHAMPIONSHIP — PRESENT
+
+`;
+
 const TYP_FAQ = [
   {
     keywords: ['point', 'পয়েন্ট', 'পয়েন্ট সিস্টেম', 'win', 'জিত', '৩ পয়েন্ট', 'draw', 'ড্র'],
@@ -8670,10 +8816,10 @@ const TYP_AI_DB = 'https://typ-championship-default-rtdb.firebaseio.com';
 // উদাহরণ: 'https://typ-ai-proxy.yourname.workers.dev'
 const TYP_AI_PROXY_URL = 'https://typ-ai-proxy.vercel.app/api/ask';
 
-// TYP_FAQ + Admin-এর যোগ করা Custom FAQ থেকে Gemini-র জন্য knowledge base বানায়
+// TYP_FAQ + Admin-এর যোগ করা Custom FAQ + পূর্ণ Rules টেক্সট থেকে Gemini-র জন্য knowledge base বানায়
 function typAiBuildKnowledgeBase() {
-  const all = [...TYP_FAQ, ...TYP_CUSTOM_FAQ];
-  return all.map(f => `- ${f.answer}`).join('\n').slice(0, 6000);
+  const faqPart = [...TYP_FAQ, ...TYP_CUSTOM_FAQ].map(f => `- ${f.answer}`).join('\n');
+  return `=== সংক্ষিপ্ত FAQ ===\n${faqPart}\n\n=== পূর্ণাঙ্গ নিয়মাবলী (Official Rules) ===\n${TYP_FULL_RULES_TEXT}`.slice(0, 20000);
 }
 
 // FAQ/Dynamic answer এ না মিললে, শেষ ধাপে real AI (Gemini) কে জিজ্ঞেস করে
