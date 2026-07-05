@@ -1952,6 +1952,8 @@ if (document.readyState === 'loading') {
           </div>
         </div>
         <div class="rule-row"><span class="rl rl-red">⚠️</span> নির্ধারিত Substitution/Swap Deadline অতিক্রম করার পর কোনো Substitution বা Swap গ্রহণযোগ্য হবে না। সকল Manager এবং Captain-কে নির্ধারিত সময়সীমা মেনে চলতে হবে।</div>
+        <div class="rule-row" style="padding-bottom:4px"><strong style="color:var(--primary)">📍 Priority Time Rule</strong></div>
+        <div class="rule-row"><span class="rl rl-red">⏱️</span> Priority Time-এ অপোনেন্টকে মেনশন করার পর যদি আপনি অ্যাক্টিভ থাকেন, তাহলে অবশ্যই ডেডলাইনের আগেই ম্যাচ সম্পন্ন করতে হবে। ডেডলাইন অতিক্রম হলে কোনো অতিরিক্ত সময় দেওয়া হবে না এবং ম্যাচ <span style="color:var(--red);font-weight:600">Auto Loss</span> হিসেবে গণ্য হবে।</div>
       </div>
     </div>
 
@@ -2037,6 +2039,11 @@ if (document.readyState === 'loading') {
         <div class="rule-row" style="padding-bottom:4px"><strong style="color:var(--primary)">📍 Video Submission Time</strong></div>
         <div class="rule-row">ম্যাচ শেষের <span class="rh">১৫ মিনিটের মধ্যে</span> ভিডিও জমা দিতে হবে। নেটওয়ার্ক সমস্যায় Sending অবস্থার স্ক্রিনশট দিতে হবে।</div>
         <div class="rule-row"><span class="rl rl-red">⛔</span> ১৫ মিনিটের মধ্যে জমা না দিলে: Win Match হলে <span style="color:var(--red);font-weight:600">Rematch</span>; Draw Match হলে Opponent <span class="rh">১ গোল লিড</span> নিয়ে Rematch শুরু করবে। কোনো অজুহাত গ্রহণযোগ্য নয়।</div>
+        <div class="rule-row" style="padding-bottom:4px"><strong style="color:var(--primary)">📍 Video Submission Rule (Invalid/Incomplete Video)</strong></div>
+        <div class="rule-row">যদি কোনো খেলোয়াড় অসম্পূর্ণ (Incomplete) বা ভুল ভিডিও সাবমিট করে — অর্থাৎ ভিডিওতে ম্যাচ ভেরিফাই করার জন্য প্রয়োজনীয় অংশ সম্পূর্ণভাবে না থাকে — তাহলে সেই ভিডিও <span style="color:var(--red);font-weight:600">Invalid</span> হিসেবে গণ্য হবে। এরপর সিদ্ধান্ত হবে নিচের নিয়ম অনুযায়ী:</div>
+        <div class="rule-row">• যদি ওই খেলোয়াড় <span class="rh">Winning Position</span>-এ থাকে, তাহলে ম্যাচটি <span class="rh">Replay (Re-Match)</span> করতে হবে।</div>
+        <div class="rule-row">• যদি ম্যাচটি <span class="rh">Draw Position</span>-এ থাকে, তাহলে প্রতিপক্ষকে <span class="rh">১ গোল লিড</span> দিয়ে Replay (Re-Match) খেলতে হবে।</div>
+        <div class="rule-row">সকল খেলোয়াড়ের দায়িত্ব সম্পূর্ণ ও পরিষ্কার ভিডিও রেকর্ড করে সাবমিট করা। ভুল বা অসম্পূর্ণ ভিডিওর দায়ভার সম্পূর্ণভাবে সংশ্লিষ্ট খেলোয়াড়ের।</div>
       </div>
     </div>
 
@@ -2126,7 +2133,16 @@ if (document.readyState === 'loading') {
         <span class="rules-toggle">▼</span>
       </div>
       <div class="rules-body">
-        <div class="rule-row"><span style="color:var(--red);font-weight:600">🚫 Wall Formation সম্পূর্ণ নিষিদ্ধ।</span> প্রমাণিত হলে Opponent <span class="rh">+১ Goal Bonus</span> পাবে। শুধুমাত্র In-Game Default Formation ব্যবহার করা যাবে, Custom Formation নিষিদ্ধ।</div>
+        <div class="rule-row" style="display:block">
+          <div style="color:var(--red);font-weight:700;margin-bottom:6px">🚫 Wall Formation Rules</div>
+          <div>1. Wall Formation সম্পূর্ণ নিষিদ্ধ। কোনো খেলোয়াড় Wall Formation ব্যবহার করেছে বলে অফিসিয়াল যাচাইয়ে প্রমাণিত হলে, তার প্রতিপক্ষকে ১ গোল লিড দেওয়া হবে।</div>
+          <div>2. ৫ CB Allowed, তবে শুধুমাত্র গেমের ডিফল্ট (Default) Formation ব্যবহার করা যাবে। ৫ CB দিয়ে Custom Formation তৈরি করা সম্পূর্ণ নিষিদ্ধ।</div>
+          <div>3. কোনো খেলোয়াড় যদি ৫ CB দিয়ে Custom Formation ব্যবহার করে, তাহলে সেটিকে Wall Formation হিসেবে গণ্য করা হবে এবং শাস্তি প্রযোজ্য হবে।</div>
+          <div>4. ম্যাচ শুরুর পর যদি প্রতিপক্ষের Wall Formation নিয়ে অভিযোগ থাকে, তাহলে In-Game Time-এর প্রথম ১০ মিনিটের মধ্যে স্ক্রিনশট (SS) নিয়ে গ্রুপে অফিসিয়ালদের ট্যাগ করে আপিল করতে হবে।</div>
+          <div>5. In-Game Time ১০ মিনিট পার হয়ে গেলে ওই অভিযোগ গ্রহণ করা হবে না।</div>
+          <div>6. ম্যাচ চলাকালীন যদি কোনো খেলোয়াড় Formation পরিবর্তন করে Wall Formation ব্যবহার করে, তাহলে সঙ্গে সঙ্গে স্ক্রিনশট নিয়ে গ্রুপে অ্যাডমিন/অফিসিয়ালকে জানাতে হবে। দেরিতে করা অভিযোগ গ্রহণযোগ্য হবে না।</div>
+          <div>7. সকল অভিযোগের চূড়ান্ত সিদ্ধান্ত TYP Officials-এর যাচাই (Official Review) অনুযায়ী নেওয়া হবে।</div>
+        </div>
         <div class="rule-row" style="padding-bottom:4px"><strong style="color:var(--primary)">📍 Appeal Rule</strong></div>
         <div class="rule-row">ম্যাচ শুরুর প্রথম <span class="rh">০-১০ সেকেন্ডের মধ্যে</span> Pause দিয়ে ভিডিওসহ অভিযোগ করতে হবে। Half Time বা Full Time-এর পরে অভিযোগ গ্রহণযোগ্য হবে না।</div>
         <div class="rule-row">✅ <span class="rh">Double Defence</span> Allowed &nbsp;|&nbsp; ✅ <span class="rh">Double Attack</span> Allowed</div>
@@ -2159,6 +2175,8 @@ if (document.readyState === 'loading') {
         <div class="rule-row" style="padding-bottom:4px"><strong style="color:var(--primary)">📍 Inactive Rules</strong></div>
         <div class="rule-row">Fixed Time শেষ হওয়ার পর সর্বোচ্চ <span class="rh">২০ মিনিটের মধ্যে</span> Mention না করলে সংশ্লিষ্ট প্লেয়ারকে Inactive ধরা হবে।</div>
         <div class="rule-row"><span class="rl rl-red">★</span> Activity Record ও Mention যাচাই করে <strong>Admin Panel</strong> Auto Win-এর সিদ্ধান্ত দেবে — যা চূড়ান্ত।</div>
+        <div class="rule-row" style="padding-bottom:4px"><strong style="color:var(--primary)">📍 Auto Win Scoreline</strong></div>
+        <div class="rule-row">Auto Win নিশ্চিত হলে ম্যাচের ফলাফল সবসময় নির্ধারিত <span class="rh">৩-০ (3-0)</span> স্কোরলাইনে রেকর্ড করা হবে — অন্য কোনো স্কোর প্রযোজ্য নয়।</div>
       </div>
     </div>
 
@@ -8438,6 +8456,9 @@ Attendance Deadline: রাত ১২:০০ । Priority Time: রাত ১১
 🕐 3RD DEADLINE — রাত ১:০০
 Attendance Deadline: রাত ১:০০ । Priority Time: রাত ১২:৪৫ । Sub/Swap Deadline: রাত ১২:৪৪:৫৯ ।
 ⚠️ নির্ধারিত Substitution/Swap Deadline অতিক্রম করার পর কোনো Substitution বা Swap গ্রহণযোগ্য হবে না। সকল Manager এবং Captain-কে নির্ধারিত সময়সীমা মেনে চলতে হবে।
+
+📍 Priority Time Rule
+Priority Time-এ অপোনেন্টকে মেনশন করার পর যদি আপনি অ্যাক্টিভ থাকেন, তাহলে অবশ্যই ডেডলাইনের আগেই ম্যাচ সম্পন্ন করতে হবে। ডেডলাইন অতিক্রম হলে কোনো অতিরিক্ত সময় দেওয়া হবে না এবং ম্যাচ Auto Loss হিসেবে গণ্য হবে।
 🃏
 Substitution & Swap Card Rules
 ▼
@@ -8483,6 +8504,12 @@ Match Result Video Rules
 📍 Video Submission Time
 ম্যাচ শেষের ১৫ মিনিটের মধ্যে ভিডিও জমা দিতে হবে। নেটওয়ার্ক সমস্যায় Sending অবস্থার স্ক্রিনশট দিতে হবে।
 ⛔ ১৫ মিনিটের মধ্যে জমা না দিলে: Win Match হলে Rematch ; Draw Match হলে Opponent ১ গোল লিড নিয়ে Rematch শুরু করবে। কোনো অজুহাত গ্রহণযোগ্য নয়।
+
+📍 Video Submission Rule (Invalid/Incomplete Video)
+যদি কোনো খেলোয়াড় অসম্পূর্ণ (Incomplete) বা ভুল ভিডিও সাবমিট করে — অর্থাৎ ভিডিওতে ম্যাচ ভেরিফাই করার জন্য প্রয়োজনীয় অংশ সম্পূর্ণভাবে না থাকে — তাহলে সেই ভিডিও Invalid হিসেবে গণ্য হবে। এরপর সিদ্ধান্ত হবে নিচের নিয়ম অনুযায়ী:
+• যদি ওই খেলোয়াড় Winning Position-এ থাকে, তাহলে ম্যাচটি Replay (Re-Match) করতে হবে।
+• যদি ম্যাচটি Draw Position-এ থাকে, তাহলে প্রতিপক্ষকে ১ গোল লিড দিয়ে Replay (Re-Match) খেলতে হবে।
+সকল খেলোয়াড়ের দায়িত্ব সম্পূর্ণ ও পরিষ্কার ভিডিও রেকর্ড করে সাবমিট করা। ভুল বা অসম্পূর্ণ ভিডিওর দায়ভার সম্পূর্ণভাবে সংশ্লিষ্ট খেলোয়াড়ের।
 📡
 Match Exit / Disconnect Rules
 ▼
@@ -8522,7 +8549,14 @@ Card System
 🛡️
 Formation Rules
 ▼
-🚫 Wall Formation সম্পূর্ণ নিষিদ্ধ। প্রমাণিত হলে Opponent +১ Goal Bonus পাবে। শুধুমাত্র In-Game Default Formation ব্যবহার করা যাবে, Custom Formation নিষিদ্ধ।
+Wall Formation Rules
+1. Wall Formation সম্পূর্ণ নিষিদ্ধ। কোনো খেলোয়াড় Wall Formation ব্যবহার করেছে বলে অফিসিয়াল যাচাইয়ে প্রমাণিত হলে, তার প্রতিপক্ষকে ১ গোল লিড দেওয়া হবে।
+2. ৫ CB Allowed, তবে শুধুমাত্র গেমের ডিফল্ট (Default) Formation ব্যবহার করা যাবে। ৫ CB দিয়ে Custom Formation তৈরি করা সম্পূর্ণ নিষিদ্ধ।
+3. কোনো খেলোয়াড় যদি ৫ CB দিয়ে Custom Formation ব্যবহার করে, তাহলে সেটিকে Wall Formation হিসেবে গণ্য করা হবে এবং শাস্তি প্রযোজ্য হবে।
+4. ম্যাচ শুরুর পর যদি প্রতিপক্ষের Wall Formation নিয়ে অভিযোগ থাকে, তাহলে In-Game Time-এর প্রথম ১০ মিনিটের মধ্যে স্ক্রিনশট (SS) নিয়ে গ্রুপে অফিসিয়ালদের ট্যাগ করে আপিল করতে হবে।
+5. In-Game Time ১০ মিনিট পার হয়ে গেলে ওই অভিযোগ গ্রহণ করা হবে না।
+6. ম্যাচ চলাকালীন যদি কোনো খেলোয়াড় Formation পরিবর্তন করে Wall Formation ব্যবহার করে, তাহলে সঙ্গে সঙ্গে স্ক্রিনশট নিয়ে গ্রুপে অ্যাডমিন/অফিসিয়ালকে জানাতে হবে। দেরিতে করা অভিযোগ গ্রহণযোগ্য হবে না।
+7. সকল অভিযোগের চূড়ান্ত সিদ্ধান্ত TYP Officials-এর যাচাই (Official Review) অনুযায়ী নেওয়া হবে।
 📍 Appeal Rule
 ম্যাচ শুরুর প্রথম ০-১০ সেকেন্ডের মধ্যে Pause দিয়ে ভিডিওসহ অভিযোগ করতে হবে। Half Time বা Full Time-এর পরে অভিযোগ গ্রহণযোগ্য হবে না।
 ✅ Double Defence Allowed  |  ✅ Double Attack Allowed
@@ -8539,6 +8573,9 @@ Auto Win & Activity Rules
 📍 Inactive Rules
 Fixed Time শেষ হওয়ার পর সর্বোচ্চ ২০ মিনিটের মধ্যে Mention না করলে সংশ্লিষ্ট প্লেয়ারকে Inactive ধরা হবে।
 ★ Activity Record ও Mention যাচাই করে Admin Panel Auto Win-এর সিদ্ধান্ত দেবে — যা চূড়ান্ত।
+
+📍 Auto Win Scoreline
+Auto Win নিশ্চিত হলে ম্যাচের ফলাফল সবসময় নির্ধারিত ৩-০ (3-0) স্কোরলাইনে রেকর্ড করা হবে — অন্য কোনো স্কোর প্রযোজ্য নয়।
 📝
 Final Notes
 ▼
@@ -8618,6 +8655,10 @@ const TYP_FAQ = [
     answer: '🔄 Substitution & Swap Rules: প্রতিটা Match Day-তে খেলোয়াড়দের উপস্থিতি, Substitution ও Swap নির্ধারিত Deadline-এর মধ্যে সম্পন্ন করতে হবে। Deadline পার হলে কোনো Substitution/Swap গ্রহণযোগ্য হবে না।\n\n🎴 Card নিয়ম: প্রতি দলের কাছে প্রতি Match Day-তে ২টি Swap Card ও ২টি Substitution Card থাকে। Swap-এর জন্য "Typ: Swap Card" এবং Substitution-এর জন্য "Typ: Sub Card" ব্যবহার বাধ্যতামূলক। Card ব্যবহারের ৩ মিনিটের মধ্যে Cancel Request দেওয়া যায়, তারপর তা Final হয়ে যায়।'
   },
   {
+    keywords: ['priority time', 'প্রায়োরিটি', 'auto loss', 'অটো লস', 'মেনশন'],
+    answer: '⏱️ Priority Time Rule: Priority Time-এ অপোনেন্টকে মেনশন করার পর যদি আপনি অ্যাক্টিভ থাকেন, তাহলে অবশ্যই ডেডলাইনের আগেই ম্যাচ সম্পন্ন করতে হবে। ডেডলাইন অতিক্রম হলে কোনো অতিরিক্ত সময় দেওয়া হবে না এবং ম্যাচ Auto Loss হিসেবে গণ্য হবে।'
+  },
+  {
     keywords: ['manager conduct', 'penalty', 'জরিমানা', 'fine', 'অসদাচরণ'],
     answer: '⚠️ Manager Conduct & Penalty: সকল Manager-কে খেলোয়াড়দের সাথে সম্মানজনক আচরণ করতে হবে। অসদাচরণের প্রমাণসহ অভিযোগ প্রমাণিত হলে ২০ টাকা জরিমানা আরোপ করা হবে। গুরুতর বা পুনরাবৃত্ত ক্ষেত্রে Tournament Authority অতিরিক্ত ব্যবস্থা নিতে পারে — তাদের সিদ্ধান্তই চূড়ান্ত।'
   },
@@ -8631,7 +8672,7 @@ const TYP_FAQ = [
   },
   {
     keywords: ['video', 'ভিডিও', 'প্রমাণ', 'proof', 'submission', 'জমা'],
-    answer: '🎥 Match Result Video Rules:\n• বিজয়ী/ড্র উভয় প্লেয়ারকে ভিডিওতে দেখাতে হবে: Match Result, SMART Assist OFF, User ID, Device Name।\n• ম্যাচ শেষের ১৫ মিনিটের মধ্যে ভিডিও Match Day গ্রুপে জমা দিতে হবে (নেটওয়ার্ক সমস্যায় Sending screenshot দিতে হবে)।\n• Winner হলে শুধু Result Screenshot দিলেই হবে, ভিডিও লাগবে না — তবে Room Create তাকেই করতে হবে।\n• ১৫ মিনিটের মধ্যে জমা না দিলে: Win Match হলে Rematch; Draw হলে Opponent ১ গোল লিড নিয়ে Rematch শুরু করবে।'
+    answer: '🎥 Match Result Video Rules:\n• বিজয়ী/ড্র উভয় প্লেয়ারকে ভিডিওতে দেখাতে হবে: Match Result, SMART Assist OFF, User ID, Device Name।\n• ম্যাচ শেষের ১৫ মিনিটের মধ্যে ভিডিও Match Day গ্রুপে জমা দিতে হবে (নেটওয়ার্ক সমস্যায় Sending screenshot দিতে হবে)।\n• Winner হলে শুধু Result Screenshot দিলেই হবে, ভিডিও লাগবে না — তবে Room Create তাকেই করতে হবে।\n• ১৫ মিনিটের মধ্যে জমা না দিলে: Win Match হলে Rematch; Draw হলে Opponent ১ গোল লিড নিয়ে Rematch শুরু করবে।\n• অসম্পূর্ণ/ভুল (Invalid) ভিডিও সাবমিট করলে: Winning Position এ থাকলে Replay, Draw হলে Opponent ১ গোল লিড দিয়ে Replay। ভুল/অসম্পূর্ণ ভিডিওর দায়ভার সংশ্লিষ্ট খেলোয়াড়ের।'
   },
   {
     keywords: ['exit', 'disconnect', 'ডিসকানেক্ট', 'এক্সিট', 'বের হওয়া'],
@@ -8655,7 +8696,7 @@ const TYP_FAQ = [
   },
   {
     keywords: ['formation', 'ফরমেশন', 'wall', 'ওয়াল'],
-    answer: '⚽ Formation Rules: Wall Formation সম্পূর্ণ নিষিদ্ধ — প্রমাণিত হলে Opponent +১ Goal Bonus পাবে। শুধু In-Game Default Formation ব্যবহার করা যাবে, Custom Formation নিষিদ্ধ। Double Defence ও Double Attack Allowed। অভিযোগ থাকলে ম্যাচের প্রথম ০-১০ সেকেন্ডের মধ্যেই Pause দিয়ে ভিডিওসহ জানাতে হবে।'
+    answer: '⚽ Wall Formation Rules: Wall Formation সম্পূর্ণ নিষিদ্ধ — প্রমাণিত হলে প্রতিপক্ষকে ১ গোল লিড দেওয়া হবে। ৫ CB Allowed তবে শুধু Default Formation-এ, Custom Formation দিয়ে ৫ CB করলে সেটাও Wall Formation হিসেবে গণ্য হবে। অভিযোগ থাকলে In-Game Time-এর প্রথম ১০ মিনিটের মধ্যে স্ক্রিনশটসহ গ্রুপে অফিসিয়ালদের জানাতে হবে, দেরি হলে গ্রহণযোগ্য হবে না। চূড়ান্ত সিদ্ধান্ত TYP Officials-এর Review অনুযায়ী হবে।'
   },
   {
     keywords: ['backpass', 'ব্যাকপাস'],
@@ -8663,7 +8704,7 @@ const TYP_FAQ = [
   },
   {
     keywords: ['auto win', 'mention', 'মেনশন', 'activity', 'inactive', 'ইনঅ্যাক্টিভ'],
-    answer: '⏱️ Auto Win & Activity Rules: Priority Time-এর মধ্যে অপোনেন্টকে কমপক্ষে ২ বার Mention করতে হবে (প্রতি Mention-এর মাঝে ন্যূনতম ২ মিনিট ব্যবধান)। ২ বারের কম Mention হলে এক্সটা ৫ মিনিট দেওয়া হয়; সেই সময়েও সাড়া না পেলে Auto Win আবেদনযোগ্য। Fixed Time শেষের ২০ মিনিটের মধ্যে Mention না করলে প্লেয়ারকে Inactive ধরা হবে। চূড়ান্ত সিদ্ধান্ত Admin Panel-এর।'
+    answer: '⏱️ Auto Win & Activity Rules: Priority Time-এর মধ্যে অপোনেন্টকে কমপক্ষে ২ বার Mention করতে হবে (প্রতি Mention-এর মাঝে ন্যূনতম ২ মিনিট ব্যবধান)। ২ বারের কম Mention হলে এক্সটা ৫ মিনিট দেওয়া হয়; সেই সময়েও সাড়া না পেলে Auto Win আবেদনযোগ্য। Fixed Time শেষের ২০ মিনিটের মধ্যে Mention না করলে প্লেয়ারকে Inactive ধরা হবে। Auto Win নিশ্চিত হলে ফলাফল সবসময় ৩-০ (3-0) স্কোরলাইনে রেকর্ড হবে। চূড়ান্ত সিদ্ধান্ত Admin Panel-এর।'
   },
   {
     keywords: ['রুলস', 'rule', 'rules', 'নিয়মাবলী', 'নিয়ম কি'],
