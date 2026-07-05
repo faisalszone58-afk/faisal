@@ -1880,6 +1880,25 @@ if (document.readyState === 'loading') {
 
     <!-- Rules sections -->
 
+    <!-- 0 -->
+    <div class="rules-section" id="rs0">
+      <div class="rules-header" onclick="toggleRule(this)">
+        <span style="font-size:1.2rem">🎮</span>
+        <span class="rules-title">TYP Room Create Rules</span>
+        <span class="rules-toggle">▼</span>
+      </div>
+      <div class="rules-body">
+        <div class="rule-row">Match Type: <span class="rh">Standard</span></div>
+        <div class="rule-row">Match Time: <span class="rh">8 Minutes</span></div>
+        <div class="rule-row">Injury Time: <span class="rh">ON</span></div>
+        <div class="rule-row">Penalty: <span class="rh">OFF</span></div>
+        <div class="rule-row">Extra Time: <span class="rh">OFF</span></div>
+        <div class="rule-row">Substitutions: <span class="rh">5/5</span></div>
+        <div class="rule-row">Player Condition: <span class="rh">Normal</span></div>
+        <div class="rule-row">Smart Assist: <span class="rh">OFF</span></div>
+      </div>
+    </div>
+
     <!-- 1 -->
     <div class="rules-section" id="rs1">
       <div class="rules-header" onclick="toggleRule(this)">
@@ -2204,6 +2223,26 @@ if (document.readyState === 'loading') {
       </div>
       <div class="rules-body">
         <div class="rule-row"><strong style="color:var(--red)">সকল অভিযোগ, প্রমাণ, শাস্তি, Auto Win, Rematch ও Card সংক্রান্ত বিষয়ে Admin Panel-এর সিদ্ধান্তই চূড়ান্ত</strong> এবং সর্বশেষ সিদ্ধান্ত হিসেবে গণ্য হবে।</div>
+      </div>
+    </div>
+
+    <!-- 20 -->
+    <div class="rules-section collapsed" id="rs20">
+      <div class="rules-header" onclick="toggleRule(this)">
+        <span style="font-size:1.2rem">🎮</span>
+        <span class="rules-title">TYP Room Create Rules</span>
+        <span class="rules-toggle">▼</span>
+      </div>
+      <div class="rules-body">
+        <div class="rule-row">Room Create করার সময় নিচের সেটিংসগুলো অবশ্যই ব্যবহার করতে হবে — কোনো ভিন্নতা গ্রহণযোগ্য নয়:</div>
+        <div class="rule-row">🎯 Match Type: <span class="rh">Standard</span></div>
+        <div class="rule-row">⏱️ Match Time: <span class="rh">8 Minutes</span></div>
+        <div class="rule-row">🩹 Injury Time: <span class="rh">ON</span></div>
+        <div class="rule-row">⚽ Penalty: <span class="rh">OFF</span></div>
+        <div class="rule-row">➕ Extra Time: <span class="rh">OFF</span></div>
+        <div class="rule-row">🔄 Substitutions: <span class="rh">5/5</span></div>
+        <div class="rule-row">🏃 Player Condition: <span class="rh">Normal</span></div>
+        <div class="rule-row">🧠 Smart Assist: <span class="rh">OFF</span></div>
       </div>
     </div>
 
@@ -8427,6 +8466,16 @@ function showPage(name) {
 // 📌 এখানে তোমার FAQ গুলো keywords সহ লেখো। যত বেশি keyword দিবে, bot তত ভালোভাবে মিল খুঁজে পাবে।
 // নতুন প্রশ্ন/উত্তর যোগ করতে চাইলে নিচের array-তে নতুন { keywords: [...], answer: "..." } object যোগ করো।
 const TYP_FULL_RULES_TEXT = `
+🎮
+TYP Room Create Rules
+Match Type: Standard
+Match Time: 8 Minutes
+Injury Time: ON
+Penalty: OFF
+Extra Time: OFF
+Substitutions: 5/5
+Player Condition: Normal
+Smart Assist: OFF
 OFFICIAL DOCUMENT
 TYP AUCTION TOURNAMENT
 RULES & REGULATIONS
@@ -8592,6 +8641,10 @@ CHAMPIONSHIP — PRESENT
 `;
 
 const TYP_FAQ = [
+  {
+    keywords: ['room create', 'room settings', 'রুম', 'match type', 'match settings', 'injury time', 'smart assist', 'game settings'],
+    answer: '🎮 TYP Room Create Rules:\n• Match Type: Standard\n• Match Time: 8 Minutes\n• Injury Time: ON\n• Penalty: OFF\n• Extra Time: OFF\n• Substitutions: 5/5\n• Player Condition: Normal\n• Smart Assist: OFF'
+  },
   {
     keywords: ['point', 'পয়েন্ট', 'পয়েন্ট সিস্টেম', 'win', 'জিত', '৩ পয়েন্ট', 'draw', 'ড্র'],
     answer: 'TYP-এর League ম্যাচে পয়েন্ট সিস্টেম:\n• প্রতিটা bout (1v1) জিতলে = 3 পয়েন্ট\n• Draw হলে = উভয় দল 1 পয়েন্ট করে\n• হারলে = 0 পয়েন্ট\nMatchday summary card-এ এই মোট পয়েন্ট দেখানো হয়।'
