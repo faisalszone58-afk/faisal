@@ -1094,6 +1094,7 @@ if (document.readyState === 'loading') {
     <button class="nav-btn" onclick="showPage('friendly')" style="color:var(--green);border-color:rgba(0,230,118,0.3)">🤝 Friendly</button>
     <button class="nav-btn" onclick="showPage('tournament')" style="color:var(--gold);border-color:rgba(124,92,252,0.4)">🏟️ Tournament</button>
     <button class="nav-btn" onclick="showPage('rules')" style="color:var(--red);border-color:rgba(220,38,38,0.3)">📋 Rules</button>
+    <button class="nav-btn" onclick="showPage('uidchange')" style="color:var(--yellow);border-color:rgba(251,191,36,0.35)">🆔 UID/Device</button>
     <button class="nav-btn" onclick="showPage('admin')" style="color:var(--primary);border-color:rgba(124,92,252,0.4)">🛡️ Admin</button>
   </div>
 </nav>
@@ -2294,6 +2295,7 @@ if (document.readyState === 'loading') {
         <div class="admin-tab" onclick="switchAdminTab('tournament')">🏟️ Tournament</div>
         <div class="admin-tab" onclick="switchAdminTab('notice')">📢 Notice</div>
         <div class="admin-tab" onclick="switchAdminTab('boutdraw')">🎲 Bout Draw</div>
+        <div class="admin-tab" onclick="switchAdminTab('uidchange')">🆔 UID/Device Change <span id="pendingUidChangeCount" style="background:var(--red);color:#fff;border-radius:10px;padding:1px 6px;font-size:11px;margin-left:4px">0</span></div>
         <div class="admin-tab" onclick="switchAdminTab('aiqa')">🤖 AI Bot <span id="aiqaUnansweredCount" style="background:var(--red);color:#fff;border-radius:10px;padding:1px 6px;font-size:11px;margin-left:4px;display:none">0</span></div>
       </div>
 
@@ -2526,6 +2528,16 @@ if (document.readyState === 'loading') {
         <div id="resultRequestsList"><div style="color:var(--text3);padding:20px;text-align:center">Loading...</div></div>
       </div>
 
+      <!-- UID/DEVICE CHANGE ADMIN TAB -->
+      <div class="admin-section" id="adminTab-uidchange">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">
+          <div style="font-size:15px;font-weight:700;color:var(--yellow)">🆔 UID / Device Change Appeals</div>
+          <button class="btn btn-outline" onclick="loadUidChangeAppeals()">🔄 Refresh</button>
+        </div>
+        <p style="font-size:12px;color:var(--text3);margin-bottom:20px">Player নিজে UID/Device change এর জন্য appeal করে। Admin Approve করলে confirmation card download করে Messenger group এ post করা যাবে।</p>
+        <div id="uidChangeAppealsList"><div style="color:var(--text3);padding:20px;text-align:center">Loading...</div></div>
+      </div>
+
     </div>
   </div>
 </div>
@@ -2654,6 +2666,95 @@ if (document.readyState === 'loading') {
     <div class="tab-content" id="ftab-myrequests" style="padding-top:20px">
       <div id="myRequestsList"></div>
     </div>
+  </div>
+</div>
+
+<!-- ═══════════════ UID / DEVICE CHANGE APPEAL PAGE ═══════════════ -->
+<div class="page" id="page-uidchange">
+  <div class="section">
+    <div class="section-title" style="color:var(--yellow)">🆔 UID / Device Change Appeal</div>
+    <div class="section-sub">// UID অথবা Device পরিবর্তন করলে এখানে appeal জমা দাও • Admin verify করবে</div>
+
+    <div class="tabs" style="margin-bottom:0">
+      <button class="tab-btn active" onclick="switchUidChangeTab('apply')">📝 Appeal Form</button>
+      <button class="tab-btn" onclick="switchUidChangeTab('mystatus')">📋 My Appeals</button>
+    </div>
+
+    <!-- APPEAL FORM TAB -->
+    <div class="tab-content active" id="uidtab-apply" style="padding-top:20px">
+      <div style="max-width:560px;margin:0 auto">
+
+        <!-- STEP A: Select Player -->
+        <div class="card" id="uidStep1Card" style="border-color:rgba(251,191,36,0.35);margin-bottom:16px">
+          <div style="font-size:15px;font-weight:700;color:var(--yellow);margin-bottom:14px">🔍 STEP 1 — নিজের Player Profile খোঁজো</div>
+          <div style="display:flex;gap:8px">
+            <input type="text" class="form-input" id="uidPlayerSearchInput" placeholder="Name বা @username লিখো..." oninput="searchUidChangePlayerLive()" style="flex:1">
+            <button class="btn" style="background:rgba(251,191,36,0.15);border:1px solid var(--yellow);color:var(--yellow);padding:10px 16px;border-radius:8px;font-weight:700;cursor:pointer;white-space:nowrap" onclick="searchUidChangePlayerLive()">🔍</button>
+          </div>
+          <div id="uidPlayerSearchResults" style="margin-top:10px"></div>
+        </div>
+
+        <!-- STEP B: Appeal Details -->
+        <div class="card" id="uidStep2Card" style="border-color:rgba(124,111,224,0.35);display:none">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+            <div style="font-size:15px;font-weight:700;color:var(--cyan)">📝 STEP 2 — Appeal Details দাও</div>
+            <span style="font-size:12px;color:var(--text3);cursor:pointer" onclick="clearUidChangeSelection()">← Back</span>
+          </div>
+          <div id="uidPlayerSelectedPreview" style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--bg3);border-radius:8px;margin-bottom:16px"></div>
+
+          <div class="alert alert-error" id="uidChangeError"></div>
+          <div class="alert alert-success" id="uidChangeSuccess"></div>
+
+          <div style="font-size:13px;font-weight:700;color:var(--yellow);margin-bottom:10px">🆔 UID পরিবর্তন</div>
+          <div class="match-add-grid" style="margin-bottom:6px">
+            <div class="form-group">
+              <label class="form-label">Old UID</label>
+              <input type="text" class="form-input" id="uidOldUid" placeholder="আগের UID">
+            </div>
+            <div class="form-group">
+              <label class="form-label">New UID</label>
+              <input type="text" class="form-input" id="uidNewUid" placeholder="নতুন UID">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">UID পরিবর্তনের কারণ</label>
+            <textarea class="form-input" id="uidUidReason" rows="2" placeholder="কেন UID change করলে লিখো..." style="resize:vertical;font-family:'Inter',sans-serif"></textarea>
+          </div>
+
+          <div style="height:1px;background:var(--border);margin:16px 0"></div>
+
+          <div style="font-size:13px;font-weight:700;color:var(--cyan);margin-bottom:10px">📱 Device পরিবর্তন</div>
+          <div class="match-add-grid" style="margin-bottom:6px">
+            <div class="form-group">
+              <label class="form-label">Old Device</label>
+              <input type="text" class="form-input" id="uidOldDevice" placeholder="আগের Device (যেমন: iPhone 11)">
+            </div>
+            <div class="form-group">
+              <label class="form-label">New Device</label>
+              <input type="text" class="form-input" id="uidNewDevice" placeholder="নতুন Device">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Device পরিবর্তনের কারণ</label>
+            <textarea class="form-input" id="uidDeviceReason" rows="2" placeholder="কেন Device change করলে লিখো..." style="resize:vertical;font-family:'Inter',sans-serif"></textarea>
+          </div>
+
+          <button class="btn btn-gold" style="width:100%;margin-top:12px;background:linear-gradient(135deg,#fbbf24,#c9a84c);color:#1a1502" onclick="submitUidChangeAppeal()">📤 Appeal Submit করো (Admin Approval)</button>
+          <p style="font-size:11px;color:var(--text3);text-align:center;margin-top:10px">⚠️ সঠিক তথ্য দাও। ভুল তথ্য দিলে appeal reject হতে পারে।</p>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- MY APPEALS STATUS TAB -->
+    <div class="tab-content" id="uidtab-mystatus" style="padding-top:20px">
+      <div style="max-width:560px;margin:0 auto 16px">
+        <input type="text" class="form-input" id="uidMyStatusSearch" placeholder="🔍 নিজের Name লিখে search করো..." oninput="if(event.key==='Enter'||event.type==='input'){}" style="width:100%">
+        <button class="btn btn-outline" style="width:100%;margin-top:8px" onclick="loadMyUidChangeAppeals()">🔍 আমার Appeals দেখাও</button>
+      </div>
+      <div id="uidMyStatusList"></div>
+    </div>
+
   </div>
 </div>
 
@@ -5285,6 +5386,377 @@ async function updateFriendlyStats(playerName, gf, ga, result) {
     pts: (existing.pts||0) + (result==='w'?3:result==='d'?1:0)
   };
   await fetch(`https://typ-championship-default-rtdb.firebaseio.com/friendlyStats/${statsKey}.json`, { method: 'PUT', body: JSON.stringify(updated) });
+}
+
+// ════════════════════════════════════════════════════════
+// UID / DEVICE CHANGE APPEAL SYSTEM
+// ════════════════════════════════════════════════════════
+const UIDCHG_DB = 'https://typ-championship-default-rtdb.firebaseio.com';
+let selectedUidChangePlayer = null;
+
+window.switchUidChangeTab = function(tab) {
+  document.querySelectorAll('#page-uidchange .tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('#page-uidchange .tab-content').forEach(c => c.classList.remove('active'));
+  const idx = tab === 'apply' ? 0 : 1;
+  document.querySelectorAll('#page-uidchange .tab-btn')[idx].classList.add('active');
+  document.getElementById('uidtab-' + tab).classList.add('active');
+  if (tab === 'mystatus') loadMyUidChangeAppeals();
+};
+
+// ── Player Search (Step 1) ──
+window.searchUidChangePlayerLive = async function() {
+  const q = document.getElementById('uidPlayerSearchInput').value.trim().toLowerCase();
+  const container = document.getElementById('uidPlayerSearchResults');
+  if (q.length < 1) { container.innerHTML = ''; return; }
+  container.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:8px">🔄 Loading players...</div>';
+  const allUsers = await getAllUsers();
+  window._allUsersCache = allUsers;
+  const filtered = allUsers.filter(p =>
+    (p.name||'').toLowerCase().includes(q) || (p.username||'').toLowerCase().includes(q)
+  ).slice(0, 8);
+  if (!filtered.length) {
+    container.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:8px">❌ কোনো player পাওয়া যায়নি।</div>';
+    return;
+  }
+  container.innerHTML = filtered.map(p => `
+    <div onclick="selectUidChangePlayer('${p.uid}')" style="display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:8px;border:1px solid var(--border);margin-bottom:6px;cursor:pointer;background:var(--bg3);transition:all 0.15s" onmouseover="this.style.borderColor='var(--yellow)'" onmouseout="this.style.borderColor='var(--border)'">
+      <div style="width:38px;height:38px;border-radius:50%;background:var(--bg2);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:16px;overflow:hidden;flex-shrink:0">
+        ${p.avatarUrl ? `<img src="${p.avatarUrl}" style="width:100%;height:100%;object-fit:cover">` : '🎮'}
+      </div>
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:700;font-size:14px;color:var(--text)">${p.name||'—'} <span style="color:var(--text3);font-weight:400;font-size:12px">@${p.username||'—'}</span></div>
+        <div style="font-size:11px;color:var(--text3)">🏟️ ${p.club||'—'} • 📍 ${p.district||'—'}</div>
+      </div>
+      <div style="font-size:13px;color:var(--yellow)">➜ Select</div>
+    </div>
+  `).join('');
+};
+
+window.selectUidChangePlayer = function(uid) {
+  const p = (window._allUsersCache||[]).find(x => x.uid === uid);
+  if (!p) return;
+  selectedUidChangePlayer = p;
+  document.getElementById('uidPlayerSelectedPreview').innerHTML = `
+    <div style="width:36px;height:36px;border-radius:50%;background:var(--bg2);border:2px solid var(--yellow);display:flex;align-items:center;justify-content:center;font-size:16px;overflow:hidden;flex-shrink:0">
+      ${p.avatarUrl ? `<img src="${p.avatarUrl}" style="width:100%;height:100%;object-fit:cover">` : '🎮'}
+    </div>
+    <div style="flex:1;min-width:0">
+      <div style="font-weight:700;font-size:14px;color:var(--yellow)">${p.name||'—'} <span style="color:var(--text3);font-weight:400;font-size:12px">@${p.username||'—'}</span></div>
+      <div style="font-size:11px;color:var(--text3)">🏟️ ${p.club||'—'}</div>
+    </div>
+  `;
+  document.getElementById('uidPlayerSearchInput').value = '';
+  document.getElementById('uidPlayerSearchResults').innerHTML = '';
+  document.getElementById('uidStep1Card').style.display = 'none';
+  document.getElementById('uidStep2Card').style.display = 'block';
+};
+
+window.clearUidChangeSelection = function() {
+  selectedUidChangePlayer = null;
+  document.getElementById('uidStep1Card').style.display = 'block';
+  document.getElementById('uidStep2Card').style.display = 'none';
+  ['uidPlayerSearchInput','uidOldUid','uidNewUid','uidUidReason','uidOldDevice','uidNewDevice','uidDeviceReason'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = '';
+  });
+  document.getElementById('uidPlayerSearchResults').innerHTML = '';
+  document.getElementById('uidChangeError').classList.remove('show');
+  document.getElementById('uidChangeSuccess').classList.remove('show');
+};
+
+// ── Submit Appeal ──
+window.submitUidChangeAppeal = async function() {
+  const errEl = document.getElementById('uidChangeError');
+  const sucEl = document.getElementById('uidChangeSuccess');
+  errEl.classList.remove('show'); sucEl.classList.remove('show');
+
+  if (!selectedUidChangePlayer) { errEl.textContent = '❌ প্রথমে নিজের Player Profile select করো।'; errEl.classList.add('show'); return; }
+
+  const oldUid = document.getElementById('uidOldUid').value.trim();
+  const newUid = document.getElementById('uidNewUid').value.trim();
+  const uidReason = document.getElementById('uidUidReason').value.trim();
+  const oldDevice = document.getElementById('uidOldDevice').value.trim();
+  const newDevice = document.getElementById('uidNewDevice').value.trim();
+  const deviceReason = document.getElementById('uidDeviceReason').value.trim();
+
+  const hasUidChange = oldUid || newUid;
+  const hasDeviceChange = oldDevice || newDevice;
+  if (!hasUidChange && !hasDeviceChange) {
+    errEl.textContent = '❌ অন্তত UID অথবা Device পরিবর্তনের তথ্য দাও।'; errEl.classList.add('show'); return;
+  }
+  if (hasUidChange && (!oldUid || !newUid || !uidReason)) {
+    errEl.textContent = '❌ UID change করলে Old UID, New UID ও কারণ — সব দিতে হবে।'; errEl.classList.add('show'); return;
+  }
+  if (hasDeviceChange && (!oldDevice || !newDevice || !deviceReason)) {
+    errEl.textContent = '❌ Device change করলে Old Device, New Device ও কারণ — সব দিতে হবে।'; errEl.classList.add('show'); return;
+  }
+
+  const p = selectedUidChangePlayer;
+  const appealData = {
+    playerUid: p.uid, playerName: p.name || '—', playerAvatar: p.avatarUrl || '', playerClub: p.club || '—',
+    oldUid: oldUid || '', newUid: newUid || '', uidChangeReason: uidReason || '',
+    oldDevice: oldDevice || '', newDevice: newDevice || '', deviceChangeReason: deviceReason || '',
+    status: 'pending', createdAt: new Date().toISOString()
+  };
+
+  try {
+    const res = await fetch(`${UIDCHG_DB}/uidDeviceAppeals.json`, { method: 'POST', body: JSON.stringify(appealData) });
+    if (!res.ok) throw new Error('save failed');
+    const _submitTime = new Date(appealData.createdAt).toLocaleString([], {dateStyle:'medium', timeStyle:'short'});
+    sucEl.textContent = `✅ Appeal submit হয়েছে (${_submitTime})! Admin review করবে।`; sucEl.classList.add('show');
+    setTimeout(() => { clearUidChangeSelection(); sucEl.classList.remove('show'); }, 2500);
+  } catch(e) {
+    errEl.textContent = '❌ Submit করতে সমস্যা হয়েছে। আবার চেষ্টা করো।'; errEl.classList.add('show');
+  }
+};
+
+// ── My Appeals (public status check) ──
+window.loadMyUidChangeAppeals = async function() {
+  const q = (document.getElementById('uidMyStatusSearch').value || '').trim().toLowerCase();
+  const container = document.getElementById('uidMyStatusList');
+  container.innerHTML = '<div class="text-center" style="padding:30px"><span class="spinner"></span></div>';
+  try {
+    const res = await fetch(`${UIDCHG_DB}/uidDeviceAppeals.json`);
+    const data = await res.json();
+    if (!data) { container.innerHTML = '<div style="color:var(--text3);padding:20px;text-align:center">কোনো appeal নেই।</div>'; return; }
+    let list = Object.entries(data).map(([id, v]) => ({ id, ...v }));
+    if (q) list = list.filter(r => (r.playerName||'').toLowerCase().includes(q));
+    list.sort((a,b) => (b.createdAt||'').localeCompare(a.createdAt||''));
+    if (!list.length) { container.innerHTML = '<div style="color:var(--text3);padding:20px;text-align:center">কোনো appeal পাওয়া যায়নি।</div>'; return; }
+    container.innerHTML = list.map(renderUidChangeCard).join('');
+  } catch(e) {
+    container.innerHTML = '<div style="color:var(--red);padding:20px">❌ Error loading appeals.</div>';
+  }
+};
+
+function renderUidChangeCard(r) {
+  const statusColor = r.status === 'approved' ? 'var(--green)' : r.status === 'rejected' ? 'var(--red)' : 'var(--yellow)';
+  const statusLabel = r.status === 'approved' ? 'Approved' : r.status === 'rejected' ? 'Rejected' : 'Pending';
+  return `<div class="player-admin-card" style="flex-direction:column;align-items:flex-start;gap:10px;border-color:rgba(251,191,36,0.25);margin-bottom:12px">
+    <div style="display:flex;align-items:center;gap:12px;width:100%;flex-wrap:wrap">
+      <div style="width:40px;height:40px;border-radius:50%;background:var(--bg3);border:2px solid rgba(251,191,36,0.35);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0">
+        ${r.playerAvatar ? `<img src="${r.playerAvatar}" style="width:100%;height:100%;object-fit:cover">` : '🎮'}
+      </div>
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:700;font-size:14px">${r.playerName||'—'} <span style="color:var(--text3);font-weight:400;font-size:12px">(${r.playerClub||'—'})</span></div>
+        <div style="font-size:11px;color:var(--text3);margin-top:2px">📅 ${new Date(r.createdAt||Date.now()).toLocaleDateString()} • 🕐 ${new Date(r.createdAt||Date.now()).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</div>
+      </div>
+      <span style="font-size:12px;font-weight:700;color:${statusColor};padding:3px 10px;border-radius:20px;border:1px solid ${statusColor};background:${statusColor}22">${statusLabel}</span>
+    </div>
+    ${r.oldUid || r.newUid ? `<div style="font-size:12px;color:var(--text2)">🆔 UID: <span style="color:var(--text3)">${r.oldUid||'—'}</span> ➜ <span style="color:var(--yellow);font-weight:600">${r.newUid||'—'}</span>${r.uidChangeReason ? ` • "${r.uidChangeReason}"` : ''}</div>` : ''}
+    ${r.oldDevice || r.newDevice ? `<div style="font-size:12px;color:var(--text2)">📱 Device: <span style="color:var(--text3)">${r.oldDevice||'—'}</span> ➜ <span style="color:var(--cyan);font-weight:600">${r.newDevice||'—'}</span>${r.deviceChangeReason ? ` • "${r.deviceChangeReason}"` : ''}</div>` : ''}
+    ${r.adminNote ? `<div style="font-size:11px;color:var(--text3)">📝 Admin Note: ${r.adminNote}</div>` : ''}
+  </div>`;
+}
+
+// ── ADMIN: Load & Manage Appeals ──
+window.loadUidChangeAppeals = async function() {
+  const container = document.getElementById('uidChangeAppealsList');
+  container.innerHTML = '<div class="text-center" style="padding:30px"><span class="spinner"></span></div>';
+  try {
+    const res = await fetch(`${UIDCHG_DB}/uidDeviceAppeals.json`);
+    const data = await res.json();
+    if (!data) {
+      container.innerHTML = '<div style="color:var(--text3);padding:20px;text-align:center">কোনো appeal নেই।</div>';
+      document.getElementById('pendingUidChangeCount').textContent = '0';
+      return;
+    }
+    window._uidAppealsCache = Object.entries(data).map(([id, v]) => ({ id, ...v }));
+    window._uidAppealsCache.sort((a,b) => (b.createdAt||'').localeCompare(a.createdAt||''));
+    const pendingCount = window._uidAppealsCache.filter(r => r.status === 'pending').length;
+    document.getElementById('pendingUidChangeCount').textContent = pendingCount;
+    container.innerHTML = window._uidAppealsCache.map(r => {
+      const statusColor = r.status === 'approved' ? 'var(--green)' : r.status === 'rejected' ? 'var(--red)' : 'var(--yellow)';
+      const statusLabel = r.status === 'approved' ? 'Approved' : r.status === 'rejected' ? 'Rejected' : 'Pending';
+      return `<div class="player-admin-card" style="flex-direction:column;align-items:flex-start;gap:10px;border-color:rgba(251,191,36,0.25)">
+        <div style="display:flex;align-items:center;gap:12px;width:100%;flex-wrap:wrap">
+          <div style="width:40px;height:40px;border-radius:50%;background:var(--bg3);border:2px solid rgba(251,191,36,0.35);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0">
+            ${r.playerAvatar ? `<img src="${r.playerAvatar}" style="width:100%;height:100%;object-fit:cover">` : '🎮'}
+          </div>
+          <div style="flex:1;min-width:0">
+            <div style="font-weight:700;font-size:14px">${r.playerName||'—'} <span style="color:var(--text3);font-weight:400;font-size:12px">(${r.playerClub||'—'})</span></div>
+            <div style="font-size:11px;color:var(--text3);margin-top:2px">📅 ${new Date(r.createdAt||Date.now()).toLocaleDateString()} • 🕐 ${new Date(r.createdAt||Date.now()).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</div>
+          </div>
+          <span style="font-size:12px;font-weight:700;color:${statusColor};padding:3px 10px;border-radius:20px;border:1px solid ${statusColor};background:${statusColor}22">${statusLabel}</span>
+        </div>
+        ${r.oldUid || r.newUid ? `<div style="font-size:12px;color:var(--text2)">🆔 UID: <span style="color:var(--text3)">${r.oldUid||'—'}</span> ➜ <span style="color:var(--yellow);font-weight:600">${r.newUid||'—'}</span>${r.uidChangeReason ? `<br><span style="color:var(--text3)">কারণ: ${r.uidChangeReason}</span>` : ''}</div>` : ''}
+        ${r.oldDevice || r.newDevice ? `<div style="font-size:12px;color:var(--text2)">📱 Device: <span style="color:var(--text3)">${r.oldDevice||'—'}</span> ➜ <span style="color:var(--cyan);font-weight:600">${r.newDevice||'—'}</span>${r.deviceChangeReason ? `<br><span style="color:var(--text3)">কারণ: ${r.deviceChangeReason}</span>` : ''}</div>` : ''}
+        <div style="display:flex;gap:8px;flex-wrap:wrap;width:100%">
+          <input type="text" class="form-input" id="uidAdminNote_${r.id}" placeholder="Admin note (optional)" value="${r.adminNote||''}" style="flex:1;min-width:160px;font-size:12px;padding:7px 10px">
+          <button class="btn-admin-edit" id="uidDownloadBtn_${r.id}" style="background:rgba(124,111,224,0.12);border-color:var(--primary);color:var(--primary)" onclick="downloadUidChangeCard('${r.id}')">⬇ Card</button>
+          ${r.status === 'pending' ? `
+          <button class="btn-admin-edit" style="background:rgba(0,230,118,0.1);border-color:var(--green);color:var(--green)" onclick="updateUidChangeStatus('${r.id}','approved')">✅ Approve</button>
+          <button class="btn-admin-del" onclick="updateUidChangeStatus('${r.id}','rejected')">❌ Reject</button>
+          ` : `<button class="btn-admin-del" onclick="deleteUidChangeAppeal('${r.id}')">🗑️ Delete</button>`}
+        </div>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    container.innerHTML = '<div style="color:var(--red);padding:20px">❌ Error loading appeals.</div>';
+  }
+};
+
+window.updateUidChangeStatus = async function(id, status) {
+  const note = document.getElementById('uidAdminNote_' + id)?.value.trim() || '';
+  await fetch(`${UIDCHG_DB}/uidDeviceAppeals/${id}.json`, {
+    method: 'PATCH',
+    body: JSON.stringify({ status, adminNote: note, processedAt: new Date().toISOString() })
+  });
+  loadUidChangeAppeals();
+};
+
+window.deleteUidChangeAppeal = async function(id) {
+  if (!confirm('এই appeal delete করতে চাও?')) return;
+  await fetch(`${UIDCHG_DB}/uidDeviceAppeals/${id}.json`, { method: 'DELETE' });
+  loadUidChangeAppeals();
+};
+
+// ── Download Confirmation Card (PNG) — for Messenger group ──
+window.downloadUidChangeCard = async function(id) {
+  const r = (window._uidAppealsCache||[]).find(x => x.id === id);
+  if (!r) return;
+  const btn = document.getElementById('uidDownloadBtn_' + id);
+  const origText = btn.innerHTML;
+  btn.innerHTML = '⏳...'; btn.disabled = true;
+
+  const W = 800, H = 1000;
+  const canvas = document.createElement('canvas');
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext('2d');
+
+  const avatarImg = await new Promise(resolve => {
+    if (!r.playerAvatar) { resolve(null); return; }
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => resolve(img);
+    img.onerror = () => resolve(null);
+    img.src = r.playerAvatar;
+  });
+  const typLogoImg = await new Promise(resolve => {
+    if (!window.TYP_LOGO_DATA) { resolve(null); return; }
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = () => resolve(null);
+    img.src = window.TYP_LOGO_DATA;
+  });
+
+  // Background
+  const bg = ctx.createLinearGradient(0, 0, 0, H);
+  bg.addColorStop(0, '#16132e'); bg.addColorStop(1, '#0e0c1a');
+  ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
+
+  // Top accent bar
+  const topBar = ctx.createLinearGradient(0, 0, W, 0);
+  topBar.addColorStop(0, '#fbbf24'); topBar.addColorStop(1, '#7c6fe0');
+  ctx.fillStyle = topBar; ctx.fillRect(0, 0, W, 8);
+
+  // Logo + Title
+  if (typLogoImg) {
+    const lh = 56;
+    const lw = typLogoImg.width * (lh / typLogoImg.height);
+    ctx.save();
+    ctx.filter = 'brightness(0) invert(1)';
+    ctx.drawImage(typLogoImg, 36, 32, lw, lh);
+    ctx.restore();
+  }
+  ctx.textAlign = 'right'; ctx.textBaseline = 'top';
+  ctx.fillStyle = '#fbbf24';
+  ctx.font = 'bold 22px Arial, sans-serif';
+  ctx.fillText('🆔 UID / DEVICE CHANGE', W - 36, 40);
+  ctx.font = 'bold 30px Arial, sans-serif';
+  const statusLabel = r.status === 'approved' ? '✅ APPROVED' : r.status === 'rejected' ? '❌ REJECTED' : '⏳ PENDING';
+  const statusColor = r.status === 'approved' ? '#34d399' : r.status === 'rejected' ? '#f87171' : '#fbbf24';
+  ctx.fillStyle = statusColor;
+  ctx.fillText(statusLabel, W - 36, 66);
+
+  // Player block
+  const avX = 36, avY = 128, avSize = 100;
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(avX + avSize/2, avY + avSize/2, avSize/2, 0, Math.PI*2);
+  ctx.closePath(); ctx.clip();
+  if (avatarImg) {
+    const iW = avatarImg.width, iH = avatarImg.height;
+    const scale = Math.max(avSize / iW, avSize / iH);
+    ctx.drawImage(avatarImg, avX + (avSize - iW*scale)/2, avY + (avSize - iH*scale)/2, iW*scale, iH*scale);
+  } else {
+    ctx.fillStyle = '#1e1a3a'; ctx.fillRect(avX, avY, avSize, avSize);
+    ctx.fillStyle = '#7c6fe0'; ctx.font = '48px Arial'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText('🎮', avX + avSize/2, avY + avSize/2 + 4);
+  }
+  ctx.restore();
+  ctx.strokeStyle = '#c9a84c'; ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.arc(avX + avSize/2, avY + avSize/2, avSize/2, 0, Math.PI*2); ctx.stroke();
+
+  ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+  ctx.fillStyle = '#f0eeff'; ctx.font = 'bold 32px Arial, sans-serif';
+  ctx.fillText(r.playerName || '—', avX + avSize + 22, avY + 14);
+  ctx.fillStyle = '#a89ed0'; ctx.font = '18px Arial, sans-serif';
+  ctx.fillText(`🏟️ ${r.playerClub || '—'}`, avX + avSize + 22, avY + 56);
+  const _dt = new Date(r.createdAt||Date.now());
+  ctx.fillText(`📅 ${_dt.toLocaleDateString()}  🕐 ${_dt.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}`, avX + avSize + 22, avY + 84);
+
+  // Section renderer helper
+  let curY = avY + avSize + 50;
+  function sectionBox(title, titleColor, rows) {
+    const boxH = 40 + rows.length * 46 + 20;
+    ctx.fillStyle = 'rgba(255,255,255,0.04)';
+    roundRect(ctx, 36, curY, W - 72, boxH, 14); ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,0.08)'; ctx.lineWidth = 1;
+    roundRect(ctx, 36, curY, W - 72, boxH, 14); ctx.stroke();
+
+    ctx.fillStyle = titleColor; ctx.font = 'bold 20px Arial, sans-serif';
+    ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+    ctx.fillText(title, 60, curY + 18);
+
+    let ry = curY + 56;
+    rows.forEach(row => {
+      ctx.font = '15px Arial, sans-serif';
+      ctx.fillStyle = '#a89ed0';
+      ctx.fillText(row.label, 60, ry);
+      ctx.font = 'bold 17px Arial, sans-serif';
+      ctx.fillStyle = row.color || '#f0eeff';
+      ctx.fillText(row.value, 210, ry - 2);
+      ry += 34;
+    });
+    curY += boxH + 24;
+  }
+
+  if (r.oldUid || r.newUid) {
+    sectionBox('🆔 UID CHANGE', '#fbbf24', [
+      { label: 'Old UID:', value: r.oldUid || '—', color: '#f87171' },
+      { label: 'New UID:', value: r.newUid || '—', color: '#34d399' },
+      { label: 'Reason:', value: wrapPlain(r.uidChangeReason || '—'), color: '#f0eeff' }
+    ]);
+  }
+  if (r.oldDevice || r.newDevice) {
+    sectionBox('📱 DEVICE CHANGE', '#7c6fe0', [
+      { label: 'Old Device:', value: r.oldDevice || '—', color: '#f87171' },
+      { label: 'New Device:', value: r.newDevice || '—', color: '#34d399' },
+      { label: 'Reason:', value: wrapPlain(r.deviceChangeReason || '—'), color: '#f0eeff' }
+    ]);
+  }
+  if (r.adminNote) {
+    ctx.fillStyle = '#a89ed0'; ctx.font = 'italic 14px Arial, sans-serif';
+    ctx.fillText(`📝 Admin Note: ${wrapPlain(r.adminNote)}`, 60, curY);
+    curY += 30;
+  }
+
+  // Footer
+  ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+  ctx.fillStyle = 'rgba(180,180,180,0.6)'; ctx.font = '15px monospace';
+  ctx.fillText('TYP Championship  |  Admin Verified Appeal', W/2, H - 22);
+
+  const link = document.createElement('a');
+  link.download = `${(r.playerName||'player').replace(/\s+/g,'-')}_UID-Device-Appeal.png`;
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+
+  btn.innerHTML = origText; btn.disabled = false;
+};
+
+function wrapPlain(str) {
+  if (!str) return '—';
+  return str.length > 40 ? str.slice(0, 40) + '…' : str;
 }
 
 // Initial home page load — called here so db/ref/get are in scope
@@ -8324,6 +8796,7 @@ window.bnavProfile = function() {
   menu.innerHTML = `
     <div onclick="showPage('tournament');setBottomNav('');document.getElementById('bnavProfileMenu').remove()" style="padding:10px 14px;cursor:pointer;border-radius:8px;color:var(--text);font-size:14px;display:flex;align-items:center;gap:8px" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background=''" >🏟️ Tournament</div>
     <div onclick="showPage('rules');setBottomNav('');document.getElementById('bnavProfileMenu').remove()" style="padding:10px 14px;cursor:pointer;border-radius:8px;color:var(--text);font-size:14px;display:flex;align-items:center;gap:8px" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background=''">📋 Rules</div>
+    <div onclick="showPage('uidchange');setBottomNav('');document.getElementById('bnavProfileMenu').remove()" style="padding:10px 14px;cursor:pointer;border-radius:8px;color:var(--yellow);font-size:14px;display:flex;align-items:center;gap:8px" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background=''">🆔 UID/Device Change</div>
     <div style="height:1px;background:var(--border);margin:4px 0"></div>
     <div onclick="showPage('admin');setBottomNav('');document.getElementById('bnavProfileMenu').remove()" style="padding:10px 14px;cursor:pointer;border-radius:8px;color:var(--primary);font-size:14px;display:flex;align-items:center;gap:8px" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background=''">🛡️ Admin Panel</div>
   `;
