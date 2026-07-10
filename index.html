@@ -5656,37 +5656,71 @@ window.downloadUidChangeCard = async function(id) {
     img.src = window.TYP_LOGO_DATA;
   });
 
-  // Background
-  const bg = ctx.createLinearGradient(0, 0, 0, H);
-  bg.addColorStop(0, '#16132e'); bg.addColorStop(1, '#0e0c1a');
-  ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
+  // ── Outer canvas backdrop (soft neutral, so the card "floats") ──
+  ctx.fillStyle = '#eef0f6';
+  ctx.fillRect(0, 0, W, H);
+
+  // ── White card with soft shadow ──
+  const cardM = 24; // outer margin
+  ctx.save();
+  ctx.shadowColor = 'rgba(30,20,70,0.18)';
+  ctx.shadowBlur = 40;
+  ctx.shadowOffsetY = 14;
+  ctx.fillStyle = '#ffffff';
+  roundRect(ctx, cardM, cardM, W - cardM*2, H - cardM*2, 26); ctx.fill();
+  ctx.restore();
+
+  // Clip everything below to the card's rounded shape
+  ctx.save();
+  roundRect(ctx, cardM, cardM, W - cardM*2, H - cardM*2, 26); ctx.clip();
 
   // Top accent bar
-  const topBar = ctx.createLinearGradient(0, 0, W, 0);
-  topBar.addColorStop(0, '#fbbf24'); topBar.addColorStop(1, '#7c6fe0');
-  ctx.fillStyle = topBar; ctx.fillRect(0, 0, W, 8);
+  const topBar = ctx.createLinearGradient(cardM, 0, W - cardM, 0);
+  topBar.addColorStop(0, '#f5b93e'); topBar.addColorStop(1, '#7c6fe0');
+  ctx.fillStyle = topBar; ctx.fillRect(cardM, cardM, W - cardM*2, 10);
+
+  // Header background wash
+  ctx.fillStyle = '#fbfaff';
+  ctx.fillRect(cardM, cardM + 10, W - cardM*2, 150);
+  ctx.strokeStyle = '#eee9fb'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(cardM, cardM + 160); ctx.lineTo(W - cardM, cardM + 160); ctx.stroke();
 
   // Logo + Title
   if (typLogoImg) {
-    const lh = 56;
+    const lh = 46;
     const lw = typLogoImg.width * (lh / typLogoImg.height);
     ctx.save();
-    ctx.filter = 'brightness(0) invert(1)';
-    ctx.drawImage(typLogoImg, 36, 32, lw, lh);
+    ctx.filter = 'brightness(0) saturate(100%) invert(13%) sepia(37%) saturate(2400%) hue-rotate(230deg) brightness(70%)';
+    ctx.drawImage(typLogoImg, cardM + 30, cardM + 34, lw, lh);
     ctx.restore();
   }
   ctx.textAlign = 'right'; ctx.textBaseline = 'top';
-  ctx.fillStyle = '#fbbf24';
-  ctx.font = 'bold 22px Arial, sans-serif';
-  ctx.fillText('🆔 UID / DEVICE CHANGE', W - 36, 40);
-  ctx.font = 'bold 30px Arial, sans-serif';
+  ctx.fillStyle = '#8a7fc4';
+  ctx.font = 'bold 18px Arial, sans-serif';
+  ctx.fillText('🆔 UID / DEVICE CHANGE', W - cardM - 30, cardM + 36);
+
+  // Status pill
   const statusLabel = r.status === 'approved' ? '✅ APPROVED' : r.status === 'rejected' ? '❌ REJECTED' : '⏳ PENDING';
-  const statusColor = r.status === 'approved' ? '#34d399' : r.status === 'rejected' ? '#f87171' : '#fbbf24';
+  const statusBg = r.status === 'approved' ? '#e3faf0' : r.status === 'rejected' ? '#fdeceb' : '#fef6e0';
+  const statusColor = r.status === 'approved' ? '#0f9d63' : r.status === 'rejected' ? '#e0483e' : '#c98a0a';
+  ctx.font = 'bold 18px Arial, sans-serif';
+  const pillW = ctx.measureText(statusLabel).width + 36, pillH = 34;
+  const pillX = W - cardM - 30 - pillW, pillY = cardM + 62;
+  ctx.fillStyle = statusBg;
+  roundRect(ctx, pillX, pillY, pillW, pillH, 17); ctx.fill();
   ctx.fillStyle = statusColor;
-  ctx.fillText(statusLabel, W - 36, 66);
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(statusLabel, pillX + pillW/2, pillY + pillH/2 + 1);
 
   // Player block
-  const avX = 36, avY = 128, avSize = 100;
+  const avX = cardM + 30, avY = cardM + 100, avSize = 92;
+  ctx.save();
+  ctx.shadowColor = 'rgba(120,100,220,0.35)'; ctx.shadowBlur = 14;
+  ctx.beginPath();
+  ctx.arc(avX + avSize/2, avY + avSize/2, avSize/2 + 3, 0, Math.PI*2);
+  ctx.fillStyle = '#ffffff'; ctx.fill();
+  ctx.restore();
+
   ctx.save();
   ctx.beginPath();
   ctx.arc(avX + avSize/2, avY + avSize/2, avSize/2, 0, Math.PI*2);
@@ -5696,79 +5730,83 @@ window.downloadUidChangeCard = async function(id) {
     const scale = Math.max(avSize / iW, avSize / iH);
     ctx.drawImage(avatarImg, avX + (avSize - iW*scale)/2, avY + (avSize - iH*scale)/2, iW*scale, iH*scale);
   } else {
-    ctx.fillStyle = '#1e1a3a'; ctx.fillRect(avX, avY, avSize, avSize);
-    ctx.fillStyle = '#7c6fe0'; ctx.font = '48px Arial'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#f1eefc'; ctx.fillRect(avX, avY, avSize, avSize);
+    ctx.fillStyle = '#7c6fe0'; ctx.font = '44px Arial'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     ctx.fillText('🎮', avX + avSize/2, avY + avSize/2 + 4);
   }
   ctx.restore();
-  ctx.strokeStyle = '#c9a84c'; ctx.lineWidth = 3;
+  ctx.strokeStyle = '#f0b93e'; ctx.lineWidth = 3;
   ctx.beginPath(); ctx.arc(avX + avSize/2, avY + avSize/2, avSize/2, 0, Math.PI*2); ctx.stroke();
 
   ctx.textAlign = 'left'; ctx.textBaseline = 'top';
-  ctx.fillStyle = '#f0eeff'; ctx.font = 'bold 32px Arial, sans-serif';
-  ctx.fillText(r.playerName || '—', avX + avSize + 22, avY + 14);
-  ctx.fillStyle = '#a89ed0'; ctx.font = '18px Arial, sans-serif';
-  ctx.fillText(`🏟️ ${r.playerClub || '—'}`, avX + avSize + 22, avY + 56);
+  ctx.fillStyle = '#241f3d'; ctx.font = 'bold 28px Arial, sans-serif';
+  ctx.fillText(r.playerName || '—', avX + avSize + 24, avY + 6);
+  ctx.fillStyle = '#8a83ab'; ctx.font = '16px Arial, sans-serif';
+  ctx.fillText(`🏟️ ${r.playerClub || '—'}`, avX + avSize + 24, avY + 44);
   const _dt = new Date(r.createdAt||Date.now());
   if (r.teamName) {
-    ctx.fillStyle = '#7c6fe0'; ctx.font = 'bold 17px Arial, sans-serif';
-    ctx.fillText(`🛡️ Team: ${r.teamName}`, avX + avSize + 22, avY + 82);
-    ctx.fillStyle = '#a89ed0'; ctx.font = '16px Arial, sans-serif';
-    ctx.fillText(`📅 ${_dt.toLocaleDateString()}  🕐 ${_dt.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}`, avX + avSize + 22, avY + 108);
+    ctx.fillStyle = '#6a5bd0'; ctx.font = 'bold 16px Arial, sans-serif';
+    ctx.fillText(`🛡️ Team: ${r.teamName}`, avX + avSize + 24, avY + 68);
+    ctx.fillStyle = '#8a83ab'; ctx.font = '15px Arial, sans-serif';
+    ctx.fillText(`📅 ${_dt.toLocaleDateString()}  🕐 ${_dt.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}`, avX + avSize + 24, avY + 92);
   } else {
-    ctx.fillText(`📅 ${_dt.toLocaleDateString()}  🕐 ${_dt.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}`, avX + avSize + 22, avY + 84);
+    ctx.fillText(`📅 ${_dt.toLocaleDateString()}  🕐 ${_dt.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}`, avX + avSize + 24, avY + 68);
   }
 
   // Section renderer helper
-  let curY = avY + avSize + 50;
-  function sectionBox(title, titleColor, rows) {
-    const boxH = 40 + rows.length * 46 + 20;
-    ctx.fillStyle = 'rgba(255,255,255,0.04)';
-    roundRect(ctx, 36, curY, W - 72, boxH, 14); ctx.fill();
-    ctx.strokeStyle = 'rgba(255,255,255,0.08)'; ctx.lineWidth = 1;
-    roundRect(ctx, 36, curY, W - 72, boxH, 14); ctx.stroke();
+  let curY = cardM + 190;
+  function sectionBox(title, titleColor, accentBg, rows) {
+    const boxH = 40 + rows.length * 44 + 18;
+    ctx.fillStyle = accentBg;
+    roundRect(ctx, cardM + 30, curY, W - (cardM + 30)*2, boxH, 16); ctx.fill();
+    ctx.strokeStyle = 'rgba(0,0,0,0.05)'; ctx.lineWidth = 1;
+    roundRect(ctx, cardM + 30, curY, W - (cardM + 30)*2, boxH, 16); ctx.stroke();
 
-    ctx.fillStyle = titleColor; ctx.font = 'bold 20px Arial, sans-serif';
+    ctx.fillStyle = titleColor; ctx.font = 'bold 18px Arial, sans-serif';
     ctx.textAlign = 'left'; ctx.textBaseline = 'top';
-    ctx.fillText(title, 60, curY + 18);
+    ctx.fillText(title, cardM + 54, curY + 18);
 
     let ry = curY + 56;
     rows.forEach(row => {
-      ctx.font = '15px Arial, sans-serif';
-      ctx.fillStyle = '#a89ed0';
-      ctx.fillText(row.label, 60, ry);
+      ctx.font = '14px Arial, sans-serif';
+      ctx.fillStyle = '#8a83ab';
+      ctx.fillText(row.label, cardM + 54, ry);
       ctx.font = 'bold 17px Arial, sans-serif';
-      ctx.fillStyle = row.color || '#f0eeff';
-      ctx.fillText(row.value, 210, ry - 2);
-      ry += 34;
+      ctx.fillStyle = row.color || '#241f3d';
+      ctx.fillText(row.value, cardM + 200, ry - 2);
+      ry += 32;
     });
-    curY += boxH + 24;
+    curY += boxH + 22;
   }
 
   if (r.oldUid || r.newUid) {
-    sectionBox('🆔 UID CHANGE', '#fbbf24', [
-      { label: 'Old UID:', value: r.oldUid || '—', color: '#f87171' },
-      { label: 'New UID:', value: r.newUid || '—', color: '#34d399' },
-      { label: 'Reason:', value: wrapPlain(r.uidChangeReason || '—'), color: '#f0eeff' }
+    sectionBox('🆔 UID CHANGE', '#c98a0a', '#fef8ec', [
+      { label: 'Old UID:', value: r.oldUid || '—', color: '#e0483e' },
+      { label: 'New UID:', value: r.newUid || '—', color: '#0f9d63' },
+      { label: 'Reason:', value: wrapPlain(r.uidChangeReason || '—'), color: '#241f3d' }
     ]);
   }
   if (r.oldDevice || r.newDevice) {
-    sectionBox('📱 DEVICE CHANGE', '#7c6fe0', [
-      { label: 'Old Device:', value: r.oldDevice || '—', color: '#f87171' },
-      { label: 'New Device:', value: r.newDevice || '—', color: '#34d399' },
-      { label: 'Reason:', value: wrapPlain(r.deviceChangeReason || '—'), color: '#f0eeff' }
+    sectionBox('📱 DEVICE CHANGE', '#6a5bd0', '#f4f2fd', [
+      { label: 'Old Device:', value: r.oldDevice || '—', color: '#e0483e' },
+      { label: 'New Device:', value: r.newDevice || '—', color: '#0f9d63' },
+      { label: 'Reason:', value: wrapPlain(r.deviceChangeReason || '—'), color: '#241f3d' }
     ]);
   }
   if (r.adminNote) {
-    ctx.fillStyle = '#a89ed0'; ctx.font = 'italic 14px Arial, sans-serif';
-    ctx.fillText(`📝 Admin Note: ${wrapPlain(r.adminNote)}`, 60, curY);
+    ctx.fillStyle = '#8a83ab'; ctx.font = 'italic 14px Arial, sans-serif';
+    ctx.fillText(`📝 Admin Note: ${wrapPlain(r.adminNote)}`, cardM + 54, curY);
     curY += 30;
   }
 
   // Footer
+  ctx.strokeStyle = '#eee9fb'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(cardM + 30, H - cardM - 56); ctx.lineTo(W - cardM - 30, H - cardM - 56); ctx.stroke();
   ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
-  ctx.fillStyle = 'rgba(180,180,180,0.6)'; ctx.font = '15px monospace';
-  ctx.fillText('TYP Championship  |  Admin Verified Appeal', W/2, H - 22);
+  ctx.fillStyle = '#a49ec4'; ctx.font = '14px monospace';
+  ctx.fillText('TYP Championship  |  Admin Verified Appeal', W/2, H - cardM - 22);
+
+  ctx.restore(); // release card clip
 
   const link = document.createElement('a');
   link.download = `${(r.playerName||'player').replace(/\s+/g,'-')}_UID-Device-Appeal.png`;
