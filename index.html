@@ -2702,8 +2702,18 @@ if (document.readyState === 'loading') {
           </div>
           <div id="uidPlayerSelectedPreview" style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--bg3);border-radius:8px;margin-bottom:16px"></div>
 
+          <div class="form-group">
+            <label class="form-label">Team Name</label>
+            <input type="text" class="form-input" id="uidTeamName" placeholder="যে Team এ খেলো (যেমন: FC Lions)">
+          </div>
+
           <div class="alert alert-error" id="uidChangeError"></div>
           <div class="alert alert-success" id="uidChangeSuccess"></div>
+
+          <div class="form-group">
+            <label class="form-label">Team Name (optional)</label>
+            <input type="text" class="form-input" id="uidTeamName" placeholder="যেমন: Dragon Warriors">
+          </div>
 
           <div style="font-size:13px;font-weight:700;color:var(--yellow);margin-bottom:10px">🆔 UID পরিবর্তন</div>
           <div class="match-add-grid" style="margin-bottom:6px">
@@ -5455,7 +5465,7 @@ window.clearUidChangeSelection = function() {
   selectedUidChangePlayer = null;
   document.getElementById('uidStep1Card').style.display = 'block';
   document.getElementById('uidStep2Card').style.display = 'none';
-  ['uidPlayerSearchInput','uidOldUid','uidNewUid','uidUidReason','uidOldDevice','uidNewDevice','uidDeviceReason'].forEach(id => {
+  ['uidPlayerSearchInput','uidTeamName','uidOldUid','uidNewUid','uidUidReason','uidOldDevice','uidNewDevice','uidDeviceReason'].forEach(id => {
     const el = document.getElementById(id); if (el) el.value = '';
   });
   document.getElementById('uidPlayerSearchResults').innerHTML = '';
@@ -5471,6 +5481,7 @@ window.submitUidChangeAppeal = async function() {
 
   if (!selectedUidChangePlayer) { errEl.textContent = '❌ প্রথমে নিজের Player Profile select করো।'; errEl.classList.add('show'); return; }
 
+  const teamName = document.getElementById('uidTeamName').value.trim();
   const oldUid = document.getElementById('uidOldUid').value.trim();
   const newUid = document.getElementById('uidNewUid').value.trim();
   const uidReason = document.getElementById('uidUidReason').value.trim();
@@ -5493,6 +5504,7 @@ window.submitUidChangeAppeal = async function() {
   const p = selectedUidChangePlayer;
   const appealData = {
     playerUid: p.uid, playerName: p.name || '—', playerAvatar: p.avatarUrl || '', playerClub: p.club || '—',
+    teamName: teamName || '',
     oldUid: oldUid || '', newUid: newUid || '', uidChangeReason: uidReason || '',
     oldDevice: oldDevice || '', newDevice: newDevice || '', deviceChangeReason: deviceReason || '',
     status: 'pending', createdAt: new Date().toISOString()
@@ -5538,6 +5550,7 @@ function renderUidChangeCard(r) {
       </div>
       <div style="flex:1;min-width:0">
         <div style="font-weight:700;font-size:14px">${r.playerName||'—'} <span style="color:var(--text3);font-weight:400;font-size:12px">(${r.playerClub||'—'})</span></div>
+        ${r.teamName ? `<div style="font-size:11px;color:var(--cyan);margin-top:1px">🛡️ Team: ${r.teamName}</div>` : ''}
         <div style="font-size:11px;color:var(--text3);margin-top:2px">📅 ${new Date(r.createdAt||Date.now()).toLocaleDateString()} • 🕐 ${new Date(r.createdAt||Date.now()).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</div>
       </div>
       <span style="font-size:12px;font-weight:700;color:${statusColor};padding:3px 10px;border-radius:20px;border:1px solid ${statusColor};background:${statusColor}22">${statusLabel}</span>
@@ -5574,6 +5587,7 @@ window.loadUidChangeAppeals = async function() {
           </div>
           <div style="flex:1;min-width:0">
             <div style="font-weight:700;font-size:14px">${r.playerName||'—'} <span style="color:var(--text3);font-weight:400;font-size:12px">(${r.playerClub||'—'})</span></div>
+            ${r.teamName ? `<div style="font-size:11px;color:var(--cyan);margin-top:1px">🛡️ Team: ${r.teamName}</div>` : ''}
             <div style="font-size:11px;color:var(--text3);margin-top:2px">📅 ${new Date(r.createdAt||Date.now()).toLocaleDateString()} • 🕐 ${new Date(r.createdAt||Date.now()).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</div>
           </div>
           <span style="font-size:12px;font-weight:700;color:${statusColor};padding:3px 10px;border-radius:20px;border:1px solid ${statusColor};background:${statusColor}22">${statusLabel}</span>
@@ -5693,7 +5707,14 @@ window.downloadUidChangeCard = async function(id) {
   ctx.fillStyle = '#a89ed0'; ctx.font = '18px Arial, sans-serif';
   ctx.fillText(`🏟️ ${r.playerClub || '—'}`, avX + avSize + 22, avY + 56);
   const _dt = new Date(r.createdAt||Date.now());
-  ctx.fillText(`📅 ${_dt.toLocaleDateString()}  🕐 ${_dt.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}`, avX + avSize + 22, avY + 84);
+  if (r.teamName) {
+    ctx.fillStyle = '#7c6fe0'; ctx.font = 'bold 17px Arial, sans-serif';
+    ctx.fillText(`🛡️ Team: ${r.teamName}`, avX + avSize + 22, avY + 82);
+    ctx.fillStyle = '#a89ed0'; ctx.font = '16px Arial, sans-serif';
+    ctx.fillText(`📅 ${_dt.toLocaleDateString()}  🕐 ${_dt.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}`, avX + avSize + 22, avY + 108);
+  } else {
+    ctx.fillText(`📅 ${_dt.toLocaleDateString()}  🕐 ${_dt.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}`, avX + avSize + 22, avY + 84);
+  }
 
   // Section renderer helper
   let curY = avY + avSize + 50;
