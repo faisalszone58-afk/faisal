@@ -2702,11 +2702,6 @@ if (document.readyState === 'loading') {
           </div>
           <div id="uidPlayerSelectedPreview" style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--bg3);border-radius:8px;margin-bottom:16px"></div>
 
-          <div class="form-group">
-            <label class="form-label">Team Name</label>
-            <input type="text" class="form-input" id="uidTeamName" placeholder="যে Team এ খেলো (যেমন: FC Lions)">
-          </div>
-
           <div class="alert alert-error" id="uidChangeError"></div>
           <div class="alert alert-success" id="uidChangeSuccess"></div>
 
@@ -5511,13 +5506,21 @@ window.submitUidChangeAppeal = async function() {
   };
 
   try {
-    const res = await fetch(`${UIDCHG_DB}/uidDeviceAppeals.json`, { method: 'POST', body: JSON.stringify(appealData) });
-    if (!res.ok) throw new Error('save failed');
+    const res = await fetch(`${UIDCHG_DB}/uidDeviceAppeals.json`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(appealData)
+    });
+    if (!res.ok) {
+      const bodyText = await res.text().catch(() => '');
+      throw new Error(`HTTP ${res.status} ${res.statusText} — ${bodyText}`);
+    }
     const _submitTime = new Date(appealData.createdAt).toLocaleString([], {dateStyle:'medium', timeStyle:'short'});
     sucEl.textContent = `✅ Appeal submit হয়েছে (${_submitTime})! Admin review করবে।`; sucEl.classList.add('show');
     setTimeout(() => { clearUidChangeSelection(); sucEl.classList.remove('show'); }, 2500);
   } catch(e) {
-    errEl.textContent = '❌ Submit করতে সমস্যা হয়েছে। আবার চেষ্টা করো।'; errEl.classList.add('show');
+    console.error('UID/Device appeal submit error:', e);
+    errEl.textContent = `❌ Submit করতে সমস্যা হয়েছে। কারণ: ${e.message || e}`; errEl.classList.add('show');
   }
 };
 
