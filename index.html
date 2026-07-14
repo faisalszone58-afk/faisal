@@ -1327,35 +1327,6 @@ if (document.readyState === 'loading') {
     <style>
       @keyframes noticeScroll { 0% { transform:translateX(100%); } 100% { transform:translateX(-100%); } }
     </style>
-    <div class="stats-bar" style="position:relative;overflow:hidden">
-      <!-- Football skin pentagon pattern overlay in stats bar -->
-      <svg style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opacity:0.08" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <pattern id="footballSkin" x="0" y="0" width="40" height="46" patternUnits="userSpaceOnUse">
-            <!-- Pentagon shapes like a football skin -->
-            <polygon points="20,3 37,14 37,32 20,43 3,32 3,14" fill="none" stroke="rgba(201,168,76,1)" stroke-width="1"/>
-            <line x1="20" y1="3" x2="20" y2="43" stroke="rgba(201,168,76,0.4)" stroke-width="0.5"/>
-          </pattern>
-        </defs>
-        <rect width="100%" height="100%" fill="url(#footballSkin)"/>
-      </svg>
-      <div class="stat-item" style="position:relative;z-index:1">
-        <div class="stat-num" id="statPlayers">—</div>
-        <div class="stat-label">Players</div>
-      </div>
-      <div class="stat-item" style="position:relative;z-index:1">
-        <div class="stat-num" id="statMatches">—</div>
-        <div class="stat-label">Matches</div>
-      </div>
-      <div class="stat-item" style="position:relative;z-index:1">
-        <div class="stat-num" id="statClubs">—</div>
-        <div class="stat-label">Clubs</div>
-      </div>
-      <div class="stat-item" style="position:relative;z-index:1">
-        <div class="stat-num" id="statSeason">S1</div>
-        <div class="stat-label">Season</div>
-      </div>
-    </div>
   </div>
 
   <!-- TOP PLAYERS SLIDING CAROUSEL -->
@@ -3515,7 +3486,7 @@ window.loadRanking = async function() {
     window._rankingMode = 'current';
     window._currentViewedSeasonName = null;
     renderRanking(rankingData);
-    document.getElementById('statPlayers').textContent = rankingData.length;
+    if (document.getElementById('statPlayers')) document.getElementById('statPlayers').textContent = rankingData.length;
   } catch(e) {
     console.error('Ranking error:', e);
     container.innerHTML = `<div class="card text-center" style="padding:40px;color:var(--red)">❌ Data load হয়নি। Error: ${e.message}</div>`;
@@ -3654,7 +3625,7 @@ window.loadMainRanking = async function() {
     window._rankingMode = 'main';
     window._currentViewedSeasonName = null;
     renderRanking(rankingData);
-    document.getElementById('statPlayers').textContent = rankingData.length;
+    if (document.getElementById('statPlayers')) document.getElementById('statPlayers').textContent = rankingData.length;
   } catch(e) {
     console.error('Main ranking error:', e);
     container.innerHTML = `<div class="card text-center" style="padding:40px;color:var(--red)">❌ Data load হয়নি। Error: ${e.message}</div>`;
@@ -4267,7 +4238,7 @@ window.loadMatches = async function() {
     matchesData.sort((a, b) => (b.date||'').localeCompare(a.date||''));
     renderMatches(matchesData);
     const completed = matchesData.filter(m => m.status === 'completed').length;
-    document.getElementById('statMatches').textContent = completed;
+    if (document.getElementById('statMatches')) document.getElementById('statMatches').textContent = completed;
   } catch(e) {
     container.innerHTML = `<div class="card text-center" style="padding:40px;color:var(--red)">❌ Data load হয়নি।</div>`;
   }
@@ -6232,14 +6203,14 @@ async function loadHomeStats() {
     const matchesData = await matchesRes.json();
     const playerCount = usersData ? Object.keys(usersData).length : 0;
     const matchCount  = matchesData ? Object.keys(matchesData).length : 0;
-    document.getElementById('statPlayers').textContent = playerCount || '—';
-    document.getElementById('statMatches').textContent = matchCount  || '—';
+    if (document.getElementById('statPlayers')) document.getElementById('statPlayers').textContent = playerCount || '—';
+    if (document.getElementById('statMatches')) document.getElementById('statMatches').textContent = matchCount  || '—';
     // clubs needs full data — skip if already cached
     if ((window._allUsersCache||[]).length) {
       const clubs = new Set(window._allUsersCache.map(p => p.club).filter(Boolean));
-      document.getElementById('statClubs').textContent = clubs.size || '—';
+      if (document.getElementById('statClubs')) document.getElementById('statClubs').textContent = clubs.size || '—';
     } else {
-      document.getElementById('statClubs').textContent = '—';
+      if (document.getElementById('statClubs')) document.getElementById('statClubs').textContent = '—';
     }
   } catch(e) {
     console.error('loadHomeStats error:', e);
