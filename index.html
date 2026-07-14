@@ -302,10 +302,11 @@ body::before {
 
 /* ── NAV ── */
 nav {
-  background: rgba(14,12,26,0.85);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border-bottom: 1px solid var(--border);
+  background: rgba(14,12,26,0.62);
+  backdrop-filter: blur(22px) saturate(180%);
+  -webkit-backdrop-filter: blur(22px) saturate(180%);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 4px 24px rgba(0,0,0,0.18);
   padding: 0 28px;
   height: 58px;
   display: flex;
@@ -317,8 +318,13 @@ nav {
 }
 
 [data-theme="light"] nav {
-  background: rgba(245,244,251,0.88);
-  border-bottom: 1px solid var(--border);
+  background: rgba(245,244,251,0.62);
+  border-bottom: 1px solid rgba(20,16,50,0.06);
+  box-shadow: 0 4px 24px rgba(90,79,190,0.08);
+}
+
+.theme-toggle-btn#themeToggleBtnMobile {
+  display: none;
 }
 
 .nav-logo {
@@ -730,6 +736,12 @@ select.form-input option { background: var(--card); color: var(--text); }
   nav { padding:0 14px; height:52px; }
   .nav-logo img { height:34px !important; }
   .nav-logo { font-size:12px; gap:7px; }
+  .theme-toggle-btn#themeToggleBtnMobile {
+    display: flex; align-items: center; justify-content: center;
+    width: 34px; height: 34px; border-radius: 50%;
+    font-size: 16px; background: var(--card2); border: 1px solid var(--border);
+    cursor: pointer; flex-shrink: 0;
+  }
   .page { padding:12px 14px 96px; }
   body { padding-bottom:80px; }
   .stats-bar { display:grid; grid-template-columns:repeat(2,1fr); }
@@ -1120,9 +1132,10 @@ if (document.readyState === 'loading') {
 
 <!-- NAV -->
 <nav id="mainNav" class="hidden">
-  <div class="nav-logo" onclick="showPage('home')"><img src="" data-typ-logo style="height:46px;width:auto;vertical-align:middle;margin-right:6px"><div class="logo-dot"></div> CHAMPIONSHIP</div>
+  <div class="nav-logo" onclick="showPage('home')"><img src="" data-typ-logo style="height:46px;width:auto;vertical-align:middle;margin-right:6px"><div class="logo-dot"></div></div>
+  <button class="theme-toggle-btn" id="themeToggleBtnMobile" onclick="toggleTheme()" title="Toggle theme">🌙</button>
   <div class="nav-links" id="navLinks">
-    <button class="nav-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle theme" style="font-size:16px;padding:7px 10px;">🌙</button>
+    <button class="nav-btn theme-toggle-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle theme" style="font-size:16px;padding:7px 10px;">🌙</button>
     <button class="nav-btn" onclick="showPage('home')">🏠 Home</button>
     <button class="nav-btn" onclick="showPage('ranking')">🏆 Ranking</button>
     <button class="nav-btn" onclick="showPage('matches')">⚽ Matches</button>
@@ -8824,8 +8837,7 @@ window.toggleRule = function(header) {
 (function() {
   const saved = localStorage.getItem('typTheme') || 'light';
   document.documentElement.setAttribute('data-theme', saved);
-  const btn = document.getElementById('themeToggleBtn');
-  if (btn) btn.textContent = saved === 'dark' ? '☀️' : '🌙';
+  document.querySelectorAll('.theme-toggle-btn').forEach(btn => { btn.textContent = saved === 'dark' ? '☀️' : '🌙'; });
 })();
 
 window.toggleTheme = function() {
@@ -8833,8 +8845,7 @@ window.toggleTheme = function() {
   const newTheme = isLight ? 'dark' : 'light';
   document.documentElement.setAttribute('data-theme', newTheme);
   localStorage.setItem('typTheme', newTheme);
-  const btn = document.getElementById('themeToggleBtn');
-  if (btn) btn.textContent = newTheme === 'light' ? '☀️' : '🌙';
+  document.querySelectorAll('.theme-toggle-btn').forEach(btn => { btn.textContent = newTheme === 'light' ? '☀️' : '🌙'; });
 };
 
 window.setBottomNav = function(name) {
