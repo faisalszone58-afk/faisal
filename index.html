@@ -750,8 +750,10 @@ select.form-input option { background: var(--card); color: var(--text); }
   .bottom-nav {
     display:flex !important;
     position:fixed;
+    top:auto;
     left:14px; right:14px; bottom:14px;
     height:66px;
+    margin:0;
     background:var(--card);
     border:1px solid var(--border);
     border-radius:26px;
@@ -760,6 +762,8 @@ select.form-input option { background: var(--card); color: var(--text); }
     justify-content:space-around;
     align-items:center;
     padding:0 4px;
+    backdrop-filter:none;
+    -webkit-backdrop-filter:none;
   }
   [data-theme="light"] .bottom-nav { box-shadow:0 10px 26px rgba(90,79,190,0.16), 0 2px 8px rgba(0,0,0,0.06); }
   .bottom-nav.nav-hidden { display:none !important; }
