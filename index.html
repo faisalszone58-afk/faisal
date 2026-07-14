@@ -6293,17 +6293,16 @@ async function loadHomePlayerCarousel() {
   if (!wrap) return;
   stopHomeCarousel();
   try {
-    const users = await getAllUsers();
-    if (!users.length) {
+    // Use Main Ranking (all-time cumulative stats across current + every archived season)
+    // so the home page highlights the same "main ranking" leaders shown in the Ranking tab —
+    // not just this season's live stats.
+    const mainRanked = await window.computeMainRankingData();
+    if (!mainRanked.length) {
       wrap.innerHTML = '<div style="text-align:center;padding:24px;color:var(--text3);font-size:13px">কোনো player নেই।</div>';
       return;
     }
 
-    const sorted = [...users].sort((a, b) => {
-      const sa = (a.wins||0)*9 + (a.mvp||0)*5 + (a.draws||0)*3 + (a.goalsFor||0)*1;
-      const sb = (b.wins||0)*9 + (b.mvp||0)*5 + (b.draws||0)*3 + (b.goalsFor||0)*1;
-      return sb - sa;
-    }).slice(0, 8);
+    const sorted = mainRanked.slice(0, 8);
 
     const medals = ['🥇','🥈','🥉'];
 
