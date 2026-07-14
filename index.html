@@ -512,12 +512,12 @@ nav {
 /* ── HOME PLAYER CAROUSEL ── */
 .player-carousel {
   position: relative;
-  max-width: 300px;
+  max-width: 340px;
   margin: 0 auto;
 }
 .player-carousel-viewport {
   overflow: hidden;
-  border-radius: 16px;
+  border-radius: 22px;
 }
 .player-carousel-track {
   display: flex;
@@ -531,28 +531,29 @@ nav {
 }
 .player-carousel-arrow {
   position: absolute;
-  top: 50%;
+  top: 46%;
   transform: translateY(-50%);
-  width: 30px; height: 30px;
+  width: 32px; height: 32px;
   border-radius: 50%;
-  background: rgba(0,0,0,0.45);
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(6px);
   border: 1px solid rgba(255,255,255,0.15);
   color: #fff;
   display: flex; align-items: center; justify-content: center;
   cursor: pointer;
-  font-size: 13px;
-  z-index: 3;
+  font-size: 14px;
+  z-index: 5;
   user-select: none;
-  transition: background 0.15s;
+  transition: background 0.15s, transform 0.15s;
 }
-.player-carousel-arrow:hover { background: rgba(0,0,0,0.7); }
-.player-carousel-arrow.prev { left: -6px; }
-.player-carousel-arrow.next { right: -6px; }
+.player-carousel-arrow:hover { background: rgba(0,0,0,0.75); transform: translateY(-50%) scale(1.06); }
+.player-carousel-arrow.prev { left: -4px; }
+.player-carousel-arrow.next { right: -4px; }
 .player-carousel-dots {
   display: flex;
   justify-content: center;
   gap: 6px;
-  margin-top: 14px;
+  margin-top: 16px;
 }
 .player-carousel-dot {
   width: 6px; height: 6px; border-radius: 50%;
@@ -564,6 +565,103 @@ nav {
   background: var(--primary);
   width: 18px;
   border-radius: 3px;
+}
+
+/* ── TOP PLAYER CARD (classy) ── */
+.tp-card {
+  position: relative;
+  border-radius: 22px;
+  overflow: hidden;
+  cursor: pointer;
+  box-shadow: 0 22px 44px -16px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.05) inset;
+  transition: transform 0.25s ease;
+}
+.tp-card:active { transform: scale(0.98); }
+.tp-rank-badge {
+  position: absolute;
+  top: 14px; left: 14px;
+  z-index: 4;
+  min-width: 32px; height: 32px;
+  padding: 0 8px;
+  border-radius: 16px;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(255,255,255,0.18);
+  font-size: 14px;
+  font-weight: 800;
+  font-family: 'Inter', sans-serif;
+  letter-spacing: 0.03em;
+}
+.tp-photo-wrap {
+  position: relative;
+  width: 100%;
+  height: 280px;
+  overflow: hidden;
+  background: rgba(255,255,255,0.04);
+}
+.tp-photo-wrap img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  object-position: center 15%;
+  display: block;
+}
+.tp-photo-placeholder {
+  width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 70px;
+  opacity: 0.28;
+}
+.tp-photo-scrim-top {
+  position: absolute; left: 0; right: 0; top: 0; height: 70px;
+  background: linear-gradient(180deg, rgba(0,0,0,0.35), rgba(0,0,0,0));
+  pointer-events: none;
+}
+.tp-photo-scrim-bottom {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 62%;
+  background: linear-gradient(180deg, rgba(0,0,0,0), rgba(0,0,0,0.92));
+  pointer-events: none;
+}
+.tp-name-block {
+  position: absolute; left: 18px; right: 18px; bottom: 14px;
+  z-index: 3;
+}
+.tp-name {
+  font-family: 'Inter', sans-serif;
+  font-weight: 800;
+  font-size: 19px;
+  color: #fff;
+  letter-spacing: 0.01em;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.tp-club {
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 10.5px;
+  color: rgba(255,255,255,0.62);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  margin-top: 4px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.tp-stats-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  padding: 14px 8px;
+}
+.tp-stat { text-align: center; }
+.tp-stat + .tp-stat { border-left: 1px solid rgba(255,255,255,0.08); }
+.tp-stat-val {
+  font-family: 'Inter', sans-serif;
+  font-weight: 800;
+  font-size: 17px;
+  line-height: 1;
+}
+.tp-stat-label {
+  font-size: 9px;
+  color: rgba(255,255,255,0.35);
+  letter-spacing: 0.15em;
+  margin-top: 6px;
 }
 
 /* ── SECTIONS ── */
@@ -6212,39 +6310,38 @@ async function loadHomePlayerCarousel() {
     const slidesHtml = sorted.map((p, i) => {
       const rank = i + 1;
       const w = p.wins||0, d = p.draws||0, l = p.losses||0, goals = p.goalsFor||0, mvp = p.mvp||0;
-      const _wl = w + l;
-      const wp = _wl > 0 ? Math.round((w/_wl)*100) : 0;
       const score = w*9 + mvp*5 + d*3 + goals*1;
-      const rating = Math.min(99, Math.max(40, Math.round(50 + w*3 - l*2 + d*0.5 + wp*0.3)));
-      const ratingColor = rating>=85?'#f5c842':rating>=70?'#7ed321':rating>=55?'#7132ca':'#aaa';
-      const cardBg = rank===1?'linear-gradient(135deg,#1a0a2e,#2d1458)':rank===2?'linear-gradient(135deg,#0d1f3c,#1a2d4a)':rank===3?'linear-gradient(135deg,#2a0a0a,#3a1010)':'linear-gradient(135deg,#1a1035,#12092a)';
-      const borderCol = rank===1?'#f5c842':rank===2?'#aaa':rank===3?'#cd7f32':'rgba(124,111,224,0.4)';
-      const avatar = p.avatarUrl
-        ? `<img src="${p.avatarUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:8px">`
-        : `<span style="font-size:40px">🎮</span>`;
+      const cardBg = rank===1?'linear-gradient(160deg,#241436,#0f0a1c)':rank===2?'linear-gradient(160deg,#16232f,#0c1218)':rank===3?'linear-gradient(160deg,#2a1512,#150a09)':'linear-gradient(160deg,#191228,#0d0916)';
+      const borderCol = rank===1?'rgba(245,200,66,0.55)':rank===2?'rgba(200,205,215,0.5)':rank===3?'rgba(205,127,50,0.5)':'rgba(124,111,224,0.3)';
+      const badgeTextCol = rank===1?'#f5c842':rank===2?'#dfe3ea':rank===3?'#e0a15c':'#c9c3f5';
+      const photo = p.avatarUrl
+        ? `<img src="${p.avatarUrl}" alt="${(p.name||'').replace(/"/g,'')}">`
+        : `<div class="tp-photo-placeholder">🎮</div>`;
 
       return `<div class="player-carousel-slide">
-        <div onclick="openPublicProfile('${p.uid}')" style="cursor:pointer;background:${cardBg};border:2px solid ${borderCol};border-radius:16px;padding:16px;position:relative;overflow:hidden">
-          <div style="position:absolute;top:10px;left:10px;font-family:'Inter',sans-serif;font-weight:900;font-size:11px;color:${borderCol};letter-spacing:0.1em">${medals[rank-1]||'#'+rank}</div>
-          <div style="position:absolute;top:10px;right:10px;text-align:center;background:rgba(0,0,0,0.5);border-radius:6px;padding:4px 8px;min-width:36px">
-            <div style="font-family:'Inter',sans-serif;font-weight:900;font-size:20px;color:${ratingColor};line-height:1">${rating}</div>
-            <div style="font-size:8px;color:rgba(255,255,255,0.4);letter-spacing:0.1em">OVR</div>
+        <div class="tp-card" onclick="openPublicProfile('${p.uid}')" style="background:${cardBg};border:1px solid ${borderCol}">
+          <div class="tp-photo-wrap">
+            ${photo}
+            <div class="tp-photo-scrim-top"></div>
+            <div class="tp-photo-scrim-bottom"></div>
+            <div class="tp-rank-badge" style="color:${badgeTextCol}">${medals[rank-1]||'#'+rank}</div>
+            <div class="tp-name-block">
+              <div class="tp-name">${(p.name||'—').toUpperCase()}</div>
+              <div class="tp-club">${(p.club||'—').toUpperCase()}</div>
+            </div>
           </div>
-          <div style="width:80px;height:80px;border-radius:8px;background:rgba(255,255,255,0.05);border:2px solid ${borderCol}33;display:flex;align-items:center;justify-content:center;margin:20px auto 12px;overflow:hidden">${avatar}</div>
-          <div style="text-align:center;font-family:'Inter',sans-serif;font-weight:800;font-size:14px;color:#fff;margin-bottom:2px;letter-spacing:0.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 8px">${(p.name||'—').toUpperCase()}</div>
-          <div style="text-align:center;font-size:10px;color:rgba(255,255,255,0.4);margin-bottom:12px;letter-spacing:0.15em">${(p.club||'—').toUpperCase()}</div>
-          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;border-top:1px solid rgba(255,255,255,0.1);padding-top:10px">
-            <div style="text-align:center">
-              <div style="font-family:'Inter',sans-serif;font-weight:700;font-size:16px;color:#4ade80">${w}</div>
-              <div style="font-size:9px;color:rgba(255,255,255,0.4);letter-spacing:0.1em">WIN</div>
+          <div class="tp-stats-row">
+            <div class="tp-stat">
+              <div class="tp-stat-val" style="color:#4ade80">${w}</div>
+              <div class="tp-stat-label">WIN</div>
             </div>
-            <div style="text-align:center;border-left:1px solid rgba(255,255,255,0.1);border-right:1px solid rgba(255,255,255,0.1)">
-              <div style="font-family:'Inter',sans-serif;font-weight:700;font-size:16px;color:#facc15">${goals}</div>
-              <div style="font-size:9px;color:rgba(255,255,255,0.4);letter-spacing:0.1em">GOALS</div>
+            <div class="tp-stat">
+              <div class="tp-stat-val" style="color:#facc15">${goals}</div>
+              <div class="tp-stat-label">GOALS</div>
             </div>
-            <div style="text-align:center">
-              <div style="font-family:'Inter',sans-serif;font-weight:700;font-size:16px;color:#60a5fa">${score}</div>
-              <div style="font-size:9px;color:rgba(255,255,255,0.4);letter-spacing:0.1em">SCORE</div>
+            <div class="tp-stat">
+              <div class="tp-stat-val" style="color:#60a5fa">${score}</div>
+              <div class="tp-stat-label">SCORE</div>
             </div>
           </div>
         </div>
