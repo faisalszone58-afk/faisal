@@ -509,6 +509,63 @@ nav {
   text-transform: uppercase;
 }
 
+/* ── HOME PLAYER CAROUSEL ── */
+.player-carousel {
+  position: relative;
+  max-width: 300px;
+  margin: 0 auto;
+}
+.player-carousel-viewport {
+  overflow: hidden;
+  border-radius: 16px;
+}
+.player-carousel-track {
+  display: flex;
+  transition: transform 0.55s cubic-bezier(0.22,1,0.36,1);
+  will-change: transform;
+}
+.player-carousel-slide {
+  flex: 0 0 100%;
+  width: 100%;
+  box-sizing: border-box;
+}
+.player-carousel-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.45);
+  border: 1px solid rgba(255,255,255,0.15);
+  color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  font-size: 13px;
+  z-index: 3;
+  user-select: none;
+  transition: background 0.15s;
+}
+.player-carousel-arrow:hover { background: rgba(0,0,0,0.7); }
+.player-carousel-arrow.prev { left: -6px; }
+.player-carousel-arrow.next { right: -6px; }
+.player-carousel-dots {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 14px;
+}
+.player-carousel-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--border);
+  cursor: pointer;
+  transition: all 0.25s;
+}
+.player-carousel-dot.active {
+  background: var(--primary);
+  width: 18px;
+  border-radius: 3px;
+}
+
 /* ── SECTIONS ── */
 .section { padding: 40px 24px; max-width: 1100px; margin: 0 auto; }
 
@@ -1200,6 +1257,15 @@ if (document.readyState === 'loading') {
         <div class="stat-num" id="statSeason">S1</div>
         <div class="stat-label">Season</div>
       </div>
+    </div>
+  </div>
+
+  <!-- TOP PLAYERS SLIDING CAROUSEL -->
+  <div class="section" style="padding-top:34px;padding-bottom:6px;position:relative;overflow:hidden">
+    <div class="section-title">🌟 Top Players</div>
+    <div class="section-sub">// এই সিজনের সেরা খেলোয়াড়দের card</div>
+    <div id="homePlayerCarousel" class="player-carousel">
+      <div style="text-align:center;padding:30px;color:var(--text3)"><span class="spinner"></span></div>
     </div>
   </div>
 
@@ -5846,6 +5912,7 @@ async function loadHomePageData() {
   loadHomeStats();
   loadHomeLiveMatchday();
   loadHomeNotice();
+  loadHomePlayerCarousel();
 }
 
 window.saveNotice = async function() {
@@ -6114,6 +6181,147 @@ async function loadHomeTopPlayers() {
     console.error('TopPlayers error:', e);
     container.innerHTML = `<div style="color:var(--red);text-align:center;padding:20px">❌ ${e.message}</div>`;
   }
+}
+
+// ════════════════════════════════════════
+// 🌟 HOME PAGE — TOP PLAYERS SLIDING CAROUSEL
+// ════════════════════════════════════════
+let _homeCarouselTimer = null;
+let _homeCarouselIndex = 0;
+let _homeCarouselTotal = 0;
+
+async function loadHomePlayerCarousel() {
+  const wrap = document.getElementById('homePlayerCarousel');
+  if (!wrap) return;
+  stopHomeCarousel();
+  try {
+    const users = await getAllUsers();
+    if (!users.length) {
+      wrap.innerHTML = '<div style="text-align:center;padding:24px;color:var(--text3);font-size:13px">কোনো player নেই।</div>';
+      return;
+    }
+
+    const sorted = [...users].sort((a, b) => {
+      const sa = (a.wins||0)*9 + (a.mvp||0)*5 + (a.draws||0)*3 + (a.goalsFor||0)*1;
+      const sb = (b.wins||0)*9 + (b.mvp||0)*5 + (b.draws||0)*3 + (b.goalsFor||0)*1;
+      return sb - sa;
+    }).slice(0, 8);
+
+    const medals = ['🥇','🥈','🥉'];
+
+    const slidesHtml = sorted.map((p, i) => {
+      const rank = i + 1;
+      const w = p.wins||0, d = p.draws||0, l = p.losses||0, goals = p.goalsFor||0, mvp = p.mvp||0;
+      const _wl = w + l;
+      const wp = _wl > 0 ? Math.round((w/_wl)*100) : 0;
+      const score = w*9 + mvp*5 + d*3 + goals*1;
+      const rating = Math.min(99, Math.max(40, Math.round(50 + w*3 - l*2 + d*0.5 + wp*0.3)));
+      const ratingColor = rating>=85?'#f5c842':rating>=70?'#7ed321':rating>=55?'#7132ca':'#aaa';
+      const cardBg = rank===1?'linear-gradient(135deg,#1a0a2e,#2d1458)':rank===2?'linear-gradient(135deg,#0d1f3c,#1a2d4a)':rank===3?'linear-gradient(135deg,#2a0a0a,#3a1010)':'linear-gradient(135deg,#1a1035,#12092a)';
+      const borderCol = rank===1?'#f5c842':rank===2?'#aaa':rank===3?'#cd7f32':'rgba(124,111,224,0.4)';
+      const avatar = p.avatarUrl
+        ? `<img src="${p.avatarUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:8px">`
+        : `<span style="font-size:40px">🎮</span>`;
+
+      return `<div class="player-carousel-slide">
+        <div onclick="openPublicProfile('${p.uid}')" style="cursor:pointer;background:${cardBg};border:2px solid ${borderCol};border-radius:16px;padding:16px;position:relative;overflow:hidden">
+          <div style="position:absolute;top:10px;left:10px;font-family:'Inter',sans-serif;font-weight:900;font-size:11px;color:${borderCol};letter-spacing:0.1em">${medals[rank-1]||'#'+rank}</div>
+          <div style="position:absolute;top:10px;right:10px;text-align:center;background:rgba(0,0,0,0.5);border-radius:6px;padding:4px 8px;min-width:36px">
+            <div style="font-family:'Inter',sans-serif;font-weight:900;font-size:20px;color:${ratingColor};line-height:1">${rating}</div>
+            <div style="font-size:8px;color:rgba(255,255,255,0.4);letter-spacing:0.1em">OVR</div>
+          </div>
+          <div style="width:80px;height:80px;border-radius:8px;background:rgba(255,255,255,0.05);border:2px solid ${borderCol}33;display:flex;align-items:center;justify-content:center;margin:20px auto 12px;overflow:hidden">${avatar}</div>
+          <div style="text-align:center;font-family:'Inter',sans-serif;font-weight:800;font-size:14px;color:#fff;margin-bottom:2px;letter-spacing:0.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 8px">${(p.name||'—').toUpperCase()}</div>
+          <div style="text-align:center;font-size:10px;color:rgba(255,255,255,0.4);margin-bottom:12px;letter-spacing:0.15em">${(p.club||'—').toUpperCase()}</div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;border-top:1px solid rgba(255,255,255,0.1);padding-top:10px">
+            <div style="text-align:center">
+              <div style="font-family:'Inter',sans-serif;font-weight:700;font-size:16px;color:#4ade80">${w}</div>
+              <div style="font-size:9px;color:rgba(255,255,255,0.4);letter-spacing:0.1em">WIN</div>
+            </div>
+            <div style="text-align:center;border-left:1px solid rgba(255,255,255,0.1);border-right:1px solid rgba(255,255,255,0.1)">
+              <div style="font-family:'Inter',sans-serif;font-weight:700;font-size:16px;color:#facc15">${goals}</div>
+              <div style="font-size:9px;color:rgba(255,255,255,0.4);letter-spacing:0.1em">GOALS</div>
+            </div>
+            <div style="text-align:center">
+              <div style="font-family:'Inter',sans-serif;font-weight:700;font-size:16px;color:#60a5fa">${score}</div>
+              <div style="font-size:9px;color:rgba(255,255,255,0.4);letter-spacing:0.1em">SCORE</div>
+            </div>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+
+    const dotsHtml = sorted.map((_, i) => `<div class="player-carousel-dot${i===0?' active':''}" onclick="homeCarouselGoTo(${i})"></div>`).join('');
+
+    wrap.innerHTML = `
+      <div class="player-carousel-viewport">
+        <div class="player-carousel-track" id="homeCarouselTrack">${slidesHtml}</div>
+      </div>
+      ${sorted.length > 1 ? `
+      <div class="player-carousel-arrow prev" onclick="homeCarouselPrev()">‹</div>
+      <div class="player-carousel-arrow next" onclick="homeCarouselNext()">›</div>
+      <div class="player-carousel-dots" id="homeCarouselDots">${dotsHtml}</div>` : ''}
+    `;
+
+    _homeCarouselIndex = 0;
+    _homeCarouselTotal = sorted.length;
+    startHomeCarousel();
+
+    // Swipe support for touch devices
+    let touchStartX = 0;
+    const viewport = wrap.querySelector('.player-carousel-viewport');
+    viewport.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; stopHomeCarousel(); }, { passive: true });
+    viewport.addEventListener('touchend', e => {
+      const diff = e.changedTouches[0].clientX - touchStartX;
+      if (diff > 40) homeCarouselPrev();
+      else if (diff < -40) homeCarouselNext();
+      else startHomeCarousel();
+    }, { passive: true });
+
+    wrap.addEventListener('mouseenter', stopHomeCarousel);
+    wrap.addEventListener('mouseleave', startHomeCarousel);
+  } catch(e) {
+    console.error('HomePlayerCarousel error:', e);
+    wrap.innerHTML = `<div style="text-align:center;padding:20px;color:var(--red);font-size:13px">❌ Load হয়নি: ${e.message}</div>`;
+  }
+}
+
+function updateHomeCarousel() {
+  const track = document.getElementById('homeCarouselTrack');
+  if (!track) return;
+  track.style.transform = `translateX(-${_homeCarouselIndex * 100}%)`;
+  document.querySelectorAll('#homeCarouselDots .player-carousel-dot').forEach((dot, i) => {
+    dot.classList.toggle('active', i === _homeCarouselIndex);
+  });
+}
+
+window.homeCarouselGoTo = function(i) {
+  _homeCarouselIndex = i;
+  updateHomeCarousel();
+  startHomeCarousel();
+};
+window.homeCarouselNext = function() {
+  if (!_homeCarouselTotal) return;
+  _homeCarouselIndex = (_homeCarouselIndex + 1) % _homeCarouselTotal;
+  updateHomeCarousel();
+  startHomeCarousel();
+};
+window.homeCarouselPrev = function() {
+  if (!_homeCarouselTotal) return;
+  _homeCarouselIndex = (_homeCarouselIndex - 1 + _homeCarouselTotal) % _homeCarouselTotal;
+  updateHomeCarousel();
+  startHomeCarousel();
+};
+function startHomeCarousel() {
+  stopHomeCarousel();
+  if (_homeCarouselTotal <= 1) return;
+  _homeCarouselTimer = setInterval(() => {
+    _homeCarouselIndex = (_homeCarouselIndex + 1) % _homeCarouselTotal;
+    updateHomeCarousel();
+  }, 3200);
+}
+function stopHomeCarousel() {
+  if (_homeCarouselTimer) { clearInterval(_homeCarouselTimer); _homeCarouselTimer = null; }
 }
 
 async function loadHomeRecentMatches() {
