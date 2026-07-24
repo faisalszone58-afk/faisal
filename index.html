@@ -1327,6 +1327,35 @@ if (document.readyState === 'loading') {
     <style>
       @keyframes noticeScroll { 0% { transform:translateX(100%); } 100% { transform:translateX(-100%); } }
     </style>
+    <div class="stats-bar" style="position:relative;overflow:hidden">
+      <!-- Football skin pentagon pattern overlay in stats bar -->
+      <svg style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opacity:0.08" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <pattern id="footballSkin" x="0" y="0" width="40" height="46" patternUnits="userSpaceOnUse">
+            <!-- Pentagon shapes like a football skin -->
+            <polygon points="20,3 37,14 37,32 20,43 3,32 3,14" fill="none" stroke="rgba(201,168,76,1)" stroke-width="1"/>
+            <line x1="20" y1="3" x2="20" y2="43" stroke="rgba(201,168,76,0.4)" stroke-width="0.5"/>
+          </pattern>
+        </defs>
+        <rect width="100%" height="100%" fill="url(#footballSkin)"/>
+      </svg>
+      <div class="stat-item" style="position:relative;z-index:1">
+        <div class="stat-num" id="statPlayers">—</div>
+        <div class="stat-label">Players</div>
+      </div>
+      <div class="stat-item" style="position:relative;z-index:1">
+        <div class="stat-num" id="statMatches">—</div>
+        <div class="stat-label">Matches</div>
+      </div>
+      <div class="stat-item" style="position:relative;z-index:1">
+        <div class="stat-num" id="statClubs">—</div>
+        <div class="stat-label">Clubs</div>
+      </div>
+      <div class="stat-item" style="position:relative;z-index:1">
+        <div class="stat-num" id="statSeason">S1</div>
+        <div class="stat-label">Season</div>
+      </div>
+    </div>
   </div>
 
   <!-- TOP PLAYERS SLIDING CAROUSEL -->
@@ -1977,43 +2006,24 @@ if (document.readyState === 'loading') {
   <div class="trn-content active" id="trntab-standings">
     <div style="margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
       <div style="font-size:12px;color:var(--text3);font-family:'Inter',sans-serif">
-        <span style="border-left:3px solid var(--green);padding-left:6px;margin-right:12px">Top 2 from each group → Semi-Final</span>
+        <span style="border-left:3px solid var(--green);padding-left:6px;margin-right:12px">Top 4 → Semi-Final</span>
       </div>
       <button class="btn btn-outline" style="padding:7px 14px;font-size:12px" onclick="loadTournamentStandings()">🔄 Refresh</button>
     </div>
 
-    <!-- GROUP A -->
-    <div style="margin-bottom:8px;font-size:13px;font-weight:700;color:var(--cyan);font-family:'Inter',sans-serif;letter-spacing:0.05em">
-      🅰️ GROUP A
-    </div>
-    <div style="overflow-x:auto;border-radius:12px;border:1px solid var(--border);margin-bottom:28px">
-      <table class="standings-table" id="trnStandingsTableA">
-        <thead>
-          <tr><th>#</th><th>TEAM</th><th>MP</th><th>W</th><th>D</th><th>L</th><th>GF</th><th>GA</th><th>GD</th><th class="pts-col">PTS</th></tr>
-        </thead>
-        <tbody id="trnStandingsBodyA">
-          <tr><td colspan="10" style="padding:40px;color:var(--text3);text-align:center"><span class="spinner"></span></td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- GROUP B -->
-    <div style="margin-bottom:8px;font-size:13px;font-weight:700;color:var(--gold);font-family:'Inter',sans-serif;letter-spacing:0.05em">
-      🅱️ GROUP B
-    </div>
     <div style="overflow-x:auto;border-radius:12px;border:1px solid var(--border)">
-      <table class="standings-table" id="trnStandingsTableB">
+      <table class="standings-table" id="trnStandingsTable">
         <thead>
           <tr><th>#</th><th>TEAM</th><th>MP</th><th>W</th><th>D</th><th>L</th><th>GF</th><th>GA</th><th>GD</th><th class="pts-col">PTS</th></tr>
         </thead>
-        <tbody id="trnStandingsBodyB">
+        <tbody id="trnStandingsBody">
           <tr><td colspan="10" style="padding:40px;color:var(--text3);text-align:center"><span class="spinner"></span></td></tr>
         </tbody>
       </table>
     </div>
 
     <div style="margin-top:16px;font-size:12px;color:var(--text3);font-family:'Inter',sans-serif">
-      * Group A ও B এর Top 2 করে মোট 4 team → Semi-Final। প্রতিটা matchday: 4 match (GRP-A × 2 + GRP-B × 2) × 9 bout। Double round-robin — প্রতি team ৬ ম্যাচ খেলবে।
+      * ৬ টা team এক League Table-এ খেলবে, Top 4 → Semi-Final। প্রতিটা matchday: 3 match × 9 bout। Double round-robin — প্রতি team বাকি ৫ টা team-এর সাথে ২ বার (Home ও Away) করে মোট ১০ ম্যাচ খেলবে।
     </div>
   </div>
 
@@ -3146,13 +3156,6 @@ if (document.readyState === 'loading') {
       <input type="text" class="form-input" id="newTeamEmoji" placeholder="🦁" maxlength="4">
     </div>
     <div class="form-group">
-      <label class="form-label">Group</label>
-      <select class="form-input" id="newTeamGroup">
-        <option value="A">Group A</option>
-        <option value="B">Group B</option>
-      </select>
-    </div>
-    <div class="form-group">
       <label class="form-label">Team Logo (optional)</label>
       <div style="display:flex;align-items:center;gap:12px">
         <div id="teamLogoPreview" style="width:64px;height:64px;border-radius:12px;border:2px dashed var(--border);display:flex;align-items:center;justify-content:center;font-size:28px;background:var(--bg3);overflow:hidden;flex-shrink:0">🏟️</div>
@@ -3165,7 +3168,7 @@ if (document.readyState === 'loading') {
       </div>
     </div>
     <div class="form-group">
-      <label class="form-label">Select Players (9 starters + 3 subs = 12 max)</label>
+      <label class="form-label">Select Players (8 starters + 3 sub = 11 max)</label>
       <input type="text" class="form-input" id="playerPickSearch" placeholder="🔍 Search player..." oninput="filterPlayerPick()" style="margin-bottom:8px">
       <div class="player-pick-list" id="playerPickList"></div>
       <div style="margin-top:8px;font-size:12px;color:var(--cyan)" id="playerPickCount">0 selected</div>
@@ -3486,7 +3489,7 @@ window.loadRanking = async function() {
     window._rankingMode = 'current';
     window._currentViewedSeasonName = null;
     renderRanking(rankingData);
-    if (document.getElementById('statPlayers')) document.getElementById('statPlayers').textContent = rankingData.length;
+    document.getElementById('statPlayers').textContent = rankingData.length;
   } catch(e) {
     console.error('Ranking error:', e);
     container.innerHTML = `<div class="card text-center" style="padding:40px;color:var(--red)">❌ Data load হয়নি। Error: ${e.message}</div>`;
@@ -3625,7 +3628,7 @@ window.loadMainRanking = async function() {
     window._rankingMode = 'main';
     window._currentViewedSeasonName = null;
     renderRanking(rankingData);
-    if (document.getElementById('statPlayers')) document.getElementById('statPlayers').textContent = rankingData.length;
+    document.getElementById('statPlayers').textContent = rankingData.length;
   } catch(e) {
     console.error('Main ranking error:', e);
     container.innerHTML = `<div class="card text-center" style="padding:40px;color:var(--red)">❌ Data load হয়নি। Error: ${e.message}</div>`;
@@ -4238,7 +4241,7 @@ window.loadMatches = async function() {
     matchesData.sort((a, b) => (b.date||'').localeCompare(a.date||''));
     renderMatches(matchesData);
     const completed = matchesData.filter(m => m.status === 'completed').length;
-    if (document.getElementById('statMatches')) document.getElementById('statMatches').textContent = completed;
+    document.getElementById('statMatches').textContent = completed;
   } catch(e) {
     container.innerHTML = `<div class="card text-center" style="padding:40px;color:var(--red)">❌ Data load হয়নি।</div>`;
   }
@@ -4264,13 +4267,18 @@ function renderMatches(data) {
           : `<div style="font-size:13px;color:var(--text2);font-family:'Inter',sans-serif">VS</div>`}
           <div style="font-size:10px;color:${done?'var(--green)':'var(--yellow)'};margin-top:2px">${done?'FT':'Upcoming'}</div>
         </div>
-        <div style="flex:1;text-align:left">
+        <div style="fl
+        mohmmaf .ifoiidof dfkddfdmdmiddfdf jkjkdfd0d   dfdfjd0ii0df opdkdllfi  kkdfkdkdfodojjdf ,jkfvfv kvnfvfvfbv fjvkfnbv
+        mjijfvvf  ,oofvfvibsspff xfx;f0f lkkfxf kkoogf ;i9i9ee 1232232235610 jjiijjijijjiij mojja,,al ooihddex:1;text-align:left">
           <div style="font-family:'Inter',sans-serif;font-size:16px;font-weight:700">${m.away_team||'—'}</div>
         </div>
       </div>
     </div>`;
   }).join('');
-}
+}mohdmmad   mokjammal  khan faisal mojammald  mojammal jadf
+
+
+
 
 window.filterMatches = function(type, btn) {
   document.querySelectorAll('#page-matches .nav-btn').forEach(b => b.classList.remove('active'));
@@ -4325,8 +4333,7 @@ async function uploadToImgBB(file) {
   const data = await res.json();
   console.log('ImgBB response:', JSON.stringify(data));
   if (data.success) return data.data.url;
-  throw new Error('ImgBB upload failed: ' + (data.error?.message || JSON.stringify(data)));
-}
+  throw new Error('ImgBB upload failed: ' + (data.error?.message || JSON.stringify(data
 
 // ── AVATAR PREVIEW (Admin Edit Player) ──
 window.previewAdminEditAvatar = async function(input) {
@@ -4592,8 +4599,7 @@ window.bdDownloadAll = async function() {
       ctx.font="13px Arial,sans-serif"; ctx.fillStyle='#1a1a1a'; ctx.textAlign='right';
       ctx.fillText((tagA?tagA+' ':'')+players.a[i],midX-28,textY+12);
       ctx.textAlign='left';
-      ctx.fillText((tagB?tagB+' ':'')+players.b[i],midX+28,textY+12);
-      y+=ROW_H+ROW_GAP;
+c,njjbn,bgj,.jb.b jm mjb nmn.      y+=ROW_H+ROW_GAP;
     }
   });
   ctx.font="10px Arial,sans-serif"; ctx.fillStyle='#bbb3a8'; ctx.textAlign='center';
@@ -6203,14 +6209,14 @@ async function loadHomeStats() {
     const matchesData = await matchesRes.json();
     const playerCount = usersData ? Object.keys(usersData).length : 0;
     const matchCount  = matchesData ? Object.keys(matchesData).length : 0;
-    if (document.getElementById('statPlayers')) document.getElementById('statPlayers').textContent = playerCount || '—';
-    if (document.getElementById('statMatches')) document.getElementById('statMatches').textContent = matchCount  || '—';
+    document.getElementById('statPlayers').textContent = playerCount || '—';
+    document.getElementById('statMatches').textContent = matchCount  || '—';
     // clubs needs full data — skip if already cached
     if ((window._allUsersCache||[]).length) {
       const clubs = new Set(window._allUsersCache.map(p => p.club).filter(Boolean));
-      if (document.getElementById('statClubs')) document.getElementById('statClubs').textContent = clubs.size || '—';
+      document.getElementById('statClubs').textContent = clubs.size || '—';
     } else {
-      if (document.getElementById('statClubs')) document.getElementById('statClubs').textContent = '—';
+      document.getElementById('statClubs').textContent = '—';
     }
   } catch(e) {
     console.error('loadHomeStats error:', e);
@@ -6323,7 +6329,7 @@ async function loadHomePlayerCarousel() {
     wrap.innerHTML = `
       <div class="player-carousel-viewport">
         <div class="player-carousel-track" id="homeCarouselTrack">${slidesHtml}</div>
-      </div>
+      </div> 
       ${sorted.length > 1 ? `
       <div class="player-carousel-arrow prev" onclick="homeCarouselPrev()">‹</div>
       <div class="player-carousel-arrow next" onclick="homeCarouselNext()">›</div>
@@ -6478,8 +6484,8 @@ function invalidateCache(urlPattern) {
 async function getAllUsers() {
   const now = Date.now();
   const CACHE_TTL = 15 * 60 * 1000; // 15 minutes
-  if ((window._allUsersCache||[]).length && window._allUsersCacheTime && (now - window._allUsersCacheTime) < CACHE_TTL) {
-    return window._allUsersCache;
+  if ((window._allUser       sCache||[]).length && window._allUsersCacheTime && (now - window._allUsersCacheTime) < CACHE_TTL) {
+    return window._al lUsersCache;
   }
   // Fetch only needed fields (exclude heavy/unused fields via shallow + specific paths)
   const res = await fetch('https://typ-championship-default-rtdb.firebaseio.com/users.json?shallow=false');
@@ -7361,30 +7367,19 @@ function renderGroupTable(tbodyId, standings, qualCount) {
 }
 
 window.loadTournamentStandings = async function() {
-  ['trnStandingsBodyA','trnStandingsBodyB'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.innerHTML = '<tr><td colspan="10" style="padding:30px;text-align:center;color:var(--text3)"><span class="spinner"></span></td></tr>';
-  });
+  const bodyEl0 = document.getElementById('trnStandingsBody');
+  if (bodyEl0) bodyEl0.innerHTML = '<tr><td colspan="10" style="padding:30px;text-align:center;color:var(--text3)"><span class="spinner"></span></td></tr>';
   try {
     await fetchTrnData();
     if (!trnTeamsCache.length) {
-      ['trnStandingsBodyA','trnStandingsBodyB'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.innerHTML = '<tr><td colspan="10" style="padding:30px;text-align:center;color:var(--text3)">কোনো team নেই।</td></tr>';
-      });
+      const el = document.getElementById('trnStandingsBody');
+      if (el) el.innerHTML = '<tr><td colspan="10" style="padding:30px;text-align:center;color:var(--text3)">কোনো team নেই।</td></tr>';
       return;
     }
-    const grpA = trnTeamsCache.filter(t => (t.group||'A') === 'A');
-    const grpB = trnTeamsCache.filter(t => (t.group||'B') === 'B');
-    const matchesA = trnMatchesCache.filter(m => m.group === 'A' || grpA.find(t => t.id === m.homeTeam));
-    const matchesB = trnMatchesCache.filter(m => m.group === 'B' || grpB.find(t => t.id === m.homeTeam));
-    renderGroupTable('trnStandingsBodyA', calcStandings(grpA, matchesA), 2);
-    renderGroupTable('trnStandingsBodyB', calcStandings(grpB, matchesB), 2);
+    renderGroupTable('trnStandingsBody', calcStandings(trnTeamsCache, trnMatchesCache), 4);
   } catch(e) {
-    ['trnStandingsBodyA','trnStandingsBodyB'].forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.innerHTML = `<tr><td colspan="10" style="padding:30px;text-align:center;color:var(--red)">❌ ${e.message}</td></tr>`;
-    });
+    const el = document.getElementById('trnStandingsBody');
+    if (el) el.innerHTML = `<tr><td colspan="10" style="padding:30px;text-align:center;color:var(--red)">❌ ${e.message}</td></tr>`;
   }
 };
 // ── TEAMS PAGE ──
@@ -7663,7 +7658,7 @@ function renderAdminTeamsList() {
       </div>
       <div style="flex:1">
         <div style="font-weight:700;font-size:14px;color:var(--text)">${safeName}</div>
-        <div style="font-size:12px;color:var(--text3)">👑 ${t.manager||'—'} • ${(t.players||[]).filter(p=>p&&p.isStarter).length}/9 starters · ${(t.players||[]).filter(p=>p&&!p.isStarter).length}/3 subs</div>
+        <div style="font-size:12px;color:var(--text3)">👑 ${t.manager||'—'} • ${(t.players||[]).filter(p=>p&&p.isStarter).length}/8 starters · ${(t.players||[]).filter(p=>p&&!p.isStarter).length}/3 sub</div>
       </div>
       <button class="btn-admin-edit" onclick="openEditTeamModal('${t.id}')">✏️ Edit</button>
       <button class="btn-admin-del" onclick="deleteTeam('${t.id}','${safeNameAttr}')">🗑️</button>
@@ -7703,7 +7698,6 @@ window.openEditTeamModal = async function(teamId) {
   document.getElementById('newTeamName').value = t.name || '';
   document.getElementById('newTeamManager').value = t.manager || '';
   document.getElementById('newTeamEmoji').value = t.emoji || '🏟️';
-  document.getElementById('newTeamGroup').value = t.group || 'A';
   document.getElementById('teamLogoUrl').value = t.logo || '';
   const prevEl = document.getElementById('teamLogoPreview');
   if (t.logo) {
@@ -7760,7 +7754,7 @@ window.togglePlayerPick = function(uid, el) {
   const idx = _playerPickSelected.indexOf(uid);
   const cb = el.querySelector('input[type=checkbox]');
   if (idx === -1) {
-    if (_playerPickSelected.length >= 12) { alert('Maximum 12 players (9 starters + 3 subs)।'); return; }
+    if (_playerPickSelected.length >= 11) { alert('Maximum 11 players (8 starters + 3 sub)।'); return; }
     _playerPickSelected.push(uid);
     el.classList.add('selected'); if(cb) cb.checked = true;
   } else {
@@ -7772,7 +7766,7 @@ window.togglePlayerPick = function(uid, el) {
 
 function updatePlayerPickCount() {
   const el = document.getElementById('playerPickCount');
-  if (el) el.textContent = `${_playerPickSelected.length} selected (${Math.min(_playerPickSelected.length,9)} starters + ${Math.max(0,_playerPickSelected.length-9)} subs)`;
+  if (el) el.textContent = `${_playerPickSelected.length} selected (${Math.min(_playerPickSelected.length,8)} starters + ${Math.max(0,_playerPickSelected.length-8)} subs)`;
 }
 
 window.previewTeamLogo = function(input) {
@@ -7791,7 +7785,6 @@ window.saveTeam = async function() {
   const name = document.getElementById('newTeamName').value.trim();
   const manager = document.getElementById('newTeamManager').value.trim();
   const emoji = document.getElementById('newTeamEmoji').value.trim() || '🏟️';
-  const group = document.getElementById('newTeamGroup')?.value || 'A';
   const errEl = document.getElementById('createTeamError');
   if (!name) { errEl.textContent = '❌ Team name দিন।'; return; }
   if (_playerPickSelected.length < 1) { errEl.textContent = '❌ কমপক্ষে ১ জন player select করুন।'; return; }
@@ -7799,7 +7792,7 @@ window.saveTeam = async function() {
   const allUsers = window._trnAllUsers || [];
   const players = _playerPickSelected.map((uid, i) => {
     const u = allUsers.find(u => u.uid === uid) || {};
-    return { uid, name: u.name || '—', isStarter: i < 9 };
+    return { uid, name: u.name || '—', isStarter: i < 8 };
   });
 
   const teamId = document.getElementById('editTeamId').value;
@@ -7839,7 +7832,7 @@ window.saveTeam = async function() {
     errEl.textContent = '';
   }
 
-  const payload = { name, manager, emoji, group, players, updatedAt: new Date().toISOString() };
+  const payload = { name, manager, emoji, players, updatedAt: new Date().toISOString() };
   if (logoUrl) payload.logo = logoUrl;
 
   if (teamId) {
@@ -7863,11 +7856,11 @@ window.saveTeam = async function() {
   await new Promise(r => setTimeout(r, 500));
   await fetchTrnData();
   renderAdminTeamsList();
-  // Auto-generate fixtures if 8 teams
-  if (trnTeamsCache.length === 8) {
+  // Auto-generate fixtures if 6 teams
+  if (trnTeamsCache.length === 6) {
     const existing = trnMatchesCache.length;
     if (existing === 0) {
-      if (confirm('8 টা team তৈরি হয়েছে! Auto-generate করবো সব fixtures?')) {
+      if (confirm('6 টা team তৈরি হয়েছে! Auto-generate করবো সব fixtures?')) {
         await generateFixtures();
       }
     }
@@ -7883,32 +7876,30 @@ window.deleteTeam = async function(id, name) {
 };
 
 // ── Auto-generate Round Robin Fixtures ──
-// Group A/B double round robin: 4 teams each group, 6 matchdays per group
-// Each matchday = 4 matches (2 GRP-A + 2 GRP-B) × 9 x 1v1 bouts
+// No groups: 6 teams, single league table, double round robin (10 matchdays)
+// Each matchday = 3 matches × 9 x 1v1 bouts
 async function generateFixtures() {
   const teams = trnTeamsCache;
-  if (teams.length !== 8) { alert('ঠিক 8টা team লাগবে fixture generate করতে।'); return; }
-
-  const groupA = teams.filter(t => (t.group||'A') === 'A');
-  const groupB = teams.filter(t => (t.group||'B') === 'B');
-
-  if (groupA.length !== 4 || groupB.length !== 4) {
-    alert(`Group A: ${groupA.length} teams, Group B: ${groupB.length} teams — প্রতি group এ ঠিক 4টা team দরকার।`);
-    return;
-  }
+  if (teams.length !== 6) { alert('ঠিক 6টা team লাগবে fixture generate করতে।'); return; }
 
   // Double round-robin: each team plays every other team TWICE (home & away)
-  // 4 teams → 6 rounds, 2 matches per round per group → 12 matches per group
-  function getDoubleRoundRobinRounds(grpTeams) {
-    const ids = grpTeams.map(t => t.id);
-    // Single round-robin using circle method (3 rounds)
+  // 6 teams → 5 rounds × 3 matches (single robin), doubled with home/away swapped → 10 rounds total
+  function getDoubleRoundRobinRounds(allTeams) {
+    const ids = allTeams.map(t => t.id);
+    const n = ids.length; // 6
+    const half = n / 2; // 3
+    // Single round-robin using circle method (n-1 rounds)
     const fixed = ids[0];
-    const rotating = ids.slice(1);
+    const rotating = ids.slice(1); // 5 teams rotate
     const singleRounds = [];
-    for (let r = 0; r < 3; r++) {
+    for (let r = 0; r < n - 1; r++) {
       const pairs = [];
-      pairs.push([fixed, rotating[r % 3]]);
-      pairs.push([rotating[(r + 1) % 3], rotating[(r + 2) % 3]]);
+      pairs.push([fixed, rotating[r % (n - 1)]]);
+      for (let i = 1; i < half; i++) {
+        const a = rotating[(r + i) % (n - 1)];
+        const b = rotating[(r - i + (n - 1)) % (n - 1)];
+        pairs.push([a, b]);
+      }
       singleRounds.push(pairs);
     }
     // Double: repeat with home/away swapped
@@ -7916,20 +7907,19 @@ async function generateFixtures() {
     singleRounds.forEach(round => {
       doubleRounds.push(round.map(([a, b]) => [b, a])); // swap home/away
     });
-    return doubleRounds; // 6 rounds total
+    return doubleRounds; // (n-1)*2 = 10 rounds total
   }
 
-  const roundsA = getDoubleRoundRobinRounds(groupA);
-  const roundsB = getDoubleRoundRobinRounds(groupB);
+  const rounds = getDoubleRoundRobinRounds(teams);
 
   const allFixtures = [];
 
   // Helper to push bouts for a match
-  function pushBouts(t1, t2, matchdayNum, matchIdx, group) {
-    const t1S = (t1.players||[]).filter(p=>p.isStarter).slice(0,9);
-    const t2S = (t2.players||[]).filter(p=>p.isStarter).slice(0,9);
-    const bouts = Math.min(t1S.length, t2S.length, 9);
-    const matchdayLabel = `Matchday ${matchdayNum} — GRP-${group} Match ${matchIdx+1}: ${t1.name} vs ${t2.name}`;
+  function pushBouts(t1, t2, matchdayNum, matchIdx) {
+    const t1S = (t1.players||[]).filter(p=>p.isStarter).slice(0,8);
+    const t2S = (t2.players||[]).filter(p=>p.isStarter).slice(0,8);
+    const bouts = Math.min(t1S.length, t2S.length, 8);
+    const matchdayLabel = `Matchday ${matchdayNum} — Match ${matchIdx+1}: ${t1.name} vs ${t2.name}`;
     for (let k = 0; k < bouts; k++) {
       allFixtures.push({
         homeTeam: t1.id, awayTeam: t2.id,
@@ -7937,27 +7927,20 @@ async function generateFixtures() {
         player1uid: t1S[k]?.uid||'', player2uid: t2S[k]?.uid||'',
         matchday: matchdayLabel,
         boutNumber: k+1, day: matchdayNum, matchNumber: matchIdx+1,
-        group, status: 'pending', createdAt: new Date().toISOString()
+        status: 'pending', createdAt: new Date().toISOString()
       });
     }
   }
 
-  // Generate all 6 matchdays (Group A & B together each day)
-  for (let rIdx = 0; rIdx < 6; rIdx++) {
+  // Generate all 10 matchdays
+  rounds.forEach((round, rIdx) => {
     const matchdayNum = rIdx + 1;
-    // Group A
-    (roundsA[rIdx] || []).forEach((pair, matchIdx) => {
+    round.forEach((pair, matchIdx) => {
       const t1 = teams.find(t => t.id === pair[0]);
       const t2 = teams.find(t => t.id === pair[1]);
-      if (t1 && t2) pushBouts(t1, t2, matchdayNum, matchIdx, 'A');
+      if (t1 && t2) pushBouts(t1, t2, matchdayNum, matchIdx);
     });
-    // Group B
-    (roundsB[rIdx] || []).forEach((pair, matchIdx) => {
-      const t1 = teams.find(t => t.id === pair[0]);
-      const t2 = teams.find(t => t.id === pair[1]);
-      if (t1 && t2) pushBouts(t1, t2, matchdayNum, matchIdx, 'B');
-    });
-  }
+  });
 
   const batchObj = {};
   allFixtures.forEach((f, i) => { batchObj[`fixture_${Date.now()}_${i}`] = f; });
@@ -7965,7 +7948,7 @@ async function generateFixtures() {
   if (!putRes.ok) { alert('❌ Fixture save failed: ' + await putRes.text()); return; }
   await new Promise(r => setTimeout(r, 500));
   await fetchTrnData();
-  alert(`✅ Fixtures generated!\nGroup A & B: 6 matchdays × 4 matches per day\nDouble round-robin (home & away)\nTotal: ${allFixtures.length} bouts`);
+  alert(`✅ Fixtures generated!\n10 matchdays × 3 matches per day\nDouble round-robin (home & away)\nTotal: ${allFixtures.length} bouts`);
 }
 
 window.confirmRegenerateFixtures = async function() {
@@ -7981,9 +7964,9 @@ window.confirmRegenerateFixtures = async function() {
   loadTrnMatchdays();
 };
 
-// ── Admin: One-click fix — promote each team's players so first 9 (existing order) become starters ──
+// ── Admin: One-click fix — promote each team's players so first 8 (existing order) become starters ──
 window.fixStartersTo9 = async function() {
-  if (!confirm('সব টিমের প্লেয়ার লিস্ট চেক করে প্রথম ৯ জনকে starter বানিয়ে দেওয়া হবে (আগের ক্রম অনুযায়ী)। Continue?')) return;
+  if (!confirm('সব টিমের প্লেয়ার লিস্ট চেক করে প্রথম ৮ জনকে starter বানিয়ে দেওয়া হবে (আগের ক্রম অনুযায়ী)। Continue?')) return;
 
   const res = await fetch(`${TRN_DB}/tournament/teams.json`);
   const data = await res.json() || {};
@@ -7998,10 +7981,10 @@ window.fixStartersTo9 = async function() {
     const players = team.players || [];
     if (!players.length) { skippedCount++; continue; }
 
-    const alreadyNine = players.filter(p => p.isStarter).length === Math.min(players.length, 9);
-    const updatedPlayers = players.map((p, i) => ({ ...p, isStarter: i < 9 }));
+    const alreadyEight = players.filter(p => p.isStarter).length === Math.min(players.length, 8);
+    const updatedPlayers = players.map((p, i) => ({ ...p, isStarter: i < 8 }));
 
-    if (alreadyNine && JSON.stringify(updatedPlayers) === JSON.stringify(players)) { skippedCount++; continue; }
+    if (alreadyEight && JSON.stringify(updatedPlayers) === JSON.stringify(players)) { skippedCount++; continue; }
 
     const patchRes = await fetch(`${TRN_DB}/tournament/teams/${teamId}.json`, {
       method: 'PATCH',
@@ -8011,7 +7994,7 @@ window.fixStartersTo9 = async function() {
     await new Promise(r => setTimeout(r, 150)); // Firebase-কে একটু breathing room দেওয়া
   }
 
-  alert(`✅ Fix সম্পন্ন!\n${fixedCount}টা team আপডেট হয়েছে, ${skippedCount}টা আগে থেকেই ঠিক ছিল।\n\nএখন "🔄 Regenerate Fixtures" বাটনে চাপ দাও — তাহলে সব ম্যাচে 9/9 bout দেখাবে।`);
+  alert(`✅ Fix সম্পন্ন!\n${fixedCount}টা team আপডেট হয়েছে, ${skippedCount}টা আগে থেকেই ঠিক ছিল।\n\nএখন "🔄 Regenerate Fixtures" বাটনে চাপ দাও — তাহলে সব ম্যাচে 8/8 bout দেখাবে।`);
 
   await loadTrnAdminTeams();
 };
@@ -8103,7 +8086,6 @@ window.renderSelectedMatchup = function() {
   const ht = teamMap[groupMatches[0].homeTeam] || {};
   const at = teamMap[groupMatches[0].awayTeam] || {};
   const doneCount = groupMatches.filter(m => m.status === 'completed').length;
-  const grp = groupMatches[0].group || '';
 
   const boutRows = groupMatches.map(m => {
     const done = m.status === 'completed';
@@ -8151,7 +8133,7 @@ window.renderSelectedMatchup = function() {
 
   area.innerHTML = `<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:16px;overflow:hidden">
     <div style="background:linear-gradient(135deg,var(--primary),var(--primary-dark));padding:12px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-      <div style="font-size:10px;color:rgba(255,255,255,0.6);font-weight:700;letter-spacing:2px;font-family:'Inter',monospace">GRP-${grp}</div>
+      <div style="font-size:10px;color:rgba(255,255,255,0.6);font-weight:700;letter-spacing:2px;font-family:'Inter',monospace">LEAGUE</div>
       <div style="flex:1;display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;color:#fff">
         <span>${ht.emoji||'🏟️'}</span>
         <span>${ht.name||'—'}</span>
@@ -8456,8 +8438,8 @@ window.downloadFixturePDF = async function() {
           <div style="font-size:9px;color:rgba(255,255,255,0.55);letter-spacing:1px;margin-top:2px">MATCHES</div>
         </div>
         <div style="flex:1;padding:10px 6px;text-align:center">
-          <div style="font-size:20px;font-weight:800;color:#fff">2</div>
-          <div style="font-size:9px;color:rgba(255,255,255,0.55);letter-spacing:1px;margin-top:2px">GROUPS</div>
+          <div style="font-size:20px;font-weight:800;color:#fff">${Object.keys(days).length}</div>
+          <div style="font-size:9px;color:rgba(255,255,255,0.55);letter-spacing:1px;margin-top:2px">MATCHDAYS</div>
         </div>
       </div>
     </div>
@@ -8998,8 +8980,7 @@ async function _renderResultCard({ matches, homeTeam, awayTeam, dayVal, fileSuff
   ctx.fillText('TYP CHAMPIONSHIP', CARD_W/2, footerY + FOOTER_H/2 + 4);
   ctx.letterSpacing = '0';
 
-  ctx.restore(); // end rounded-corner clip
-
+  ctx.restore(); // end rounded-corner 
   // outer border for polished card edge
   roundRectCanvas(ctx, 1, 1, CARD_W-2, CARD_H-2, 18);
   ctx.strokeStyle = 'rgba(15,128,90,0.25)';
@@ -9481,8 +9462,8 @@ const TYP_FAQ = [
     answer: 'Friendly Match-এ খেলোয়াড়রা নিজেরা ম্যাচের ফলাফল জমা দেয়। Admin সেটা approve করলে তোমার স্ট্যাটস আপডেট হয় এবং আলাদা Friendly Leaderboard-এ যোগ হয়।'
   },
   {
-    keywords: ['tournament', 'টুর্নামেন্ট', 'গ্রুপ এ', 'গ্রুপ বি', 'group', 'knockout', 'নকআউট', 'কাপ'],
-    answer: 'Tournament-এ Group A ও Group B-তে round-robin ম্যাচ হয়, এরপর সেরা দলগুলো নিয়ে knockout ব্র্যাকেট হয়ে চ্যাম্পিয়ন নির্ধারিত হয়। প্রতিটা ম্যাচের রেজাল্ট কার্ড PNG আকারে ডাউনলোড করা যায়।'
+    keywords: ['tournament', 'টুর্নামেন্ট', 'লিগ', 'league', 'knockout', 'নকআউট', 'কাপ'],
+    answer: 'Tournament-এ ৬ টা team এক League Table-এ Double Round-Robin (Home ও Away) খেলে, এরপর Top 4 team নিয়ে knockout ব্র্যাকেট হয়ে চ্যাম্পিয়ন নির্ধারিত হয়। প্রতিটা ম্যাচের রেজাল্ট কার্ড PNG আকারে ডাউনলোড করা যায়।'
   },
   {
     keywords: ['বিরোধ', 'dispute', 'ভুল ফলাফল', 'complain', 'অভিযোগ', 'রিপোর্ট'],
