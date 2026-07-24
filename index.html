@@ -1977,16 +1977,12 @@ if (document.readyState === 'loading') {
   <div class="trn-content active" id="trntab-standings">
     <div style="margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
       <div style="font-size:12px;color:var(--text3);font-family:'Inter',sans-serif">
-        <span style="border-left:3px solid var(--green);padding-left:6px;margin-right:12px">Top 2 from each group → Semi-Final</span>
+        <span style="border-left:3px solid var(--green);padding-left:6px;margin-right:12px">Top 4 → Semi-Final</span>
       </div>
       <button class="btn btn-outline" style="padding:7px 14px;font-size:12px" onclick="loadTournamentStandings()">🔄 Refresh</button>
     </div>
 
-    <!-- GROUP A -->
-    <div style="margin-bottom:8px;font-size:13px;font-weight:700;color:var(--cyan);font-family:'Inter',sans-serif;letter-spacing:0.05em">
-      🅰️ GROUP A
-    </div>
-    <div style="overflow-x:auto;border-radius:12px;border:1px solid var(--border);margin-bottom:28px">
+    <div style="overflow-x:auto;border-radius:12px;border:1px solid var(--border)">
       <table class="standings-table" id="trnStandingsTableA">
         <thead>
           <tr><th>#</th><th>TEAM</th><th>MP</th><th>W</th><th>D</th><th>L</th><th>GF</th><th>GA</th><th>GD</th><th class="pts-col">PTS</th></tr>
@@ -1997,23 +1993,8 @@ if (document.readyState === 'loading') {
       </table>
     </div>
 
-    <!-- GROUP B -->
-    <div style="margin-bottom:8px;font-size:13px;font-weight:700;color:var(--gold);font-family:'Inter',sans-serif;letter-spacing:0.05em">
-      🅱️ GROUP B
-    </div>
-    <div style="overflow-x:auto;border-radius:12px;border:1px solid var(--border)">
-      <table class="standings-table" id="trnStandingsTableB">
-        <thead>
-          <tr><th>#</th><th>TEAM</th><th>MP</th><th>W</th><th>D</th><th>L</th><th>GF</th><th>GA</th><th>GD</th><th class="pts-col">PTS</th></tr>
-        </thead>
-        <tbody id="trnStandingsBodyB">
-          <tr><td colspan="10" style="padding:40px;color:var(--text3);text-align:center"><span class="spinner"></span></td></tr>
-        </tbody>
-      </table>
-    </div>
-
     <div style="margin-top:16px;font-size:12px;color:var(--text3);font-family:'Inter',sans-serif">
-      * Group A ও B এর Top 2 করে মোট 4 team → Semi-Final। প্রতিটা matchday: 4 match (GRP-A × 2 + GRP-B × 2) × 9 bout। Double round-robin — প্রতি team ৬ ম্যাচ খেলবে।
+      * 6 টা team, কোনো group নেই। Top 4 team → Semi-Final। প্রতিটা matchday তে match হবে × 8 bout (11 জন স্কোয়াড থেকে 8 জন 1v1 খেলবে, 3 জন বেঞ্চে)। Double round-robin — প্রতি team বাকি ৫ দলের সাথে ২ বার (Home ও Away) খেলবে, মোট ১০ ম্যাচ।
     </div>
   </div>
 
@@ -3099,7 +3080,7 @@ if (document.readyState === 'loading') {
 
   <div class="trn-admin-section">
     <div class="trn-admin-section-title">⚽ Enter Match Results</div>
-    <p style="font-size:13px;color:var(--text3);margin-bottom:14px">Select a matchday to enter bout results. প্রতিটা matchday = 4 matches × 9 bout (double round-robin)।</p>
+    <p style="font-size:13px;color:var(--text3);margin-bottom:14px">Select a matchday to enter bout results. প্রতিটা matchday = 3 matches × 8 bout (double round-robin)।</p>
     <div style="margin-bottom:12px;display:flex;gap:10px;flex-wrap:wrap">
       <select class="form-input" id="trnMatchdaySelect" style="flex:1;min-width:200px" onchange="loadMatchdayForEntry()">
         <option value="">-- Select Matchday --</option>
@@ -3146,13 +3127,6 @@ if (document.readyState === 'loading') {
       <input type="text" class="form-input" id="newTeamEmoji" placeholder="🦁" maxlength="4">
     </div>
     <div class="form-group">
-      <label class="form-label">Group</label>
-      <select class="form-input" id="newTeamGroup">
-        <option value="A">Group A</option>
-        <option value="B">Group B</option>
-      </select>
-    </div>
-    <div class="form-group">
       <label class="form-label">Team Logo (optional)</label>
       <div style="display:flex;align-items:center;gap:12px">
         <div id="teamLogoPreview" style="width:64px;height:64px;border-radius:12px;border:2px dashed var(--border);display:flex;align-items:center;justify-content:center;font-size:28px;background:var(--bg3);overflow:hidden;flex-shrink:0">🏟️</div>
@@ -3165,7 +3139,7 @@ if (document.readyState === 'loading') {
       </div>
     </div>
     <div class="form-group">
-      <label class="form-label">Select Players (9 starters + 3 subs = 12 max)</label>
+      <label class="form-label">Select Players (8 starters + 3 subs = 11 max)</label>
       <input type="text" class="form-input" id="playerPickSearch" placeholder="🔍 Search player..." oninput="filterPlayerPick()" style="margin-bottom:8px">
       <div class="player-pick-list" id="playerPickList"></div>
       <div style="margin-top:8px;font-size:12px;color:var(--cyan)" id="playerPickCount">0 selected</div>
@@ -7361,30 +7335,19 @@ function renderGroupTable(tbodyId, standings, qualCount) {
 }
 
 window.loadTournamentStandings = async function() {
-  ['trnStandingsBodyA','trnStandingsBodyB'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.innerHTML = '<tr><td colspan="10" style="padding:30px;text-align:center;color:var(--text3)"><span class="spinner"></span></td></tr>';
-  });
+  const el0 = document.getElementById('trnStandingsBodyA');
+  if (el0) el0.innerHTML = '<tr><td colspan="10" style="padding:30px;text-align:center;color:var(--text3)"><span class="spinner"></span></td></tr>';
   try {
     await fetchTrnData();
     if (!trnTeamsCache.length) {
-      ['trnStandingsBodyA','trnStandingsBodyB'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.innerHTML = '<tr><td colspan="10" style="padding:30px;text-align:center;color:var(--text3)">কোনো team নেই।</td></tr>';
-      });
+      const el = document.getElementById('trnStandingsBodyA');
+      if (el) el.innerHTML = '<tr><td colspan="10" style="padding:30px;text-align:center;color:var(--text3)">কোনো team নেই।</td></tr>';
       return;
     }
-    const grpA = trnTeamsCache.filter(t => (t.group||'A') === 'A');
-    const grpB = trnTeamsCache.filter(t => (t.group||'B') === 'B');
-    const matchesA = trnMatchesCache.filter(m => m.group === 'A' || grpA.find(t => t.id === m.homeTeam));
-    const matchesB = trnMatchesCache.filter(m => m.group === 'B' || grpB.find(t => t.id === m.homeTeam));
-    renderGroupTable('trnStandingsBodyA', calcStandings(grpA, matchesA), 2);
-    renderGroupTable('trnStandingsBodyB', calcStandings(grpB, matchesB), 2);
+    renderGroupTable('trnStandingsBodyA', calcStandings(trnTeamsCache, trnMatchesCache), 4);
   } catch(e) {
-    ['trnStandingsBodyA','trnStandingsBodyB'].forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.innerHTML = `<tr><td colspan="10" style="padding:30px;text-align:center;color:var(--red)">❌ ${e.message}</td></tr>`;
-    });
+    const el = document.getElementById('trnStandingsBodyA');
+    if (el) el.innerHTML = `<tr><td colspan="10" style="padding:30px;text-align:center;color:var(--red)">❌ ${e.message}</td></tr>`;
   }
 };
 // ── TEAMS PAGE ──
@@ -7663,7 +7626,7 @@ function renderAdminTeamsList() {
       </div>
       <div style="flex:1">
         <div style="font-weight:700;font-size:14px;color:var(--text)">${safeName}</div>
-        <div style="font-size:12px;color:var(--text3)">👑 ${t.manager||'—'} • ${(t.players||[]).filter(p=>p&&p.isStarter).length}/9 starters · ${(t.players||[]).filter(p=>p&&!p.isStarter).length}/3 subs</div>
+        <div style="font-size:12px;color:var(--text3)">👑 ${t.manager||'—'} • ${(t.players||[]).filter(p=>p&&p.isStarter).length}/8 starters · ${(t.players||[]).filter(p=>p&&!p.isStarter).length}/3 subs</div>
       </div>
       <button class="btn-admin-edit" onclick="openEditTeamModal('${t.id}')">✏️ Edit</button>
       <button class="btn-admin-del" onclick="deleteTeam('${t.id}','${safeNameAttr}')">🗑️</button>
@@ -7703,7 +7666,6 @@ window.openEditTeamModal = async function(teamId) {
   document.getElementById('newTeamName').value = t.name || '';
   document.getElementById('newTeamManager').value = t.manager || '';
   document.getElementById('newTeamEmoji').value = t.emoji || '🏟️';
-  document.getElementById('newTeamGroup').value = t.group || 'A';
   document.getElementById('teamLogoUrl').value = t.logo || '';
   const prevEl = document.getElementById('teamLogoPreview');
   if (t.logo) {
@@ -7760,7 +7722,7 @@ window.togglePlayerPick = function(uid, el) {
   const idx = _playerPickSelected.indexOf(uid);
   const cb = el.querySelector('input[type=checkbox]');
   if (idx === -1) {
-    if (_playerPickSelected.length >= 12) { alert('Maximum 12 players (9 starters + 3 subs)।'); return; }
+    if (_playerPickSelected.length >= 11) { alert('Maximum 11 players (8 starters + 3 subs)।'); return; }
     _playerPickSelected.push(uid);
     el.classList.add('selected'); if(cb) cb.checked = true;
   } else {
@@ -7772,7 +7734,7 @@ window.togglePlayerPick = function(uid, el) {
 
 function updatePlayerPickCount() {
   const el = document.getElementById('playerPickCount');
-  if (el) el.textContent = `${_playerPickSelected.length} selected (${Math.min(_playerPickSelected.length,9)} starters + ${Math.max(0,_playerPickSelected.length-9)} subs)`;
+  if (el) el.textContent = `${_playerPickSelected.length} selected (${Math.min(_playerPickSelected.length,8)} starters + ${Math.max(0,_playerPickSelected.length-8)} subs)`;
 }
 
 window.previewTeamLogo = function(input) {
@@ -7791,7 +7753,6 @@ window.saveTeam = async function() {
   const name = document.getElementById('newTeamName').value.trim();
   const manager = document.getElementById('newTeamManager').value.trim();
   const emoji = document.getElementById('newTeamEmoji').value.trim() || '🏟️';
-  const group = document.getElementById('newTeamGroup')?.value || 'A';
   const errEl = document.getElementById('createTeamError');
   if (!name) { errEl.textContent = '❌ Team name দিন।'; return; }
   if (_playerPickSelected.length < 1) { errEl.textContent = '❌ কমপক্ষে ১ জন player select করুন।'; return; }
@@ -7799,7 +7760,7 @@ window.saveTeam = async function() {
   const allUsers = window._trnAllUsers || [];
   const players = _playerPickSelected.map((uid, i) => {
     const u = allUsers.find(u => u.uid === uid) || {};
-    return { uid, name: u.name || '—', isStarter: i < 9 };
+    return { uid, name: u.name || '—', isStarter: i < 8 };
   });
 
   const teamId = document.getElementById('editTeamId').value;
@@ -7839,7 +7800,7 @@ window.saveTeam = async function() {
     errEl.textContent = '';
   }
 
-  const payload = { name, manager, emoji, group, players, updatedAt: new Date().toISOString() };
+  const payload = { name, manager, emoji, players, updatedAt: new Date().toISOString() };
   if (logoUrl) payload.logo = logoUrl;
 
   if (teamId) {
@@ -7863,11 +7824,11 @@ window.saveTeam = async function() {
   await new Promise(r => setTimeout(r, 500));
   await fetchTrnData();
   renderAdminTeamsList();
-  // Auto-generate fixtures if 8 teams
-  if (trnTeamsCache.length === 8) {
+  // Auto-generate fixtures if 6 teams
+  if (trnTeamsCache.length === 6) {
     const existing = trnMatchesCache.length;
     if (existing === 0) {
-      if (confirm('8 টা team তৈরি হয়েছে! Auto-generate করবো সব fixtures?')) {
+      if (confirm('6 টা team তৈরি হয়েছে! Auto-generate করবো সব fixtures?')) {
         await generateFixtures();
       }
     }
@@ -7883,53 +7844,46 @@ window.deleteTeam = async function(id, name) {
 };
 
 // ── Auto-generate Round Robin Fixtures ──
-// Group A/B double round robin: 4 teams each group, 6 matchdays per group
-// Each matchday = 4 matches (2 GRP-A + 2 GRP-B) × 9 x 1v1 bouts
+// No groups: 6 teams, single table, double round robin (home & away)
+// 6 teams → 10 matchdays × 3 matches per matchday × 8 x 1v1 bouts per match
 async function generateFixtures() {
   const teams = trnTeamsCache;
-  if (teams.length !== 8) { alert('ঠিক 8টা team লাগবে fixture generate করতে।'); return; }
+  if (teams.length !== 6) { alert('ঠিক 6টা team লাগবে fixture generate করতে।'); return; }
 
-  const groupA = teams.filter(t => (t.group||'A') === 'A');
-  const groupB = teams.filter(t => (t.group||'B') === 'B');
-
-  if (groupA.length !== 4 || groupB.length !== 4) {
-    alert(`Group A: ${groupA.length} teams, Group B: ${groupB.length} teams — প্রতি group এ ঠিক 4টা team দরকার।`);
-    return;
-  }
-
-  // Double round-robin: each team plays every other team TWICE (home & away)
-  // 4 teams → 6 rounds, 2 matches per round per group → 12 matches per group
-  function getDoubleRoundRobinRounds(grpTeams) {
-    const ids = grpTeams.map(t => t.id);
-    // Single round-robin using circle method (3 rounds)
-    const fixed = ids[0];
-    const rotating = ids.slice(1);
+  // Double round-robin (circle method): 6 teams → 5 single rounds (3 matches each),
+  // then repeated with home/away swapped → 10 rounds total
+  function getDoubleRoundRobinRounds(allTeams) {
+    const ids = allTeams.map(t => t.id);
+    const n = ids.length; // 6
+    const arr = ids.slice();
     const singleRounds = [];
-    for (let r = 0; r < 3; r++) {
-      const pairs = [];
-      pairs.push([fixed, rotating[r % 3]]);
-      pairs.push([rotating[(r + 1) % 3], rotating[(r + 2) % 3]]);
-      singleRounds.push(pairs);
+    for (let r = 0; r < n - 1; r++) {
+      const round = [];
+      for (let i = 0; i < n / 2; i++) {
+        round.push([arr[i], arr[n - 1 - i]]);
+      }
+      singleRounds.push(round);
+      // rotate: keep arr[0] fixed, move last element to position 1
+      arr.splice(1, 0, arr.pop());
     }
     // Double: repeat with home/away swapped
     const doubleRounds = [...singleRounds];
     singleRounds.forEach(round => {
-      doubleRounds.push(round.map(([a, b]) => [b, a])); // swap home/away
+      doubleRounds.push(round.map(([a, b]) => [b, a]));
     });
-    return doubleRounds; // 6 rounds total
+    return doubleRounds; // 10 rounds total
   }
 
-  const roundsA = getDoubleRoundRobinRounds(groupA);
-  const roundsB = getDoubleRoundRobinRounds(groupB);
+  const rounds = getDoubleRoundRobinRounds(teams);
 
   const allFixtures = [];
 
-  // Helper to push bouts for a match
-  function pushBouts(t1, t2, matchdayNum, matchIdx, group) {
-    const t1S = (t1.players||[]).filter(p=>p.isStarter).slice(0,9);
-    const t2S = (t2.players||[]).filter(p=>p.isStarter).slice(0,9);
-    const bouts = Math.min(t1S.length, t2S.length, 9);
-    const matchdayLabel = `Matchday ${matchdayNum} — GRP-${group} Match ${matchIdx+1}: ${t1.name} vs ${t2.name}`;
+  // Helper to push bouts for a match (8 starters × 1v1, 3 subs on bench)
+  function pushBouts(t1, t2, matchdayNum, matchIdx) {
+    const t1S = (t1.players||[]).filter(p=>p.isStarter).slice(0,8);
+    const t2S = (t2.players||[]).filter(p=>p.isStarter).slice(0,8);
+    const bouts = Math.min(t1S.length, t2S.length, 8);
+    const matchdayLabel = `Matchday ${matchdayNum} — Match ${matchIdx+1}: ${t1.name} vs ${t2.name}`;
     for (let k = 0; k < bouts; k++) {
       allFixtures.push({
         homeTeam: t1.id, awayTeam: t2.id,
@@ -7937,27 +7891,20 @@ async function generateFixtures() {
         player1uid: t1S[k]?.uid||'', player2uid: t2S[k]?.uid||'',
         matchday: matchdayLabel,
         boutNumber: k+1, day: matchdayNum, matchNumber: matchIdx+1,
-        group, status: 'pending', createdAt: new Date().toISOString()
+        status: 'pending', createdAt: new Date().toISOString()
       });
     }
   }
 
-  // Generate all 6 matchdays (Group A & B together each day)
-  for (let rIdx = 0; rIdx < 6; rIdx++) {
+  // Generate all matchdays
+  rounds.forEach((round, rIdx) => {
     const matchdayNum = rIdx + 1;
-    // Group A
-    (roundsA[rIdx] || []).forEach((pair, matchIdx) => {
+    round.forEach((pair, matchIdx) => {
       const t1 = teams.find(t => t.id === pair[0]);
       const t2 = teams.find(t => t.id === pair[1]);
-      if (t1 && t2) pushBouts(t1, t2, matchdayNum, matchIdx, 'A');
+      if (t1 && t2) pushBouts(t1, t2, matchdayNum, matchIdx);
     });
-    // Group B
-    (roundsB[rIdx] || []).forEach((pair, matchIdx) => {
-      const t1 = teams.find(t => t.id === pair[0]);
-      const t2 = teams.find(t => t.id === pair[1]);
-      if (t1 && t2) pushBouts(t1, t2, matchdayNum, matchIdx, 'B');
-    });
-  }
+  });
 
   const batchObj = {};
   allFixtures.forEach((f, i) => { batchObj[`fixture_${Date.now()}_${i}`] = f; });
@@ -7965,7 +7912,7 @@ async function generateFixtures() {
   if (!putRes.ok) { alert('❌ Fixture save failed: ' + await putRes.text()); return; }
   await new Promise(r => setTimeout(r, 500));
   await fetchTrnData();
-  alert(`✅ Fixtures generated!\nGroup A & B: 6 matchdays × 4 matches per day\nDouble round-robin (home & away)\nTotal: ${allFixtures.length} bouts`);
+  alert(`✅ Fixtures generated!\n6 teams, no groups: 10 matchdays × 3 matches per day\nDouble round-robin (home & away)\nটোটাল: ${allFixtures.length} bouts`);
 }
 
 window.confirmRegenerateFixtures = async function() {
@@ -7981,9 +7928,9 @@ window.confirmRegenerateFixtures = async function() {
   loadTrnMatchdays();
 };
 
-// ── Admin: One-click fix — promote each team's players so first 9 (existing order) become starters ──
+// ── Admin: One-click fix — promote each team's players so first 8 (existing order) become starters ──
 window.fixStartersTo9 = async function() {
-  if (!confirm('সব টিমের প্লেয়ার লিস্ট চেক করে প্রথম ৯ জনকে starter বানিয়ে দেওয়া হবে (আগের ক্রম অনুযায়ী)। Continue?')) return;
+  if (!confirm('সব টিমের প্লেয়ার লিস্ট চেক করে প্রথম ৮ জনকে starter বানিয়ে দেওয়া হবে (আগের ক্রম অনুযায়ী)। Continue?')) return;
 
   const res = await fetch(`${TRN_DB}/tournament/teams.json`);
   const data = await res.json() || {};
@@ -7998,8 +7945,8 @@ window.fixStartersTo9 = async function() {
     const players = team.players || [];
     if (!players.length) { skippedCount++; continue; }
 
-    const alreadyNine = players.filter(p => p.isStarter).length === Math.min(players.length, 9);
-    const updatedPlayers = players.map((p, i) => ({ ...p, isStarter: i < 9 }));
+    const alreadyNine = players.filter(p => p.isStarter).length === Math.min(players.length, 8);
+    const updatedPlayers = players.map((p, i) => ({ ...p, isStarter: i < 8 }));
 
     if (alreadyNine && JSON.stringify(updatedPlayers) === JSON.stringify(players)) { skippedCount++; continue; }
 
@@ -8011,7 +7958,7 @@ window.fixStartersTo9 = async function() {
     await new Promise(r => setTimeout(r, 150)); // Firebase-কে একটু breathing room দেওয়া
   }
 
-  alert(`✅ Fix সম্পন্ন!\n${fixedCount}টা team আপডেট হয়েছে, ${skippedCount}টা আগে থেকেই ঠিক ছিল।\n\nএখন "🔄 Regenerate Fixtures" বাটনে চাপ দাও — তাহলে সব ম্যাচে 9/9 bout দেখাবে।`);
+  alert(`✅ Fix সম্পন্ন!\n${fixedCount}টা team আপডেট হয়েছে, ${skippedCount}টা আগে থেকেই ঠিক ছিল।\n\nএখন "🔄 Regenerate Fixtures" বাটনে চাপ দাও — তাহলে সব ম্যাচে 8/8 bout দেখাবে।`);
 
   await loadTrnAdminTeams();
 };
@@ -8103,7 +8050,6 @@ window.renderSelectedMatchup = function() {
   const ht = teamMap[groupMatches[0].homeTeam] || {};
   const at = teamMap[groupMatches[0].awayTeam] || {};
   const doneCount = groupMatches.filter(m => m.status === 'completed').length;
-  const grp = groupMatches[0].group || '';
 
   const boutRows = groupMatches.map(m => {
     const done = m.status === 'completed';
@@ -8151,7 +8097,6 @@ window.renderSelectedMatchup = function() {
 
   area.innerHTML = `<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:16px;overflow:hidden">
     <div style="background:linear-gradient(135deg,var(--primary),var(--primary-dark));padding:12px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-      <div style="font-size:10px;color:rgba(255,255,255,0.6);font-weight:700;letter-spacing:2px;font-family:'Inter',monospace">GRP-${grp}</div>
       <div style="flex:1;display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;color:#fff">
         <span>${ht.emoji||'🏟️'}</span>
         <span>${ht.name||'—'}</span>
@@ -9481,8 +9426,8 @@ const TYP_FAQ = [
     answer: 'Friendly Match-এ খেলোয়াড়রা নিজেরা ম্যাচের ফলাফল জমা দেয়। Admin সেটা approve করলে তোমার স্ট্যাটস আপডেট হয় এবং আলাদা Friendly Leaderboard-এ যোগ হয়।'
   },
   {
-    keywords: ['tournament', 'টুর্নামেন্ট', 'গ্রুপ এ', 'গ্রুপ বি', 'group', 'knockout', 'নকআউট', 'কাপ'],
-    answer: 'Tournament-এ Group A ও Group B-তে round-robin ম্যাচ হয়, এরপর সেরা দলগুলো নিয়ে knockout ব্র্যাকেট হয়ে চ্যাম্পিয়ন নির্ধারিত হয়। প্রতিটা ম্যাচের রেজাল্ট কার্ড PNG আকারে ডাউনলোড করা যায়।'
+    keywords: ['tournament', 'টুর্নামেন্ট', 'group', 'knockout', 'নকআউট', 'কাপ'],
+    answer: 'Tournament-এ 6 টা team কোনো group ছাড়াই একটা টেবিলে double round-robin ম্যাচ খেলে (প্রতি দল বাকি সবার সাথে Home ও Away মিলিয়ে ২ বার), এরপর Top 4 team নিয়ে knockout ব্র্যাকেট হয়ে চ্যাম্পিয়ন নির্ধারিত হয়। প্রতিটা ম্যাচের রেজাল্ট কার্ড PNG আকারে ডাউনলোড করা যায়।'
   },
   {
     keywords: ['বিরোধ', 'dispute', 'ভুল ফলাফল', 'complain', 'অভিযোগ', 'রিপোর্ট'],
