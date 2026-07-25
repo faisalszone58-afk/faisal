@@ -4365,7 +4365,7 @@ window.switchAdminTab = function(tab) {
 const BD_CONFIG = {
   1:{count:3,label:'Deadline 1',boutLabel:'3v3 Bout Draw'},
   2:{count:2,label:'Deadline 2',boutLabel:'2v2 Bout Draw'},
-  3:{count:4,label:'Deadline 3',boutLabel:'4v4 Bout Draw'},
+  3:{count:3,label:'Deadline 3',boutLabel:'3v3 Bout Draw'},
 };
 let bdCurrentDL = 1;
 const bdSaved = {1:null,2:null,3:null};
@@ -4512,7 +4512,7 @@ window.bdDownloadAll = async function() {
   });
   const SCALE=2,W=560,PAD=28;
   const ROW_H=44,ROW_GAP=6,SECTION_GAP=22,SEC_LABEL_H=30;
-  const HEADER_H=102,FOOTER_H=38;
+  const HEADER_H=120,FOOTER_H=38;
   const totalRows=BD_CONFIG[1].count+BD_CONFIG[2].count+BD_CONFIG[3].count;
   const totalH=HEADER_H+3*SEC_LABEL_H+totalRows*(ROW_H+ROW_GAP)-ROW_GAP+2*SECTION_GAP+FOOTER_H+24;
   const canvas=document.createElement('canvas');
@@ -4521,17 +4521,17 @@ window.bdDownloadAll = async function() {
   ctx.scale(SCALE,SCALE);
   ctx.fillStyle='#f5f2ee'; ctx.fillRect(0,0,W,totalH);
   if (typLogoImg) {
-    const lh=100, lw = typLogoImg.width * (lh/typLogoImg.height);
-    ctx.drawImage(typLogoImg, PAD, PAD-4, lw, lh);
+    const lh=56, lw = typLogoImg.width * (lh/typLogoImg.height);
+    ctx.drawImage(typLogoImg, PAD, PAD, lw, lh);
   } else {
-    ctx.font="bold 48px 'Arial Black',Arial,sans-serif";
+    ctx.font="bold 40px 'Arial Black',Arial,sans-serif";
     ctx.fillStyle='#1a1a1a'; ctx.textAlign='left';
-    ctx.fillText('TYP',PAD,PAD+40);
+    ctx.fillText('TYP',PAD,PAD+38);
   }
   ctx.font="700 13px Arial,sans-serif"; ctx.fillStyle='#2c2c2c'; ctx.textAlign='right';
-  ctx.fillText('TYP Championship',W-PAD,PAD+24);
+  ctx.fillText('TYP Championship',W-PAD,PAD+30);
   ctx.font="10px Arial,sans-serif"; ctx.fillStyle='#888078'; ctx.textAlign='right';
-  ctx.fillText('BOUT DRAW RESULT',W-PAD,PAD+40);
+  ctx.fillText('BOUT DRAW RESULT',W-PAD,PAD+46);
   ctx.fillStyle='#d8d0c4'; ctx.fillRect(PAD,HEADER_H-22,W-PAD*2,1);
   ctx.font="bold 16px 'Arial Black',Arial,sans-serif";
   ctx.fillStyle='#1a1a1a'; ctx.textAlign='left'; ctx.fillText(ta.toUpperCase(),PAD,HEADER_H-5);
