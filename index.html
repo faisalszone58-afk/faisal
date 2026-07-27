@@ -3580,6 +3580,8 @@ window.computeMainRankingData = async function() {
       if (p.club) totals[p.uid].club = p.club;
       if (p.district) totals[p.uid].district = p.district;
     }
+    // Card status is always a LIVE/current-status field — always sync from live user, never from archive
+    totals[p.uid].card = p.card || null;
   });
 
   const arr = Object.values(totals);
@@ -3648,6 +3650,8 @@ window.loadMainRanking = async function() {
         if (p.club) totals[p.uid].club = p.club;
         if (p.district) totals[p.uid].district = p.district;
       }
+      // Card status সবসময় LIVE user থেকে sync করো (archive-এ card থাকে না)
+      if (totals[p.uid]) totals[p.uid].card = p.card || null;
     });
 
     rankingData = Object.values(totals);
@@ -3744,6 +3748,16 @@ window.refreshRankingView = async function() {
   window.onRankSeasonChange();
 };
 
+// ── Card System: shared badge renderer (yellow/red card emoji + matches-left tooltip) ──
+function cardBadgeHtml(p) {
+  if (!p || !p.card || !p.card.type) return '';
+  const isRed = p.card.type === 'red';
+  const emoji = isRed ? '🟥' : '🟨';
+  const left = (p.card.matchesLeft != null) ? p.card.matchesLeft : '?';
+  return `<span title="${isRed ? 'Red' : 'Yellow'} Card — ${left} ম্যাচ বাকি" style="font-size:13px;margin-left:5px;cursor:default;vertical-align:middle">${emoji}</span>`;
+}
+window.cardBadgeHtml = cardBadgeHtml;
+
 function renderRanking(data) {
   const banner = document.getElementById('rankSeasonBanner');
   if (banner) {
@@ -3815,7 +3829,7 @@ function renderRanking(data) {
         <div style="display:flex;align-items:center;cursor:pointer" onclick="openPublicProfile('${p.uid}')">
           ${avatar}
           <div>
-            <div style="font-weight:600;color:var(--cyan);text-decoration:underline dotted;text-underline-offset:3px">${p.name||'—'}</div>
+            <div style="font-weight:600;color:var(--cyan);text-decoration:underline dotted;text-underline-offset:3px">${p.name||'—'}${cardBadgeHtml(p)}</div>
             <div style="font-size:11px;color:var(--text3)">${p.club||'—'} • ${p.district||'—'}</div>
           </div>
         </div>
@@ -3899,7 +3913,7 @@ function renderRankingCards(data) {
       <!-- Avatar -->
       <div style="width:80px;height:80px;border-radius:8px;background:rgba(255,255,255,0.05);border:2px solid ${borderCol}33;display:flex;align-items:center;justify-content:center;margin:20px auto 12px;overflow:hidden">${avatar}</div>
       <!-- Name -->
-      <div style="text-align:center;font-family:'Inter',sans-serif;font-weight:800;font-size:14px;color:#fff;margin-bottom:2px;letter-spacing:0.02em">${(p.name||'—').toUpperCase()}</div>
+      <div style="text-align:center;font-family:'Inter',sans-serif;font-weight:800;font-size:14px;color:#fff;margin-bottom:2px;letter-spacing:0.02em">${(p.name||'—').toUpperCase()}${cardBadgeHtml(p)}</div>
       <div style="text-align:center;font-size:10px;color:rgba(255,255,255,0.4);margin-bottom:12px;letter-spacing:0.15em">${(p.club||'—').toUpperCase()}</div>
       <!-- Stats row -->
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;border-top:1px solid rgba(255,255,255,0.1);padding-top:10px">
@@ -4737,12 +4751,16 @@ function renderAdminPlayers(players) {
     <div class="player-admin-card">
       <div class="player-admin-avatar">${p.avatarUrl ? `<img src="${p.avatarUrl}">` : '🎮'}</div>
       <div class="player-admin-info">
-        <div class="player-admin-name">${p.name || '—'} <span style="font-size:11px;color:var(--text3)">@${p.username||'—'}</span></div>
+        <div class="player-admin-name">${p.name || '—'} <span style="font-size:11px;color:var(--text3)">@${p.username||'—'}</span>${cardBadgeHtml(p)}</div>
         <div class="player-admin-meta">🏟️ ${p.club||'—'} • 📍 ${p.district||'—'} • M:${p.matches||0} W:${p.wins||0} D:${p.draws||0} L:${p.losses||0} • PTS:${p.points||0}</div>
+        ${p.card && p.card.type ? `<div style="font-size:11px;margin-top:4px;font-weight:700;color:${p.card.type==='red'?'var(--red)':'var(--yellow)'}">${p.card.type==='red'?'🟥 Red Card':'🟨 Yellow Card'} — ${p.card.matchesLeft||0} ম্যাচ বাকি</div>` : ''}
       </div>
       <div class="player-admin-actions">
         <button class="btn-admin-edit" onclick="openAdminEditProfile('${p.uid}')">👤 Edit Profile</button>
         <button class="btn-admin-edit" onclick="openStatsModal('${p.uid}')">✏️ Edit Stats</button>
+        <button class="btn-admin-edit" style="background:rgba(251,191,36,0.15);border:1px solid var(--yellow);color:var(--yellow)" onclick="giveCard('${p.uid}','yellow')">🟨 Yellow Card</button>
+        <button class="btn-admin-edit" style="background:rgba(220,38,38,0.12);border:1px solid var(--red);color:var(--red)" onclick="giveCard('${p.uid}','red')">🟥 Red Card</button>
+        ${p.card && p.card.type ? `<button class="btn-admin-edit" onclick="removeCard('${p.uid}')">♻️ Remove Card</button>` : ''}
         <button class="btn-admin-del" onclick="deletePlayer('${p.uid}','${(p.name||'').replace(/'/g,'')}')" >🗑️ Delete</button>
       </div>
     </div>
@@ -4756,6 +4774,55 @@ window.filterAdminPlayers = function(q) {
     (p.club||'').toLowerCase().includes(q.toLowerCase())
   );
   renderAdminPlayers(filtered);
+};
+
+// ── Card System: Give / Remove Yellow & Red Cards ──
+// Card lives on users/{uid}/card = { type:'yellow'|'red', matchesLeft:2, issuedAt }
+// Auto-expires after 2 matches (decremented in savePlayerStats when matches count increases).
+// A 2nd Yellow while one is still active auto-escalates to a Red Card.
+window.giveCard = async function(uid, type) {
+  const p = allPlayersCache.find(x => x.uid === uid);
+  if (!p) return;
+  let newCard;
+
+  if (type === 'yellow') {
+    if (p.card && p.card.type === 'yellow') {
+      if (!confirm(`"${p.name}" আগে থেকেই একটা 🟨 Yellow Card পেয়ে আছে (${p.card.matchesLeft||0} ম্যাচ বাকি)।\n\nআরেকটা Yellow দিলে এটা সরাসরি 🟥 Red Card হয়ে যাবে। এগিয়ে যাবে?`)) return;
+      newCard = { type: 'red', matchesLeft: 2, issuedAt: new Date().toISOString() };
+    } else {
+      if (!confirm(`"${p.name}"-কে 🟨 Yellow Card দিতে চাও? এটা ২ ম্যাচ পর্যন্ত থাকবে।`)) return;
+      newCard = { type: 'yellow', matchesLeft: 2, issuedAt: new Date().toISOString() };
+    }
+  } else if (type === 'red') {
+    if (!confirm(`"${p.name}"-কে সরাসরি 🟥 Red Card দিতে চাও? এটা ২ ম্যাচ পর্যন্ত থাকবে।`)) return;
+    newCard = { type: 'red', matchesLeft: 2, issuedAt: new Date().toISOString() };
+  } else return;
+
+  try {
+    await window._set(window._ref(window._db, `users/${uid}/card`), newCard);
+    p.card = newCard;
+    window._allUsersCache = []; window._allUsersCacheTime = 0;
+    window._mainRankingCache = null;
+    renderAdminPlayers(allPlayersCache);
+    alert(`✅ ${newCard.type === 'yellow' ? '🟨 Yellow' : '🟥 Red'} Card দেওয়া হয়েছে!`);
+  } catch(e) {
+    alert(`❌ Error: ${e.message}`);
+  }
+};
+
+window.removeCard = async function(uid) {
+  const p = allPlayersCache.find(x => x.uid === uid);
+  if (!p) return;
+  if (!confirm(`"${p.name}"-এর Card remove করবে?`)) return;
+  try {
+    await window._set(window._ref(window._db, `users/${uid}/card`), null);
+    delete p.card;
+    window._allUsersCache = []; window._allUsersCacheTime = 0;
+    window._mainRankingCache = null;
+    renderAdminPlayers(allPlayersCache);
+  } catch(e) {
+    alert(`❌ Error: ${e.message}`);
+  }
 };
 
 window.openStatsModal = function(uid) {
@@ -4785,9 +4852,21 @@ window.savePlayerStats = async function() {
   const uid = document.getElementById('modalPlayerUid').value;
   const p = allPlayersCache.find(x => x.uid === uid);
   if (!p) return;
+  const newMatches = parseInt(document.getElementById('se_matches').value) || 0;
+
+  // ── Card System: auto-decrement matchesLeft when matches count goes up, auto-clear at 0 ──
+  let updatedCard = p.card || null;
+  if (updatedCard) {
+    const matchesIncrease = newMatches - (p.matches || 0);
+    if (matchesIncrease > 0) {
+      const matchesLeft = (updatedCard.matchesLeft || 0) - matchesIncrease;
+      updatedCard = matchesLeft > 0 ? { ...updatedCard, matchesLeft } : null;
+    }
+  }
+
   const updates = {
     ...p,
-    matches: parseInt(document.getElementById('se_matches').value) || 0,
+    matches: newMatches,
     wins: parseInt(document.getElementById('se_wins').value) || 0,
     draws: parseInt(document.getElementById('se_draws').value) || 0,
     losses: parseInt(document.getElementById('se_losses').value) || 0,
@@ -4798,14 +4877,16 @@ window.savePlayerStats = async function() {
     mvp: parseInt(document.getElementById('se_mvp').value) || 0,
     rank: parseInt(document.getElementById('se_rank').value) || 0,
     points: parseInt(document.getElementById('se_points').value) || 0,
+    card: updatedCard,
   };
   await window._set(window._ref(window._db, `users/${uid}`), updates);
   window._allUsersCache = [];
+  window._mainRankingCache = null;
   const idx = allPlayersCache.findIndex(x => x.uid === uid);
   if (idx !== -1) allPlayersCache[idx] = updates;
   closeStatsModal();
   renderAdminPlayers(allPlayersCache);
-  alert('✅ Stats save হয়েছে!');
+  alert('✅ Stats save হয়েছে!' + (p.card && !updatedCard ? ' 🎉 Card মেয়াদ শেষ হয়ে গেছে, remove হয়ে গেছে।' : ''));
 };
 
 // ── Admin: Open Edit Profile Modal ──
@@ -6737,6 +6818,10 @@ window.openPublicProfile = async function(uid) {
   if (w > 0 && w === maxWins)    badges.push({ icon: '🥇', label: 'Most Wins', color: '#f5c842' });
   if (m > 0 && l === 0)          badges.push({ icon: '⚡', label: 'Unbeaten',  color: '#00e6f6' });
   if (mvp > 0 && mvp === maxMVP) badges.push({ icon: '🏅', label: 'Most MVP',  color: '#ff9500' });
+  if (p.card && p.card.type) {
+    const isRed = p.card.type === 'red';
+    badges.push({ icon: isRed ? '🟥' : '🟨', label: `${isRed?'Red':'Yellow'} Card • ${p.card.matchesLeft||0} match বাকি`, color: isRed ? '#dc2626' : '#fbbf24' });
+  }
   document.getElementById('ppBadges').innerHTML = badges.map(b =>
     `<div style="display:flex;align-items:center;gap:5px;background:rgba(255,255,255,0.06);border:1px solid ${b.color}55;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700;color:${b.color};font-family:'Inter',sans-serif">${b.icon} ${b.label}</div>`
   ).join('');
