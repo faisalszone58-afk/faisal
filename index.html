@@ -7246,14 +7246,12 @@ let trnMatchesCache = [];
 let trnKnockoutCache = {};
 let trnSettingsCache = {};
 let trnAllFixtures = [];
-let trnDecidersCache = {}; // key: "<Matchday Label>__<homeTeamId>__<awayTeamId>" -> {homePlayerUid,homePlayerName,awayPlayerUid,awayPlayerName,homeScore,awayScore,winner,updatedAt}
+let trnDecidersCache = {};
 
-// Normalize a raw matchday label the same way across admin entry, standings, and deciders
-function trnNormDay(raw) {
-  return (raw || '').replace(/\s*—.*$/, '').trim().replace(/^GRP-[AB]\s+Day\s+(\d+)$/i, 'Matchday $1');
-}
-function trnDeciderKey(day, homeTeam, awayTeam) {
-  return `${trnNormDay(day)}__${homeTeam}__${awayTeam}`.replace(/[.#$\[\]\/\s]/g, '_');
+// Matchday draw হলে 1v1 decider match খেলে winner ঠিক করার জন্য key builder
+function trnDeciderKey(rawMatchday, homeTeam, awayTeam) {
+  const day = (rawMatchday || '').replace(/\s*—.*$/, '').trim().replace(/^GRP-[AB]\s+Day\s+(\d+)$/i, 'Matchday $1').replace(/\s+/g, '');
+  return `${day}_${homeTeam}_${awayTeam}`;
 }
 
 // ── Tab switcher ──
@@ -7283,13 +7281,13 @@ async function fetchTrnData() {
   const matchesRaw = await matchRes.json();
   const settings = await settRes.json();
   const knockout = await koRes.json();
-  const decidersRaw = await decRes.json();
+  const deciders = await decRes.json();
 
   trnTeamsCache = teamsRaw ? Object.entries(teamsRaw).map(([id, v]) => ({ id, ...v })) : [];
   trnMatchesCache = matchesRaw ? Object.entries(matchesRaw).map(([id, v]) => ({ id, ...v })) : [];
   trnSettingsCache = settings || {};
   trnKnockoutCache = knockout || {};
-  trnDecidersCache = decidersRaw || {};
+  trnDecidersCache = deciders || {};
 
   if (trnSettingsCache.seasonName) {
     const lbl = document.getElementById('trnSeasonLabel');
@@ -7299,8 +7297,7 @@ async function fetchTrnData() {
 }
 
 // ── Calculate team standings ──
-function calcStandings(teams, matches, deciders) {
-  deciders = deciders || trnDecidersCache || {};
+function calcStandings(teams, matches) {
   const table = {};
   teams.forEach(t => {
     table[t.id] = { id: t.id, name: t.name, emoji: t.emoji || '🏟️', mp: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, pts: 0 };
@@ -7341,15 +7338,12 @@ function calcStandings(teams, matches, deciders) {
       table[md.awayTeam].w++; table[md.awayTeam].pts += 3;
       table[md.homeTeam].l++;
     } else {
-      // Genuine bout-tie — check if a 1v1 Decider Match was played to break it
-      const dKey = trnDeciderKey(md.matchday, md.homeTeam, md.awayTeam);
-      const decider = deciders[dKey];
-      if (decider && decider.winner === 'home') {
-        table[md.homeTeam].w++; table[md.homeTeam].pts += 3;
-        table[md.awayTeam].l++;
-      } else if (decider && decider.winner === 'away') {
-        table[md.awayTeam].w++; table[md.awayTeam].pts += 3;
-        table[md.homeTeam].l++;
+      // Points tied — check if a 1v1 decider match was recorded for this matchday
+      const decider = trnDecidersCache[trnDeciderKey(md.matchday, md.homeTeam, md.awayTeam)];
+      if (decider && decider.winnerTeam && table[decider.winnerTeam]) {
+        const loserTeam = decider.winnerTeam === md.homeTeam ? md.awayTeam : md.homeTeam;
+        table[decider.winnerTeam].w++; table[decider.winnerTeam].pts += 3;
+        if (table[loserTeam]) table[loserTeam].l++;
       } else {
         table[md.homeTeam].d++; table[md.homeTeam].pts += 1;
         table[md.awayTeam].d++; table[md.awayTeam].pts += 1;
@@ -7540,17 +7534,23 @@ window.filterFixtures = function(type, btn) {
       // Points system: bout win = 3 pts, bout draw = 1 pt each, loss = 0 pt (same rule used for standings)
       const homePts = homeWins * 3 + draws;
       const awayPts = awayWins * 3 + draws;
-      const winH = allDone && homePts > awayPts;
-      const winA = allDone && awayPts > homePts;
+      const isTied = allDone && homePts === awayPts;
+      const decider = isTied && bouts[0] ? trnDecidersCache[trnDeciderKey(bouts[0].matchday, match.homeTeam, match.awayTeam)] : null;
+      const winH = allDone && (decider ? decider.winnerTeam === match.homeTeam : homePts > awayPts);
+      const winA = allDone && (decider ? decider.winnerTeam === match.awayTeam : awayPts > homePts);
 
       const scoreDisplay = doneBouts.length > 0
         ? `${homePts}–${awayPts}`
         : 'vs';
       const scoreClass = doneBouts.length > 0 ? '' : 'pending';
 
-      const badgeColor = allDone ? 'var(--green)' : doneBouts.length > 0 ? 'var(--yellow)' : 'var(--text3)';
-      const badgeIcon = allDone ? '✅' : doneBouts.length > 0 ? '⏳' : '🎮';
-      const badgeText = allDone
+      const badgeColor = decider ? 'var(--gold)' : allDone && isTied ? 'var(--yellow)' : allDone ? 'var(--green)' : doneBouts.length > 0 ? 'var(--yellow)' : 'var(--text3)';
+      const badgeIcon = decider ? '🎯' : allDone && isTied ? '⚖️' : allDone ? '✅' : doneBouts.length > 0 ? '⏳' : '🎮';
+      const badgeText = decider
+        ? `${badgeIcon} Decider: ${(teamMap[decider.winnerTeam]||{}).name || 'Winner'} জিতেছে`
+        : allDone && isTied
+        ? `${badgeIcon} Draw — Decider Match বাকি`
+        : allDone
         ? `${badgeIcon} Completed`
         : doneBouts.length > 0
         ? `${badgeIcon} ${doneBouts.length}/${totalBouts} bouts done`
@@ -8195,64 +8195,37 @@ window.renderSelectedMatchup = function() {
     </div>`;
   }).join('');
 
-  // Check if this matchup is a genuine bout-tie once every bout is completed —
-  // if so, show a 1v1 Decider Match box so the admin can settle the winner.
-  let hw = 0, aw = 0;
-  groupMatches.forEach(m => {
-    if (m.status !== 'completed') return;
-    const hs = parseInt(m.homeScore)||0, as_ = parseInt(m.awayScore)||0;
-    if (hs > as_) hw++; else if (as_ > hs) aw++;
-  });
-  const allBoutsDone = groupMatches.length > 0 && doneCount === groupMatches.length;
-  const isTied = allBoutsDone && hw === aw;
-  const dKey = trnDeciderKey(window._trnCurrentDay, groupMatches[0].homeTeam, groupMatches[0].awayTeam);
-  window._trnCurrentDeciderKey = dKey;
-  const existingDecider = trnDecidersCache[dKey] || null;
-
-  let deciderHtml = '';
-  if (isTied) {
-    const htPlayers = (ht.players || []);
-    const atPlayers = (at.players || []);
-    const homeOpts = htPlayers.map(p =>
-      `<option value="${p.uid}" ${existingDecider && p.uid === existingDecider.homePlayerUid ? 'selected' : ''}>${p.name}</option>`
-    ).join('');
-    const awayOpts = atPlayers.map(p =>
-      `<option value="${p.uid}" ${existingDecider && p.uid === existingDecider.awayPlayerUid ? 'selected' : ''}>${p.name}</option>`
-    ).join('');
-    const winnerLine = existingDecider
-      ? `<div style="font-size:12px;color:var(--green);font-weight:700;margin-top:8px">🏆 ${existingDecider.winner === 'home' ? (ht.name||'Home') : (at.name||'Away')} জিতেছে এই Decider Match-এ</div>`
-      : '';
-    deciderHtml = `<div style="background:var(--bg);border:2px dashed var(--gold,#e0a63b);border-radius:8px;padding:12px;margin-top:6px">
-      <div style="font-size:11px;color:var(--gold,#e0a63b);font-weight:800;letter-spacing:1px;margin-bottom:8px">🎯 DECIDER MATCH — সব bout শেষে ম্যাচ Draw, তাই winner ঠিক করতে ১v১ Decider খেলুন</div>
-      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-        <div style="flex:1;min-width:100px">
-          <div style="font-size:10px;color:var(--cyan);margin-bottom:4px">🏠 HOME থেকে</div>
-          <select class="form-input" id="trnDeciderHomePlayer" style="font-size:12px;padding:7px 10px">
-            <option value="">-- Select --</option>
-            ${homeOpts}
-          </select>
-        </div>
-        <div style="display:flex;align-items:center;gap:6px;padding-top:16px">
-          <input type="number" min="0" max="99" value="${existingDecider ? existingDecider.homeScore : ''}" placeholder="0"
-            class="form-input" id="trnDeciderHomeScore"
-            style="width:52px;text-align:center;padding:8px 4px;font-size:16px;font-weight:700">
-          <span style="color:var(--text3);font-weight:700">—</span>
-          <input type="number" min="0" max="99" value="${existingDecider ? existingDecider.awayScore : ''}" placeholder="0"
-            class="form-input" id="trnDeciderAwayScore"
-            style="width:52px;text-align:center;padding:8px 4px;font-size:16px;font-weight:700">
-        </div>
-        <div style="flex:1;min-width:100px">
-          <div style="font-size:10px;color:var(--gold);margin-bottom:4px;text-align:right">AWAY থেকে 🏟️</div>
-          <select class="form-input" id="trnDeciderAwayPlayer" style="font-size:12px;padding:7px 10px">
-            <option value="">-- Select --</option>
-            ${awayOpts}
-          </select>
-        </div>
-      </div>
-      ${winnerLine}
-      <button class="btn btn-gold" onclick="saveTrnDecider()" style="margin-top:10px;padding:8px 16px;font-size:12px">💾 Decider Result Save করুন</button>
-      <div id="trnDeciderStatus" style="font-size:11px;color:var(--text3);margin-top:6px"></div>
-    </div>`;
+  // Matchday tied on points → offer a 1v1 decider match entry
+  let decHtml = '';
+  if (doneCount === groupMatches.length && groupMatches.length > 0) {
+    let hPts = 0, aPts = 0;
+    groupMatches.forEach(m => {
+      const hs = parseInt(m.homeScore) || 0, as_ = parseInt(m.awayScore) || 0;
+      if (hs > as_) hPts += 3; else if (as_ > hs) aPts += 3; else { hPts += 1; aPts += 1; }
+    });
+    if (hPts === aPts) {
+      const homeTeamId = groupMatches[0].homeTeam, awayTeamId = groupMatches[0].awayTeam;
+      const dKey = trnDeciderKey(groupMatches[0].matchday, homeTeamId, awayTeamId);
+      const existing = trnDecidersCache[dKey];
+      decHtml = `<div style="background:var(--bg3);border:1px solid var(--gold);border-radius:10px;padding:14px;margin:0 12px 12px">
+        <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:8px">⚖️ Matchday Draw (${hPts}–${aPts})! Winner ঠিক করতে 1v1 Decider Match খেলাও।</div>
+        ${existing ? `
+          <div style="font-size:13px;font-weight:700;color:var(--green);margin-bottom:8px">✅ Decider জিতেছে: ${(teamMap[existing.winnerTeam]||{}).name || existing.winnerTeam}${existing.winnerScore!=null ? ` (${existing.winnerScore}–${existing.loserScore ?? 0})` : ''}</div>
+          <button onclick="clearTrnDecider('${dKey}')" style="font-size:11px;color:var(--red);background:none;border:none;cursor:pointer;padding:0">✕ Decider result মুছে ফেলো</button>
+        ` : `
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px">
+            <select id="trnDeciderWinner" class="form-input" style="flex:1;min-width:140px;font-size:12px">
+              <option value="">-- Winner select করো --</option>
+              <option value="${homeTeamId}">${ht.name || 'Home'}</option>
+              <option value="${awayTeamId}">${at.name || 'Away'}</option>
+            </select>
+            <input type="number" min="0" id="trnDeciderWinnerScore" class="form-input" placeholder="Winner Score" style="width:110px;font-size:12px;text-align:center">
+            <input type="number" min="0" id="trnDeciderLoserScore" class="form-input" placeholder="Loser Score" style="width:110px;font-size:12px;text-align:center">
+          </div>
+          <button onclick="saveTrnDecider('${dKey}','${homeTeamId}','${awayTeamId}')" style="background:linear-gradient(135deg,#f5a623,#d68910);border:none;color:#000;padding:9px 16px;border-radius:8px;font-weight:700;font-size:12px;cursor:pointer">💾 Decider Result Save করো</button>
+        `}
+      </div>`;
+    }
   }
 
   area.innerHTML = `<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:16px;overflow:hidden">
@@ -8269,55 +8242,47 @@ window.renderSelectedMatchup = function() {
         ${doneCount}/${groupMatches.length} bouts
       </div>
     </div>
-    <div style="padding:12px">${boutRows}${deciderHtml}</div>
+    <div style="padding:12px">${boutRows}</div>
+    ${decHtml}
   </div>`;
 
   window._trnCurrentMatchupKey = key;
   btnWrap.style.display = 'block';
 };
 
-// Save the 1v1 Decider Match result for a bout-tied matchup
-window.saveTrnDecider = async function() {
-  const statusEl = document.getElementById('trnDeciderStatus');
-  const dKey = window._trnCurrentDeciderKey;
-  if (!dKey) return;
+// ── Matchday points tied → admin records the 1v1 decider match winner ──
+window.saveTrnDecider = async function(dKey, homeTeamId, awayTeamId) {
+  const winnerSel = document.getElementById('trnDeciderWinner');
+  const wsInp = document.getElementById('trnDeciderWinnerScore');
+  const lsInp = document.getElementById('trnDeciderLoserScore');
+  const winnerTeam = winnerSel ? winnerSel.value : '';
+  if (!winnerTeam) { alert('⚠️ আগে Winner select করো।'); return; }
+  const loserTeam = winnerTeam === homeTeamId ? awayTeamId : homeTeamId;
+  const winnerScore = wsInp && wsInp.value.trim() !== '' ? parseInt(wsInp.value) : null;
+  const loserScore = lsInp && lsInp.value.trim() !== '' ? parseInt(lsInp.value) : null;
 
-  const homeSel = document.getElementById('trnDeciderHomePlayer');
-  const awaySel = document.getElementById('trnDeciderAwayPlayer');
-  const homeScoreInp = document.getElementById('trnDeciderHomeScore');
-  const awayScoreInp = document.getElementById('trnDeciderAwayScore');
-
-  const homeScore = parseInt(homeScoreInp.value);
-  const awayScore = parseInt(awayScoreInp.value);
-
-  if (homeSel.value === '' || awaySel.value === '' || homeScoreInp.value === '' || awayScoreInp.value === '') {
-    if (statusEl) statusEl.textContent = '⚠️ Player এবং score সব fill up করুন।';
-    return;
+  try {
+    await fetch(`${TRN_DB}/tournament/deciders/${dKey}.json`, {
+      method: 'PUT',
+      body: JSON.stringify({ winnerTeam, loserTeam, winnerScore, loserScore, savedAt: new Date().toISOString() })
+    });
+    await fetchTrnData();
+    renderSelectedMatchup();
+    alert('✅ Decider result save হয়েছে! Standings-এ এই matchday-র winner হিসেবে credit পেয়ে যাবে।');
+  } catch (e) {
+    alert('❌ Decider save করতে সমস্যা হয়েছে: ' + e.message);
   }
-  if (homeScore === awayScore) {
-    if (statusEl) statusEl.textContent = '⚠️ Decider Match-এ Draw হতে পারবে না — winner লাগবে, score ঠিক করুন।';
-    return;
+};
+
+window.clearTrnDecider = async function(dKey) {
+  if (!confirm('এই decider result মুছে ফেলবে? Matchday আবার Draw অবস্থায় ফিরে যাবে।')) return;
+  try {
+    await fetch(`${TRN_DB}/tournament/deciders/${dKey}.json`, { method: 'DELETE' });
+    await fetchTrnData();
+    renderSelectedMatchup();
+  } catch (e) {
+    alert('❌ Error: ' + e.message);
   }
-
-  const winner = homeScore > awayScore ? 'home' : 'away';
-  const data = {
-    homePlayerUid: homeSel.value,
-    homePlayerName: homeSel.options[homeSel.selectedIndex].text,
-    awayPlayerUid: awaySel.value,
-    awayPlayerName: awaySel.options[awaySel.selectedIndex].text,
-    homeScore, awayScore, winner,
-    updatedAt: new Date().toISOString()
-  };
-
-  if (statusEl) statusEl.textContent = '⏳ Saving...';
-  await fetch(`${TRN_DB}/tournament/deciders/${dKey}.json`, {
-    method: 'PUT',
-    body: JSON.stringify(data)
-  });
-  trnDecidersCache[dKey] = data;
-
-  if (statusEl) statusEl.textContent = '✅ Decider result saved! Standings-এ apply হয়ে গেছে।';
-  renderSelectedMatchup();
 };
 
 // Export বাটন এখন current selected matchup এর card বানাবে
