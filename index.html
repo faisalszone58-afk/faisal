@@ -9507,11 +9507,12 @@ let bd_picks = [];         // array of uid, in click order (max 5)
 let bd_voter = null;       // selected voter {uid,name,club,avatarUrl,username}
 let bd_hasVoted = false;
 
-// ── Simple device fingerprint (fraud-detection aid, not a login system) ──
+// ── Device fingerprint — deterministic hash from stable device/browser traits.
+// No random component on purpose: this way even if someone clears localStorage/cache,
+// recomputing on the same device+browser gives the SAME fingerprint, so the
+// one-vote-per-device check below still catches them.
 function bdGetDeviceFingerprint() {
   try {
-    let fp = localStorage.getItem('typ_bd_fp');
-    if (fp) return fp;
     const raw = [
       navigator.userAgent, navigator.language, screen.width, screen.height,
       screen.colorDepth, new Date().getTimezoneOffset(),
@@ -9519,9 +9520,7 @@ function bdGetDeviceFingerprint() {
     ].join('|');
     let hash = 0;
     for (let i = 0; i < raw.length; i++) { hash = ((hash << 5) - hash + raw.charCodeAt(i)) | 0; }
-    fp = 'fp_' + Math.abs(hash).toString(36) + '_' + Math.random().toString(36).slice(2, 8);
-    localStorage.setItem('typ_bd_fp', fp);
-    return fp;
+    return 'fp_' + Math.abs(hash).toString(36);
   } catch (e) { return 'fp_unknown'; }
 }
 
@@ -9539,7 +9538,40 @@ window.bdLoadPage = async function() {
   document.getElementById('bdVoteSuccess').classList.remove('show');
 
   await bdLoadNominees();
+  await bdCheckDeviceVoted();
 };
+
+// ── One-vote-per-device gate ──
+// Checked on page load (before any name is even selected) and again right before submit.
+async function bdCheckDeviceVoted() {
+  const fp = bdGetDeviceFingerprint();
+
+  // fast local guard
+  if (localStorage.getItem('typ_bd_device_voted')) {
+    bdShowDeviceBlocked();
+    return true;
+  }
+
+  // authoritative server-side check
+  try {
+    const res = await fetch(`${BD_DB}/ballondorDeviceVotes/${fp}.json`);
+    const existing = await res.json();
+    if (existing) {
+      localStorage.setItem('typ_bd_device_voted', '1');
+      bdShowDeviceBlocked();
+      return true;
+    }
+  } catch (e) {}
+  return false;
+}
+
+function bdShowDeviceBlocked() {
+  document.getElementById('bdVoterCard').style.display = 'none';
+  document.getElementById('bdVotingArea').style.display = 'none';
+  const av = document.getElementById('bdAlreadyVoted');
+  av.style.display = 'block';
+  av.innerHTML = `<div style="font-weight:700;color:var(--green);margin-bottom:6px">✅ এই ডিভাইস থেকে ইতিমধ্যে ভোট দেওয়া হয়ে গেছে!</div><div style="font-size:12px;color:var(--text3)">প্রতিটা ডিভাইস থেকে শুধু একবারই ভোট দেওয়া যাবে।</div>`;
+}
 
 async function bdLoadNominees() {
   const grid = document.getElementById('bdNomineesGrid');
@@ -9716,17 +9748,29 @@ window.bdSubmitVote = async function() {
   if (bd_picks.length !== 5) { errEl.textContent = `⚠️ ঠিক ৫ জনকে ভোট দিতে হবে (এখন ${bd_picks.length} জন সিলেক্ট করা আছে)।`; errEl.classList.add('show'); return; }
 
   // local quick guard
-  if (localStorage.getItem('typ_bd_voted_' + bd_voter.uid)) {
-    errEl.textContent = '⚠️ তুমি ইতিমধ্যে ভোট দিয়েছো।'; errEl.classList.add('show'); return;
+  if (localStorage.getItem('typ_bd_voted_' + bd_voter.uid) || localStorage.getItem('typ_bd_device_voted')) {
+    errEl.textContent = '⚠️ তুমি (বা এই ডিভাইস থেকে) ইতিমধ্যে ভোট দিয়েছো।'; errEl.classList.add('show');
+    bdShowDeviceBlocked();
+    return;
   }
 
   try {
+    const fp = bdGetDeviceFingerprint();
+
     // server-side re-check right before writing (race-condition guard)
-    const chk = await fetch(`${BD_DB}/ballondorVotes/${bd_voter.uid}.json`);
-    const existing = await chk.json();
-    if (existing) {
+    const [chk, deviceChk] = await Promise.all([
+      fetch(`${BD_DB}/ballondorVotes/${bd_voter.uid}.json`).then(r => r.json()),
+      fetch(`${BD_DB}/ballondorDeviceVotes/${fp}.json`).then(r => r.json())
+    ]);
+    if (chk) {
       errEl.textContent = '⚠️ তুমি ইতিমধ্যে ভোট দিয়েছো।'; errEl.classList.add('show');
       bd_hasVoted = true;
+      return;
+    }
+    if (deviceChk) {
+      errEl.textContent = '⚠️ এই ডিভাইস থেকে ইতিমধ্যে ভোট দেওয়া হয়ে গেছে।'; errEl.classList.add('show');
+      localStorage.setItem('typ_bd_device_voted', '1');
+      bdShowDeviceBlocked();
       return;
     }
 
@@ -9740,7 +9784,7 @@ window.bdSubmitVote = async function() {
       voterName: bd_voter.name || '—',
       voterUsername: bd_voter.username || '',
       picks: picksPayload,
-      deviceFingerprint: bdGetDeviceFingerprint(),
+      deviceFingerprint: fp,
       timestamp: Date.now(),
       dateStr: new Date().toISOString()
     };
@@ -9750,7 +9794,13 @@ window.bdSubmitVote = async function() {
     });
     if (!putRes.ok) throw new Error('write failed');
 
+    // mark this device as having voted (server-side + local)
+    fetch(`${BD_DB}/ballondorDeviceVotes/${fp}.json`, {
+      method: 'PUT', body: JSON.stringify({ voterUid: bd_voter.uid, voterName: bd_voter.name || '—', timestamp: Date.now() })
+    }).catch(() => {});
+
     localStorage.setItem('typ_bd_voted_' + bd_voter.uid, '1');
+    localStorage.setItem('typ_bd_device_voted', '1');
     bd_hasVoted = true;
     okEl.textContent = '✅ তোমার ভোট সফলভাবে জমা হয়েছে! ধন্যবাদ 🏆';
     okEl.classList.add('show');
