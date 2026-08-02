@@ -9897,7 +9897,7 @@ window.bdaLoadRankingTable = async function() {
   const el = document.getElementById('bdaRankingTable');
   el.innerHTML = '<div style="color:var(--text3);font-size:13px">লোড হচ্ছে...</div>';
   try {
-    const res = await fetch(`${BD_DB}/ballondorVotes.json`);
+    const res = await fetch(`${BD_DB}/ballondorVotes.json?_=${Date.now()}`, { cache: 'no-store' });
     const votes = await res.json();
     const totals = {};
     if (votes) {
@@ -9928,7 +9928,7 @@ window.bdaLoadVoteList = async function() {
   const countEl = document.getElementById('bdaVoteCount');
   el.innerHTML = '<div style="color:var(--text3);font-size:13px">লোড হচ্ছে...</div>';
   try {
-    const res = await fetch(`${BD_DB}/ballondorVotes.json`);
+    const res = await fetch(`${BD_DB}/ballondorVotes.json?_=${Date.now()}`, { cache: 'no-store' });
     const votes = await res.json();
     const arr = votes ? Object.values(votes) : [];
     countEl.textContent = `(${arr.length} জন ভোট দিয়েছে)`;
@@ -9967,12 +9967,21 @@ window.bdaDeleteVote = async function(uid, name, fp) {
   try {
     const jobs = [ fetch(`${BD_DB}/ballondorVotes/${uid}.json`, { method: 'DELETE' }) ];
     if (fp) jobs.push(fetch(`${BD_DB}/ballondorDeviceVotes/${fp}.json`, { method: 'DELETE' }));
-    await Promise.all(jobs);
+    const results = await Promise.all(jobs);
+    if (results.some(r => !r.ok)) throw new Error('delete request failed with status ' + results.map(r => r.status).join(','));
+
+    // verify against server (bypassing cache) that it's actually gone
+    const verifyRes = await fetch(`${BD_DB}/ballondorVotes/${uid}.json?_=${Date.now()}`, { cache: 'no-store' });
+    const verifyData = await verifyRes.json();
+    if (verifyData) throw new Error('vote still present after delete');
+
     bdaLoadRankingTable();
     bdaLoadVoteList();
-    alert(`✅ "${name}" এর ভোট মুছে ফেলা হয়েছে। সে এখন আবার ভোট দিতে পারবে।\n\nনোট: ও যদি একই ব্রাউজার/ডিভাইস থেকে ভোট দিয়ে থাকে, তাহলে সেই ডিভাইসে আগের ভোটের লোকাল ক্যাশ থেকে যেতে পারে — সেক্ষেত্রে ওকে ব্রাউজার সাইট ডাটা/ক্যাশ ক্লিয়ার করতে বা অন্য ব্রাউজার/ইনকগনিটো ব্যবহার করতে বলো।`);
+    alert(`✅ "${name}" এর ভোট মুছে ফেলা হয়েছে এবং সার্ভারে confirm করা হয়েছে। সে এখন আবার ভোট দিতে পারবে।\n\nনোট: ও যদি একই ব্রাউজার/ডিভাইস থেকে ভোট দিয়ে থাকে, তাহলে সেই ডিভাইসে আগের ভোটের লোকাল ক্যাশ থেকে যেতে পারে — সেক্ষেত্রে ওকে ব্রাউজার সাইট ডাটা/ক্যাশ ক্লিয়ার করতে বা অন্য ব্রাউজার/ইনকগনিটো ব্যবহার করতে বলো।`);
   } catch (e) {
-    alert('❌ ভোট মুছতে সমস্যা হয়েছে।');
+    console.error(e);
+    alert('❌ ভোট মুছতে সমস্যা হয়েছে (Firebase rules/network সমস্যা হতে পারে)। Console এ error details আছে।');
+    bdaLoadVoteList();
   }
 };
 
