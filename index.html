@@ -7945,7 +7945,7 @@ function renderAdminTeamsList() {
       </div>
       <div style="flex:1">
         <div style="font-weight:700;font-size:14px;color:var(--text)">${safeName}</div>
-        <div style="font-size:12px;color:var(--text3)">👑 ${t.manager||'—'} • ${(t.players||[]).filter(p=>p&&p.isStarter).length}/9 starters · ${(t.players||[]).filter(p=>p&&!p.isStarter).length}/3 subs</div>
+        <div style="font-size:12px;color:var(--text3)">👑 ${t.manager||'—'} • ${(t.players||[]).filter(p=>p&&p.isStarter).length}/8 starters · ${(t.players||[]).filter(p=>p&&!p.isStarter).length}/3 subs</div>
       </div>
       <button class="btn-admin-edit" onclick="openEditTeamModal('${t.id}')">✏️ Edit</button>
       <button class="btn-admin-del" onclick="deleteTeam('${t.id}','${safeNameAttr}')">🗑️</button>
@@ -8081,7 +8081,7 @@ window.saveTeam = async function() {
   const allUsers = window._trnAllUsers || [];
   const players = _playerPickSelected.map((uid, i) => {
     const u = allUsers.find(u => u.uid === uid) || {};
-    return { uid, name: u.name || '—', isStarter: i < 9 };
+    return { uid, name: u.name || '—', isStarter: i < 8 };
   });
 
   const teamId = document.getElementById('editTeamId').value;
@@ -8280,8 +8280,8 @@ window.fixStartersTo9 = async function() {
     const players = team.players || [];
     if (!players.length) { skippedCount++; continue; }
 
-    const alreadyNine = players.filter(p => p.isStarter).length === Math.min(players.length, 9);
-    const updatedPlayers = players.map((p, i) => ({ ...p, isStarter: i < 9 }));
+    const alreadyNine = players.filter(p => p.isStarter).length === Math.min(players.length, 8);
+    const updatedPlayers = players.map((p, i) => ({ ...p, isStarter: i < 8 }));
 
     if (alreadyNine && JSON.stringify(updatedPlayers) === JSON.stringify(players)) { skippedCount++; continue; }
 
@@ -8737,7 +8737,7 @@ window.generateKnockoutBouts = function(key) {
   if (!t1 || !t2) { alert('Team data পাওয়া যায়নি।'); return; }
   if (!(t1.players||[]).length || !(t2.players||[]).length) { alert('এই দুই দলের squad set করা নেই — আগে Teams tab-এ player যোগ করো।'); return; }
   const existing = trnKnockoutCache[key]?.bouts || {};
-  const n = 9;
+  const n = 8;
   const bouts = {};
   for (let i = 0; i < n; i++) {
     const oldB = existing[`b${i}`];
