@@ -2055,43 +2055,24 @@ if (document.readyState === 'loading') {
   <div class="trn-content active" id="trntab-standings">
     <div style="margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
       <div style="font-size:12px;color:var(--text3);font-family:'Inter',sans-serif">
-        <span style="border-left:3px solid var(--green);padding-left:6px;margin-right:12px">Top 2 from each group → Semi-Final</span>
+        <span style="border-left:3px solid var(--green);padding-left:6px;margin-right:12px">Top 4 → Semi-Final</span>
       </div>
       <button class="btn btn-outline" style="padding:7px 14px;font-size:12px" onclick="loadTournamentStandings()">🔄 Refresh</button>
     </div>
 
-    <!-- GROUP A -->
-    <div style="margin-bottom:8px;font-size:13px;font-weight:700;color:var(--cyan);font-family:'Inter',sans-serif;letter-spacing:0.05em">
-      🅰️ GROUP A
-    </div>
-    <div style="overflow-x:auto;border-radius:12px;border:1px solid var(--border);margin-bottom:28px">
-      <table class="standings-table" id="trnStandingsTableA">
-        <thead>
-          <tr><th>#</th><th>TEAM</th><th>MP</th><th>W</th><th>D</th><th>L</th><th>GF</th><th>GA</th><th>GD</th><th class="pts-col">PTS</th></tr>
-        </thead>
-        <tbody id="trnStandingsBodyA">
-          <tr><td colspan="10" style="padding:40px;color:var(--text3);text-align:center"><span class="spinner"></span></td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- GROUP B -->
-    <div style="margin-bottom:8px;font-size:13px;font-weight:700;color:var(--gold);font-family:'Inter',sans-serif;letter-spacing:0.05em">
-      🅱️ GROUP B
-    </div>
     <div style="overflow-x:auto;border-radius:12px;border:1px solid var(--border)">
-      <table class="standings-table" id="trnStandingsTableB">
+      <table class="standings-table" id="trnStandingsTable">
         <thead>
           <tr><th>#</th><th>TEAM</th><th>MP</th><th>W</th><th>D</th><th>L</th><th>GF</th><th>GA</th><th>GD</th><th class="pts-col">PTS</th></tr>
         </thead>
-        <tbody id="trnStandingsBodyB">
+        <tbody id="trnStandingsBody">
           <tr><td colspan="10" style="padding:40px;color:var(--text3);text-align:center"><span class="spinner"></span></td></tr>
         </tbody>
       </table>
     </div>
 
     <div style="margin-top:16px;font-size:12px;color:var(--text3);font-family:'Inter',sans-serif">
-      * Group A ও B এর Top 2 করে মোট 4 team → Semi-Final। প্রতিটা matchday: 4 match (GRP-A × 2 + GRP-B × 2) × 9 bout। Double round-robin — প্রতি team ৬ ম্যাচ খেলবে।
+      * Single round-robin table — Top 4 team সরাসরি Semi-Final এ যাবে (1st vs 4th, 2nd vs 3rd)। Double round-robin — প্রতি team প্রতিপক্ষের সাথে ২ বার খেলবে (home ও away)।
     </div>
   </div>
 
@@ -7675,30 +7656,17 @@ function renderGroupTable(tbodyId, standings, qualCount) {
 }
 
 window.loadTournamentStandings = async function() {
-  ['trnStandingsBodyA','trnStandingsBodyB'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.innerHTML = '<tr><td colspan="10" style="padding:30px;text-align:center;color:var(--text3)"><span class="spinner"></span></td></tr>';
-  });
+  const bodyEl = document.getElementById('trnStandingsBody');
+  if (bodyEl) bodyEl.innerHTML = '<tr><td colspan="10" style="padding:30px;text-align:center;color:var(--text3)"><span class="spinner"></span></td></tr>';
   try {
     await fetchTrnData();
     if (!trnTeamsCache.length) {
-      ['trnStandingsBodyA','trnStandingsBodyB'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.innerHTML = '<tr><td colspan="10" style="padding:30px;text-align:center;color:var(--text3)">কোনো team নেই।</td></tr>';
-      });
+      if (bodyEl) bodyEl.innerHTML = '<tr><td colspan="10" style="padding:30px;text-align:center;color:var(--text3)">কোনো team নেই।</td></tr>';
       return;
     }
-    const grpA = trnTeamsCache.filter(t => (t.group||'A') === 'A');
-    const grpB = trnTeamsCache.filter(t => (t.group||'B') === 'B');
-    const matchesA = trnMatchesCache.filter(m => m.group === 'A' || grpA.find(t => t.id === m.homeTeam));
-    const matchesB = trnMatchesCache.filter(m => m.group === 'B' || grpB.find(t => t.id === m.homeTeam));
-    renderGroupTable('trnStandingsBodyA', calcStandings(grpA, matchesA), 2);
-    renderGroupTable('trnStandingsBodyB', calcStandings(grpB, matchesB), 2);
+    renderGroupTable('trnStandingsBody', calcStandings(trnTeamsCache, trnMatchesCache), 4);
   } catch(e) {
-    ['trnStandingsBodyA','trnStandingsBodyB'].forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.innerHTML = `<tr><td colspan="10" style="padding:30px;text-align:center;color:var(--red)">❌ ${e.message}</td></tr>`;
-    });
+    if (bodyEl) bodyEl.innerHTML = `<tr><td colspan="10" style="padding:30px;text-align:center;color:var(--red)">❌ ${e.message}</td></tr>`;
   }
 };
 // ── TEAMS PAGE ──
@@ -10299,7 +10267,7 @@ const TYP_FAQ = [
   },
   {
     keywords: ['tournament', 'টুর্নামেন্ট', 'গ্রুপ এ', 'গ্রুপ বি', 'group', 'knockout', 'নকআউট', 'কাপ'],
-    answer: 'Tournament-এ Group A ও Group B-তে round-robin ম্যাচ হয়, এরপর সেরা দলগুলো নিয়ে knockout ব্র্যাকেট হয়ে চ্যাম্পিয়ন নির্ধারিত হয়। প্রতিটা ম্যাচের রেজাল্ট কার্ড PNG আকারে ডাউনলোড করা যায়।'
+    answer: 'Tournament-এ সব দল একটাই টেবিলে double round-robin ম্যাচ খেলে, এরপর Top 4 দল Semi-Final এ যায় (1st vs 4th, 2nd vs 3rd), তারপর Final হয়ে চ্যাম্পিয়ন নির্ধারিত হয়। প্রতিটা ম্যাচের রেজাল্ট কার্ড PNG আকারে ডাউনলোড করা যায়।'
   },
   {
     keywords: ['বিরোধ', 'dispute', 'ভুল ফলাফল', 'complain', 'অভিযোগ', 'রিপোর্ট'],
